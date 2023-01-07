@@ -19,7 +19,7 @@ const Home: NextPage = () => {
                 <h1>ทดสอบ</h1>
                 <Button>test</Button>
                 <AiFillAlert />
-                <div>{data && data.name}</div>
+                <div className="text-red-500">{data && data.name}</div>
             </BaseLayout>
         </>
     );

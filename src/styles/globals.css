@@ -4,7 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+.menu-icon {
+    @apply mb-2 h-6 w-6;
+}
+.menu-text {
+    @apply text-xs font-bold;
+}
+
 * {
     font-family: 'Kanit', sans-serif;
     font-family: 'Noto Sans Thai', sans-serif;
+}
+
+.ant-menu-inline .ant-menu-item {
+    height: 100%;
+    padding-left: 16px !important;
+}
+
+.ant-menu-inline.ant-menu-root .ant-menu-item > .ant-menu-title-content {
+    overflow: initial;
 }
