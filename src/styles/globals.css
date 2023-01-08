@@ -11,6 +11,10 @@
     @apply text-xs font-bold;
 }
 
+.icon {
+    @apply inline-flex h-6 w-6 items-center justify-center;
+}
+
 * {
     font-family: 'Kanit', sans-serif;
     font-family: 'Noto Sans Thai', sans-serif;

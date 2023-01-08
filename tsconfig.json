@@ -23,6 +23,7 @@
       "@styles/*": ["styles/*"],  
       "@assets/*": ["assets/*"],  
       "@services/*": ["services/*"],  
+      "@utilities/*": ["utilities/*"],  
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prettier.config.js"],
