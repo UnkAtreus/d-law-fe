@@ -1,7 +1,8 @@
 import BaseLayout from '@baseComponents/BaseLayout';
+import BaseLoading from '@baseComponents/BaseLoading';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import guidelineService from '@services/guidelineService';
-import { Button, Col, Row, Spin } from 'antd';
+import { Button, Col, Row } from 'antd';
 
 import { NextPage } from 'next';
 
@@ -29,23 +30,24 @@ const Home: NextPage = () => {
         },
     ];
 
+    if (isLoading) {
+        return <BaseLoading />;
+    }
     return (
         <>
-            <Spin spinning={isLoading}>
-                <BaseLayout>
-                    <Row>
-                        <Col span={5}>
-                            <BaseTag items={Tags} defaultTag="tag_1" />
-                        </Col>
-                        <Col></Col>
-                    </Row>
-                    <h1>Create Next App</h1>
-                    <h1>ทดสอบ</h1>
-                    <Button>test</Button>
-                    <AiFillAlert />
-                    <div className="text-red-500">{data && data.name}</div>
-                </BaseLayout>
-            </Spin>
+            <BaseLayout>
+                <Row>
+                    <Col span={5}>
+                        <BaseTag items={Tags} defaultTag="tag_1" />
+                    </Col>
+                    <Col></Col>
+                </Row>
+                <h1>Create Next App</h1>
+                <h1>ทดสอบ</h1>
+                <Button>test</Button>
+                <AiFillAlert />
+                <div className="text-red-500">{data && data.name}</div>
+            </BaseLayout>
         </>
     );
 };
