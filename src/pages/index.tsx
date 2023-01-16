@@ -8,7 +8,13 @@ import { Button, Col, Row } from 'antd';
 import { NextPage } from 'next';
 
 import { AiFillAlert } from 'react-icons/ai';
-import { RiBankCardFill } from 'react-icons/ri';
+import {
+    RiBankCardFill,
+    RiFileExcelFill,
+    RiFilePdfFill,
+    RiFileTextFill,
+    RiFileWordFill,
+} from 'react-icons/ri';
 
 const Home: NextPage = () => {
     const { data, isLoading } = guidelineService.getData('1');
@@ -16,18 +22,36 @@ const Home: NextPage = () => {
     const Tags: ITag[] = [
         {
             key: 'tag_1',
-            name: 'สำเนาบัตรประจะตัวประชาชน',
+            name: 'สำเนาบัตรประจำตัวประชาชน',
             icon: <RiBankCardFill className="icon" />,
-            value: '22',
+            value: '2',
             onClick: () => {
                 console.log(`test`);
             },
         },
         {
             key: 'tag_2',
-            name: 'สำเนาบัตรประจะตัวประชาชน',
-            icon: <RiBankCardFill className="icon" />,
+            name: 'เอกสาร Excel',
+            icon: <RiFileExcelFill className="icon" />,
+            value: '5',
+        },
+        {
+            key: 'tag_3',
+            name: 'เอกสาร PDF',
+            icon: <RiFilePdfFill className="icon" />,
+            value: '10',
+        },
+        {
+            key: 'tag_4',
+            name: 'เอกสารทั้งหมด',
+            icon: <RiFileTextFill className="icon" />,
             value: '22',
+        },
+        {
+            key: 'tag_5',
+            name: 'เอกสาร Word',
+            icon: <RiFileWordFill className="icon" />,
+            value: '2',
         },
     ];
 
@@ -38,17 +62,18 @@ const Home: NextPage = () => {
     return (
         <>
             <BaseLayout>
-                <Row>
+                <Row gutter={24}>
                     <Col span={5}>
                         <BaseTag items={Tags} defaultTag="tag_1" />
                     </Col>
-                    <Col></Col>
+                    <Col>
+                        <h1>Create Next App</h1>
+                        <h1>ทดสอบ</h1>
+                        <Button onClick={BaseModal.delete}>test</Button>
+                        <AiFillAlert />
+                        <div className="text-red-500">{data && data.name}</div>
+                    </Col>
                 </Row>
-                <h1>Create Next App</h1>
-                <h1>ทดสอบ</h1>
-                <Button onClick={BaseModal.delete}>test</Button>
-                <AiFillAlert />
-                <div className="text-red-500">{data && data.name}</div>
             </BaseLayout>
         </>
     );
