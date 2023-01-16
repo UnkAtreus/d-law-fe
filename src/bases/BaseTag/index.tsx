@@ -26,23 +26,29 @@ const BaseTag: FC<IBaseTag> = ({ items, defaultTag }) => {
             >
                 <div className="flex items-center space-x-2 ">
                     <div
-                        className={`text-gray-400 transition-all duration-200 group-hover:text-primary ${
-                            active && 'text-white group-hover:text-white'
+                        className={` transition-all duration-200  ${
+                            active
+                                ? 'text-white group-hover:text-white'
+                                : 'text-gray-400 group-hover:text-primary'
                         }`}
                     >
                         {icon}
                     </div>
                     <div
-                        className={`text-sm text-gray-500 transition-all duration-200 group-hover:text-primary ${
-                            active && 'text-white group-hover:text-white'
+                        className={`text-sm transition-all duration-200 ${
+                            active
+                                ? 'text-white group-hover:text-white'
+                                : 'text-gray-500 group-hover:text-primary'
                         }`}
                     >
                         {name}
                     </div>
                 </div>
                 <span
-                    className={`rounded-full bg-slate-300/50 px-2 text-xs text-gray-500 transition-all duration-200 group-hover:text-primary ${
-                        active && 'text-white group-hover:text-white'
+                    className={`rounded-full bg-slate-300/50 px-2 text-xs  transition-all duration-200 ${
+                        active
+                            ? 'text-white group-hover:text-white'
+                            : 'text-gray-500 group-hover:text-primary'
                     }`}
                 >
                     {changeNumberTo1k(value)}

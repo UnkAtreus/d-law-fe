@@ -1,5 +1,6 @@
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
+import BaseModal from '@baseComponents/BaseModal';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import guidelineService from '@services/guidelineService';
 import { Button, Col, Row } from 'antd';
@@ -33,6 +34,7 @@ const Home: NextPage = () => {
     if (isLoading) {
         return <BaseLoading />;
     }
+
     return (
         <>
             <BaseLayout>
@@ -44,7 +46,7 @@ const Home: NextPage = () => {
                 </Row>
                 <h1>Create Next App</h1>
                 <h1>ทดสอบ</h1>
-                <Button>test</Button>
+                <Button onClick={BaseModal.delete}>test</Button>
                 <AiFillAlert />
                 <div className="text-red-500">{data && data.name}</div>
             </BaseLayout>
