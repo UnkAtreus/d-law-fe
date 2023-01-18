@@ -12,7 +12,7 @@ import {
 
 function BaseLayout({ children }: { children: React.ReactNode }) {
     const {
-        token: { colorBgContainer, colorTextSecondary },
+        token: { colorBgContainer },
     } = theme.useToken();
     type MenuItem = Required<MenuProps>['items'][number];
 

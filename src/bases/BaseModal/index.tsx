@@ -1,8 +1,8 @@
-import { Modal } from 'antd';
+import { Modal, ModalFuncProps } from 'antd';
 import React, { useState } from 'react';
 
 const BaseModal = {
-    form() {
+    Form({ children }: { children: React.ReactNode }) {
         const [isModalOpen, setIsModalOpen] = useState(true);
 
         return (
@@ -15,23 +15,28 @@ const BaseModal = {
                 <p>Some contents...</p>
                 <p>Some contents...</p>
                 <p>Some contents...</p>
+                {children}
             </Modal>
         );
     },
-    delete() {
+    delete({
+        title,
+        content,
+        okText,
+        okType,
+        cancelText,
+        onOk,
+        onCancel,
+    }: ModalFuncProps) {
         return Modal.confirm({
-            title: 'Are you sure delete this task?',
+            title: title,
             //  icon: <ExclamationCircleFilled />,
-            content: 'Some descriptions',
-            okText: 'Yes',
-            okType: 'danger',
-            cancelText: 'No',
-            onOk() {
-                console.log('OK');
-            },
-            onCancel() {
-                console.log('Cancel');
-            },
+            content: content,
+            okText: okText || 'Yes',
+            okType: okType || 'danger',
+            cancelText: cancelText || 'No',
+            onOk: onOk,
+            onCancel: onCancel,
         });
     },
 };

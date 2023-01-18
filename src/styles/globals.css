@@ -15,6 +15,14 @@
     @apply inline-flex h-6 w-6 items-center justify-center;
 }
 
+.hover-btn {
+    @apply transition-all duration-200 hover:bg-primary/10 hover:text-primary;
+}
+
+.transition {
+    @apply transition-all duration-200;
+}
+
 .ant-menu-inline .ant-menu-item {
     height: 100%;
     padding-left: 16px !important;
@@ -28,7 +36,7 @@
 ::before,
 ::after {
     box-sizing: border-box;
-    font-family: 'Noto Sans Thai', sans-serif;
+    font-family: 'Noto Sans Thai', sans-serif !important;
 }
 
 ::before,
@@ -99,8 +107,8 @@ audio,
 iframe,
 embed,
 object {
-    display: block; /* 1 */
-    vertical-align: middle; /* 2 */
+    display: block;
+    vertical-align: middle;
 }
 
 :disabled {

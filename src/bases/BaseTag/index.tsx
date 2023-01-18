@@ -5,6 +5,7 @@ import { FC } from 'react';
 interface IBaseTag {
     items: ITag[];
     defaultTag?: string;
+    onChange: (_key: string, _tag: ITag) => void;
 }
 export interface ITag extends HTMLAttributes<HTMLDivElement> {
     key: string;
@@ -14,7 +15,7 @@ export interface ITag extends HTMLAttributes<HTMLDivElement> {
     active?: boolean;
 }
 
-const BaseTag: FC<IBaseTag> = ({ items, defaultTag }) => {
+const BaseTag: FC<IBaseTag> = ({ items, defaultTag, onChange }) => {
     const [selectTag, setSelectTag] = useState<string>(defaultTag || '');
     const Tag: FC<ITag> = ({ name, icon, value, active, onClick }) => {
         return (
@@ -70,6 +71,8 @@ const BaseTag: FC<IBaseTag> = ({ items, defaultTag }) => {
                             if (tag.onClick) {
                                 tag.onClick(event);
                             }
+
+                            onChange(tag.key, tag);
 
                             setSelectTag(tag.key);
                         }}
