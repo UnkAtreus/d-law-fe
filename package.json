@@ -11,7 +11,7 @@
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
     },
     "dependencies": {
-        "@ant-design/pro-components": "^2.3.52",
+        "@ant-design/pro-components": "2.3.52",
         "@next/font": "13.1.1",
         "@types/node": "18.11.18",
         "@types/react": "18.0.26",

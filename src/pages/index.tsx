@@ -1,4 +1,3 @@
-import { ModalForm } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
 import BaseModal from '@baseComponents/BaseModal';
@@ -92,8 +91,8 @@ const Home: NextPage = () => {
                         <BaseTag
                             items={Tags}
                             defaultTag="tag_1"
-                            onChange={(key) => {
-                                console.log(key);
+                            onChange={(key, tag) => {
+                                console.log(key, tag);
                             }}
                         />
                     </Col>
@@ -134,29 +133,7 @@ const Home: NextPage = () => {
                         >
                             test
                         </Button>
-                        <BaseModal.Form>
-                            <div>test</div>
-                        </BaseModal.Form>
-                        <ModalForm<{
-                            name: string;
-                            company: string;
-                        }>
-                            title="modal form"
-                            trigger={<Button type="primary">open modal</Button>}
-                            form={form}
-                            autoFocusFirstInput
-                            modalProps={{
-                                destroyOnClose: true,
-                                onCancel: () => console.log('run'),
-                                okText: 'OK',
-                                cancelText: 'Cancel',
-                            }}
-                            submitTimeout={2000}
-                            onFinish={async (values) => {
-                                console.log(values.name);
-                                return true;
-                            }}
-                        ></ModalForm>
+
                         <AiFillAlert />
                         <div className="text-red-500">{data && data.name}</div>
                     </Col>
