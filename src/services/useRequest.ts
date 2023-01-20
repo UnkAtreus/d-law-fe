@@ -48,7 +48,7 @@ function useRequest<T>(
 ) {
     const { data, error, isLoading, isValidating, mutate } = useSwr<T>(
         [path, method, payload, config],
-        ([path, method, payload, config]) =>
+        ([path, method, payload, config]: [string, Method, any, AxiosRequestConfig<any>]) =>
             fetcher(path, method, payload, config)
     );
 
