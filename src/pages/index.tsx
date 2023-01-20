@@ -1,3 +1,4 @@
+import { ProFormText } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
 import BaseModal from '@baseComponents/BaseModal';
@@ -133,6 +134,8 @@ const Home: NextPage = () => {
                         >
                             test
                         </Button>
+
+                        <ProFormText />
 
                         <AiFillAlert />
                         <div className="text-red-500">{data && data.name}</div>
