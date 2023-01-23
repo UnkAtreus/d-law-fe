@@ -1,3 +1,4 @@
+import { ModalForm, ProForm, ProFormText } from '@ant-design/pro-form';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
 import BaseModal from '@baseComponents/BaseModal';
@@ -133,7 +134,25 @@ const Home: NextPage = () => {
                         >
                             test
                         </Button>
-
+                        <ProForm>
+                            <ProFormText
+                                width="md"
+                                name="name"
+                                required
+                                dependencies={[['contract', 'name']]}
+                                addonBefore={<a>客户名称应该怎么获得？</a>}
+                                addonAfter={<a>点击查看更多</a>}
+                                label="签约客户名称"
+                                tooltip="最长为 24 位"
+                                placeholder="请输入名称"
+                                rules={[
+                                    { required: true, message: '这是必填项' },
+                                ]}
+                            />
+                        </ProForm>
+                        <ModalForm
+                            trigger={<Button type="primary">新建表单</Button>}
+                        ></ModalForm>
                         <AiFillAlert />
                         <div className="text-red-500">{data && data.name}</div>
                     </Col>

@@ -1,40 +1,55 @@
 import useSwr, { Key } from 'swr';
-import axios, { AxiosRequestConfig, Method } from 'axios';
+import { extend } from 'umi-request';
 
 const BASE_URL = 'https://pokeapi.co/api/v2/';
 
-const instance = axios.create({
-    baseURL: BASE_URL,
+type Method =
+    | 'get' | 'GET'
+    | 'delete' | 'DELETE'
+    | 'head' | 'HEAD'
+    | 'options' | 'OPTIONS'
+    | 'post' | 'POST'
+    | 'put' | 'PUT'
+    | 'patch' | 'PATCH'
+    | 'purge' | 'PURGE'
+    | 'link' | 'LINK'
+    | 'unlink' | 'UNLINK';
+
+const request = extend({
+  prefix: BASE_URL,
 });
 
 function fetcher(
     path: string,
     method: Method,
     data: any,
-    config?: AxiosRequestConfig
 ) {
     try {
         switch (method.toUpperCase()) {
             case 'GET':
-                return instance
-                    .get(path, config)
-                    .then((res: { data: any }) => res.data);
+                return request
+                    .get(path)
+                    .then((res) => res);
             case 'POST':
-                return instance
-                    .post(path, data, config)
-                    .then((res: { data: any }) => res.data);
+                return request
+                    .post(path, {
+                        data,
+                    })
+                    .then((res) => res);
             case 'DELETE':
-                return instance
-                    .delete(path, config)
-                    .then((res: { data: any }) => res.data);
+                return request
+                    .delete(path)
+                    .then((res) => res);
             case 'PATCH':
-                return instance
-                    .patch(path, data, config)
-                    .then((res: { data: any }) => res.data);
+                return request
+                    .patch(path, {
+                        data,
+                    })
+                    .then((res) => res);
             default:
-                return axios
+                return request
                     .get(BASE_URL + path)
-                    .then((res: { data: any }) => res.data);
+                    .then((res) => res);
         }
     } catch (error: any) {
         return error;
@@ -44,12 +59,11 @@ function useRequest<T>(
     path: Key,
     method: Method,
     payload?: any,
-    config?: AxiosRequestConfig
 ) {
     const { data, error, isLoading, isValidating, mutate } = useSwr<T>(
-        [path, method, payload, config],
-        ([path, method, payload, config]: [string, Method, any, AxiosRequestConfig<any>]) =>
-            fetcher(path, method, payload, config)
+        [path, method, payload],
+        ([path, method, payload]: [string, Method, any]) =>
+            fetcher(path, method, payload)
     );
 
     return { data, error, isLoading, isValidating, mutate };
