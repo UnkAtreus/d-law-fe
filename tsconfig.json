@@ -24,6 +24,7 @@
       "@assets/*": ["assets/*"],  
       "@services/*": ["services/*"],  
       "@utilities/*": ["utilities/*"],  
+      "@locales/*": ["locales/*"],  
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prettier.config.js"],

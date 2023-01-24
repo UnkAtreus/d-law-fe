@@ -1,10 +1,12 @@
 import type { AppProps } from 'next/app';
 import { ConfigProvider } from 'antd';
 import '@styles/globals.css';
+import thTH from '@locales/th_TH';
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
         <ConfigProvider
+            locale={thTH}
             theme={{
                 token: {
                     colorPrimary: '#8e5431',
