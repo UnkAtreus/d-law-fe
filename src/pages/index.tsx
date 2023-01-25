@@ -1,14 +1,26 @@
-import { ModalForm, ProForm, ProFormText } from '@ant-design/pro-form';
+import { ActionType, ProColumns, ProTable } from '@ant-design/pro-table';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
-import BaseModal from '@baseComponents/BaseModal';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
+import thTH from '@locales/th_TH';
+import en_US from 'antd/locale/en_US';
+import th_TH from 'antd/locale/th_TH';
 import guidelineService from '@services/guidelineService';
-import { Button, Col, Form, Row, Typography } from 'antd';
+import {
+    Button,
+    Col,
+    ConfigProvider,
+    Dropdown,
+    Form,
+    Row,
+    Space,
+    Tag,
+    Typography,
+} from 'antd';
 
 import { NextPage } from 'next';
+import { useRef } from 'react';
 
-import { AiFillAlert } from 'react-icons/ai';
 import {
     RiBankCardFill,
     RiFileExcelFill,
@@ -20,11 +32,95 @@ import {
     RiImage2Fill,
     RiVideoFill,
 } from 'react-icons/ri';
+import request from 'umi-request';
+import useUpload from '@utilities/useUpload';
+import { useDropzone } from 'react-dropzone';
 
 const Home: NextPage = () => {
     const { data, isLoading } = guidelineService.getData('1');
 
     const [form] = Form.useForm<{ name: string; company: string }>();
+    const {
+        getRootProps,
+        acceptedFiles,
+        isDragActive,
+        isDragAccept,
+        isDragReject,
+    } = useDropzone({
+        accept: {
+            'image/jpeg': ['.jpeg', '.png'],
+        },
+        noClick: true,
+        noKeyboard: true,
+    });
+
+    type ItemType = {
+        [x: string]: any;
+    };
+
+    const columns: ProColumns<ItemType>[] = [
+        {
+            title: 'ชื่อไฟล์',
+            dataIndex: 'title',
+            ellipsis: true,
+            formItemProps: {
+                rules: [
+                    {
+                        required: true,
+                        message: 'message',
+                    },
+                ],
+            },
+        },
+        {
+            disable: true,
+            title: 'title',
+            dataIndex: 'labels',
+            search: false,
+            renderFormItem: (_: any, { defaultRender }: any) => {
+                return defaultRender(_);
+            },
+            render: (_: any, record: any) => (
+                <Space>
+                    {record.labels.map(
+                        ({ name, color }: { name: any; color: any }) => (
+                            <Tag color={color} key={name}>
+                                {name}
+                            </Tag>
+                        )
+                    )}
+                </Space>
+            ),
+        },
+        {
+            title: 'showTime',
+            key: 'showTime',
+            dataIndex: 'created_at',
+            valueType: 'date',
+            sorter: true,
+            hideInSearch: true,
+        },
+        {
+            title: 'created_at',
+            dataIndex: 'created_at',
+            valueType: 'dateRange',
+            hideInTable: true,
+            search: {
+                transform: (value: any[]) => {
+                    return {
+                        startTime: value[0],
+                        endTime: value[1],
+                    };
+                },
+            },
+        },
+        {
+            title: 'title',
+            valueType: 'option',
+            key: 'option',
+        },
+    ];
+    const actionRef = useRef<ActionType>();
 
     const Tags: ITag[] = [
         {
@@ -97,7 +193,16 @@ const Home: NextPage = () => {
                             }}
                         />
                     </Col>
-                    <Col flex={'auto'} className="space-y-6">
+                    <Col
+                        xl={19}
+                        xxl={20}
+                        className="space-y-6"
+                        {...getRootProps()}
+                    >
+                        {isDragActive && (
+                            <div className="t-0 r-0 absolute z-50 h-24 w-24 bg-black"></div>
+                        )}
+
                         <div className="space-y-4">
                             <Typography.Title level={3}>
                                 โฟลเดอร์ที่ใช้บ่อย (2)
@@ -113,48 +218,79 @@ const Home: NextPage = () => {
                                 </Col>
                             </Row>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-4 ">
                             <Typography.Title level={3}>
                                 เอกสารที่เปิดล่าสุด (1)
                             </Typography.Title>
                         </div>
                         <h1>Create Next App</h1>
                         <h1>ทดสอบ</h1>
-                        <Button
-                            onClick={() => {
-                                BaseModal.delete({ title: 'test' });
-                            }}
-                        >
-                            test
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                BaseModal.delete({ title: 'test' });
-                            }}
-                        >
-                            test
-                        </Button>
-                        <ProForm>
-                            <ProFormText
-                                width="md"
-                                name="name"
-                                required
-                                dependencies={[['contract', 'name']]}
-                                addonBefore={<a>客户名称应该怎么获得？</a>}
-                                addonAfter={<a>点击查看更多</a>}
-                                label="签约客户名称"
-                                tooltip="最长为 24 位"
-                                placeholder="请输入名称"
-                                rules={[
-                                    { required: true, message: '这是必填项' },
-                                ]}
+                        <ConfigProvider locale={en_US}>
+                            <ProTable<ItemType>
+                                columns={columns}
+                                actionRef={actionRef}
+                                cardBordered
+                                request={async (
+                                    params = {},
+                                    sort: any,
+                                    filter: any
+                                ) => {
+                                    return request<{
+                                        data: ItemType[];
+                                    }>(
+                                        'https://proapi.azurewebsites.net/github/issues',
+                                        {
+                                            params,
+                                        }
+                                    );
+                                }}
+                                editable={{
+                                    type: 'multiple',
+                                }}
+                                columnsState={{
+                                    persistenceKey: 'pro-table-singe-demos',
+                                    persistenceType: 'localStorage',
+                                    onChange(value: any) {
+                                        console.log('value: ', value);
+                                    },
+                                }}
+                                rowKey="id"
+                                options={{
+                                    search: {
+                                        placeholder: 'ค้นหา',
+
+                                        onSearch: (value: string) => {
+                                            console.log('value: ', value);
+                                            return false;
+                                        },
+                                    },
+                                    setting: false,
+                                    reload: false,
+                                    density: false,
+                                }}
+                                search={false}
+                                form={{
+                                    syncToUrl: (values: any, type: string) => {
+                                        if (type === 'get') {
+                                            return {
+                                                ...values,
+                                                created_at: [
+                                                    values.startTime,
+                                                    values.endTime,
+                                                ],
+                                            };
+                                        }
+                                        return values;
+                                    },
+                                }}
+                                pagination={{
+                                    pageSize: 5,
+                                    onChange: (page: any) => console.log(page),
+                                }}
+                                dateFormatter="string"
+                                headerTitle="test"
                             />
-                        </ProForm>
-                        <ModalForm
-                            trigger={<Button type="primary">新建表单</Button>}
-                        ></ModalForm>
-                        <AiFillAlert />
-                        <div className="text-red-500">{data && data.name}</div>
+                        </ConfigProvider>
                     </Col>
                 </Row>
             </BaseLayout>
