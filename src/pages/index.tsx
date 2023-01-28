@@ -5,6 +5,7 @@ import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import thTH from '@locales/th_TH';
 import en_US from 'antd/locale/en_US';
 import th_TH from 'antd/locale/th_TH';
+
 import guidelineService from '@services/guidelineService';
 import {
     Button,
@@ -225,6 +226,7 @@ const Home: NextPage = () => {
                         </div>
                         <h1>Create Next App</h1>
                         <h1>ทดสอบ</h1>
+
                         <ConfigProvider locale={en_US}>
                             <ProTable<ItemType>
                                 columns={columns}

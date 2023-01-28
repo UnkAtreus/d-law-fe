@@ -6,6 +6,13 @@ const nextConfig = {
             test: /\.svg$/,
             use: ['@svgr/webpack'],
         });
+        config.module.rules.push({
+            test: /\.(jpg|png|gif|pdf)$/,
+            type: 'asset',
+            generator: {
+                filename: 'static/chunks/[path][name].[hash][ext]',
+            },
+        });
         return config;
     },
 };
