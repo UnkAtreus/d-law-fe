@@ -183,7 +183,7 @@ const Home: NextPage = () => {
 
     return (
         <>
-            <BaseLayout>
+            <BaseLayout.Main>
                 <Row gutter={24}>
                     <Col xl={5} xxl={4}>
                         <BaseTag
@@ -295,7 +295,7 @@ const Home: NextPage = () => {
                         </ConfigProvider>
                     </Col>
                 </Row>
-            </BaseLayout>
+            </BaseLayout.Main>
         </>
     );
 };

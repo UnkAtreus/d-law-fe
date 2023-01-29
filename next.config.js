@@ -7,7 +7,7 @@ const nextConfig = {
             use: ['@svgr/webpack'],
         });
         config.module.rules.push({
-            test: /\.(jpg|png|gif|pdf)$/,
+            test: /\.(pdf)$/,
             type: 'asset',
             generator: {
                 filename: 'static/chunks/[path][name].[hash][ext]',
