@@ -3,10 +3,17 @@ import React from 'react';
 import HeroBanner from '@assets/hero_login.jpg';
 import { Button, Checkbox, Form, Input, Typography } from 'antd';
 import Link from 'next/link';
-import { RiLockLine, RiMailLine, RiUser3Line } from 'react-icons/ri';
+import { RiLockLine, RiUser3Line } from 'react-icons/ri';
+import { signIn } from '@services/useAuth';
 
 function Login() {
-    console.log(HeroBanner);
+    function onFinish(value: {
+        email: string;
+        password: string;
+        remember: boolean;
+    }) {
+        const { data } = signIn(value.email, value.password);
+    }
 
     return (
         <BaseLayout.Landing>
@@ -26,10 +33,15 @@ function Login() {
                                 Document management system for lawyer
                             </Typography.Text>
                         </div>
-                        <Form
+                        <Form<{
+                            email: string;
+                            password: string;
+                            remember: boolean;
+                        }>
                             layout="vertical"
                             autoComplete="false"
                             initialValues={{ remember: true }}
+                            onFinish={onFinish}
                         >
                             <Form.Item
                                 name="email"
@@ -61,12 +73,14 @@ function Login() {
                                 />
                             </Form.Item>
 
-                            <Form.Item
-                                name="remember"
-                                valuePropName="checked"
-                                className="mb-2"
-                            >
-                                <Checkbox>จดจำรหัสผ่าน</Checkbox>
+                            <Form.Item className="mb-2">
+                                <Form.Item
+                                    name="remember"
+                                    valuePropName="checked"
+                                    noStyle
+                                >
+                                    <Checkbox>จดจำรหัสผ่าน</Checkbox>
+                                </Form.Item>
                                 <Link
                                     className="float-right mt-1 text-xs text-gray-400 hover:text-primary"
                                     href={'/'}
