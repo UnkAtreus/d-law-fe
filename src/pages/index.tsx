@@ -2,16 +2,12 @@ import { ActionType, ProColumns, ProTable } from '@ant-design/pro-table';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
-import thTH from '@locales/th_TH';
 import en_US from 'antd/locale/en_US';
-import th_TH from 'antd/locale/th_TH';
 
 import guidelineService from '@services/guidelineService';
 import {
-    Button,
     Col,
     ConfigProvider,
-    Dropdown,
     Form,
     Row,
     Space,
@@ -34,7 +30,6 @@ import {
     RiVideoFill,
 } from 'react-icons/ri';
 import request from 'umi-request';
-import useUpload from '@utilities/useUpload';
 import { useDropzone } from 'react-dropzone';
 
 const Home: NextPage = () => {
@@ -252,9 +247,7 @@ const Home: NextPage = () => {
                                 columnsState={{
                                     persistenceKey: 'pro-table-singe-demos',
                                     persistenceType: 'localStorage',
-                                    onChange(value: any) {
-                                        console.log('value: ', value);
-                                    },
+                                    onChange(value: any) {},
                                 }}
                                 rowKey="id"
                                 options={{
@@ -262,7 +255,6 @@ const Home: NextPage = () => {
                                         placeholder: 'ค้นหา',
 
                                         onSearch: (value: string) => {
-                                            console.log('value: ', value);
                                             return false;
                                         },
                                     },
