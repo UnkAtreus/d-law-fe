@@ -1,12 +1,14 @@
 import useRequest from './useRequest';
 
 const guidelineService = {
-    getData(id: string) {
-        const response = useRequest<{ name: string }>(`pokemon/${id}`, 'GET');
+    getData(id: string, params?: object | URLSearchParams) {
+        const response = useRequest<{ name: string }>(`pokemon/${id}`, 'GET', {
+            params,
+        });
         return response;
     },
     postData(data: any) {
-        return useRequest<{ name: string }>(`pokemon`, 'POST', data);
+        return useRequest<{ name: string }>(`pokemon`, 'POST', { data });
     },
 };
 

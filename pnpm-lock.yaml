@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@ant-design/pro-card': ^2.1.10
   '@ant-design/pro-form': ^2.5.4
   '@ant-design/pro-table': ^3.2.12
   '@next/eslint-plugin-next': ^13.1.1
@@ -32,6 +33,7 @@ specifiers:
   umi-request: ^1.4.0
 
 dependencies:
+  '@ant-design/pro-card': 2.1.10_lcxbtxw4o7vexw32hqjnpbuya4
   '@ant-design/pro-form': 2.5.4_kmmxbhzbfu6sosaqnacqphcmpa
   '@ant-design/pro-table': 3.2.12_kmmxbhzbfu6sosaqnacqphcmpa
   '@next/font': 13.1.1

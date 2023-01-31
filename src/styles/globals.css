@@ -36,6 +36,10 @@
     overflow: initial;
 }
 
+.ant-pro-card .ant-pro-card-collapsible-icon {
+    color: #4b5563;
+}
+
 /* .ant-form-item {
     margin-bottom: 16px;
 } */

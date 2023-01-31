@@ -1,19 +1,12 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-table';
+import { ProCard } from '@ant-design/pro-card';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseLoading from '@baseComponents/BaseLoading';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import en_US from 'antd/locale/en_US';
 
 import guidelineService from '@services/guidelineService';
-import {
-    Col,
-    ConfigProvider,
-    Form,
-    Row,
-    Space,
-    Tag,
-    Typography,
-} from 'antd';
+import { Col, ConfigProvider, Form, Row, Space, Tag, Typography } from 'antd';
 
 import { NextPage } from 'next';
 import { useRef } from 'react';
@@ -198,14 +191,32 @@ const Home: NextPage = () => {
                         {isDragActive && (
                             <div className="t-0 r-0 absolute z-50 h-24 w-24 bg-black"></div>
                         )}
-
-                        <div className="space-y-4">
-                            <Typography.Title level={3}>
-                                โฟลเดอร์ที่ใช้บ่อย (2)
-                            </Typography.Title>
-                            <Row gutter={8}>
+                        <ProCard
+                            title={
+                                <Typography.Title level={4} className="inline">
+                                    โฟลเดอร์ที่ใช้บ่อย (2)
+                                </Typography.Title>
+                            }
+                            bordered
+                            collapsible
+                        >
+                            <Row gutter={[8, 8]}>
                                 <Col span={4}>
-                                    <div className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded bg-white py-5 pl-4 pr-6">
+                                    <div
+                                        className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-gray-200 bg-white py-5 pl-4 pr-6 "
+                                        style={{ borderStyle: 'solid' }}
+                                    >
+                                        <RiFolder5Fill className="icon text-gray-500 transition group-hover:text-primary" />
+                                        <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
+                                            น้องสมชาย
+                                        </span>
+                                    </div>
+                                </Col>
+                                <Col span={4}>
+                                    <div
+                                        className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-gray-200 bg-white py-5 pl-4 pr-6 "
+                                        style={{ borderStyle: 'solid' }}
+                                    >
                                         <RiFolder5Fill className="icon text-gray-500 transition group-hover:text-primary" />
                                         <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
                                             น้องสมชาย
@@ -213,20 +224,24 @@ const Home: NextPage = () => {
                                     </div>
                                 </Col>
                             </Row>
-                        </div>
-                        <div className="space-y-4 ">
-                            <Typography.Title level={3}>
-                                เอกสารที่เปิดล่าสุด (1)
-                            </Typography.Title>
-                        </div>
-                        <h1>Create Next App</h1>
-                        <h1>ทดสอบ</h1>
+                        </ProCard>
 
                         <ConfigProvider locale={en_US}>
                             <ProTable<ItemType>
                                 columns={columns}
                                 actionRef={actionRef}
                                 cardBordered
+                                cardProps={{
+                                    collapsible: true,
+                                    title: (
+                                        <Typography.Title
+                                            level={4}
+                                            className="inline"
+                                        >
+                                            เอกสารที่เปิดล่าสุด (1)
+                                        </Typography.Title>
+                                    ),
+                                }}
                                 request={async (
                                     params = {},
                                     sort: any,
@@ -241,48 +256,19 @@ const Home: NextPage = () => {
                                         }
                                     );
                                 }}
-                                editable={{
-                                    type: 'multiple',
-                                }}
-                                columnsState={{
-                                    persistenceKey: 'pro-table-singe-demos',
-                                    persistenceType: 'localStorage',
-                                    onChange(value: any) {},
-                                }}
                                 rowKey="id"
                                 options={{
-                                    search: {
-                                        placeholder: 'ค้นหา',
-
-                                        onSearch: (value: string) => {
-                                            return false;
-                                        },
-                                    },
                                     setting: false,
                                     reload: false,
                                     density: false,
                                 }}
                                 search={false}
-                                form={{
-                                    syncToUrl: (values: any, type: string) => {
-                                        if (type === 'get') {
-                                            return {
-                                                ...values,
-                                                created_at: [
-                                                    values.startTime,
-                                                    values.endTime,
-                                                ],
-                                            };
-                                        }
-                                        return values;
-                                    },
-                                }}
                                 pagination={{
-                                    pageSize: 5,
+                                    pageSize: 50,
                                     onChange: (page: any) => console.log(page),
                                 }}
                                 dateFormatter="string"
-                                headerTitle="test"
+                                headerTitle=" "
                             />
                         </ConfigProvider>
                     </Col>
