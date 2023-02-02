@@ -40,6 +40,10 @@
     color: #4b5563;
 }
 
+.ant-table-wrapper .ant-table-thead > tr > th {
+    background: #f9fafb;
+}
+
 /* .ant-form-item {
     margin-bottom: 16px;
 } */

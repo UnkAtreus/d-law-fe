@@ -1,7 +1,6 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-table';
 import { ProCard } from '@ant-design/pro-card';
 import BaseLayout from '@baseComponents/BaseLayout';
-import BaseLoading from '@baseComponents/BaseLoading';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import en_US from 'antd/locale/en_US';
 
@@ -24,6 +23,7 @@ import {
 } from 'react-icons/ri';
 import request from 'umi-request';
 import { useDropzone } from 'react-dropzone';
+import BaseLoading from '@baseComponents/BaseLoading';
 
 const Home: NextPage = () => {
     const { data, isLoading } = guidelineService.getData('1');
@@ -188,9 +188,6 @@ const Home: NextPage = () => {
                         className="space-y-6"
                         {...getRootProps()}
                     >
-                        {isDragActive && (
-                            <div className="t-0 r-0 absolute z-50 h-24 w-24 bg-black"></div>
-                        )}
                         <ProCard
                             title={
                                 <Typography.Title level={4} className="inline">

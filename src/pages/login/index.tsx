@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import BaseLayout from '@baseComponents/BaseLayout';
 import React from 'react';
 import HeroBanner from '@assets/hero_login.jpg';
@@ -17,15 +18,13 @@ function Login() {
 
     return (
         <BaseLayout.Landing>
-            <div className="flex h-full min-h-[calc(100vh-64px)] items-center justify-center">
-                <div className="flex w-full max-w-screen-xl space-x-4 rounded-2xl bg-white p-16">
-                    <img
-                        src={HeroBanner.src}
-                        alt=""
-                        className="w-full flex-1"
-                    />
-                    <div className="flex flex-1 flex-col justify-center">
-                        <div className="mb-4">
+            <div className="flex h-full min-h-[calc(100vh-64px)] items-center justify-center ">
+                <div className="my-8 flex w-full max-w-screen-lg space-x-4 rounded-2xl bg-white p-16 2xl:max-w-screen-xl">
+                    <div className="hidden h-auto w-auto flex-1 md:block">
+                        <img src={HeroBanner.src} alt="" />
+                    </div>
+                    <div className="flex max-w-md flex-1 flex-col justify-center">
+                        <div className="mb-4 text-center md:text-left">
                             <h1 className="text-2xl text-gray-600">
                                 Welcome to D-Law
                             </h1>
@@ -91,7 +90,7 @@ function Login() {
 
                             <Form.Item>
                                 <Button type="primary" htmlType="submit" block>
-                                    Login now
+                                    เข้าสู่ระบบ
                                 </Button>
                             </Form.Item>
                         </Form>

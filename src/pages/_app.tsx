@@ -4,7 +4,7 @@ import '@styles/globals.css';
 import thTH from '@locales/th_TH';
 import { authContext, useAuthState } from '@services/useAuth';
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
     const { user } = useAuthState();
     return (
         <authContext.Provider value={user}>
@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
                     },
                 }}
             >
-                <Component {...pageProps} />
+                <Component {...pageProps} {...router} />
             </ConfigProvider>
         </authContext.Provider>
     );

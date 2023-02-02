@@ -21,6 +21,7 @@ import {
     RiLogoutBoxLine,
 } from 'react-icons/ri';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -41,21 +42,35 @@ function getItem(
 }
 
 const BaseLayout = {
-    Main({ children }: { children: React.ReactNode }) {
+    Main({
+        children,
+        path = 'workspace',
+    }: {
+        children: React.ReactNode;
+        path?: string;
+    }) {
         const {
             token: { colorBgContainer },
         } = theme.useToken();
 
+        const router = useRouter();
+
         const items: MenuProps['items'] = [
             getItem(
-                <div className="flex flex-col items-center justify-center py-5">
+                <div
+                    onClick={() => router.push('/')}
+                    className="flex flex-col items-center justify-center py-5"
+                >
                     <RiComputerLine className="menu-icon" />
                     <div className="menu-text">WORKSPACE</div>
                 </div>,
                 'workspace'
             ),
             getItem(
-                <div className="flex flex-col items-center justify-center py-5">
+                <div
+                    onClick={() => router.push('/document')}
+                    className="flex flex-col items-center justify-center py-5"
+                >
                     <RiFileCopy2Line className="menu-icon" />
                     <div className="menu-text">DOCUMENT</div>
                 </div>,
@@ -80,13 +95,13 @@ const BaseLayout = {
         const nav_menu: MenuProps['items'] = [
             getItem(
                 'Logout',
-                'workspace',
+                'logout',
                 <RiLogoutBoxLine className="m-auto h-6 w-6" />
             ),
         ];
 
         return (
-            <Layout className="min-h-screen">
+            <Layout className="min-h-screen" hasSider>
                 <Layout.Sider
                     style={{
                         background: colorBgContainer,
@@ -95,11 +110,7 @@ const BaseLayout = {
                     width={120}
                 >
                     <Logo className="m-4" />
-                    <Menu
-                        defaultSelectedKeys={['workspace']}
-                        mode="inline"
-                        items={items}
-                    />
+                    <Menu selectedKeys={[path]} mode="inline" items={items} />
                 </Layout.Sider>
                 <Layout>
                     <Layout.Header
@@ -110,7 +121,7 @@ const BaseLayout = {
                         }}
                     >
                         <div className="flex items-center justify-between px-6 ">
-                            <h1 className="font-bold">Workshop</h1>
+                            <h1 className="font-bold">Workspace</h1>
                             <div>
                                 <Dropdown
                                     menu={{
@@ -141,7 +152,7 @@ const BaseLayout = {
         } = theme.useToken();
 
         return (
-            <Layout className="min-h-screen">
+            <Layout className="min-h-screen" hasSider>
                 <Layout>
                     <Layout.Header
                         style={{
