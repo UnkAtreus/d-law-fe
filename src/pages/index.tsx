@@ -10,20 +10,10 @@ import { Col, ConfigProvider, Form, Row, Space, Tag, Typography } from 'antd';
 import { NextPage } from 'next';
 import { useRef } from 'react';
 
-import {
-    RiBankCardFill,
-    RiFileExcelFill,
-    RiFileList2Fill,
-    RiFilePdfFill,
-    RiFileTextFill,
-    RiFileWordFill,
-    RiFolder5Fill,
-    RiImage2Fill,
-    RiVideoFill,
-} from 'react-icons/ri';
 import request from 'umi-request';
 import { useDropzone } from 'react-dropzone';
 import BaseLoading from '@baseComponents/BaseLoading';
+import { FileTypeIcons } from '@utilities/index';
 
 const Home: NextPage = () => {
     const { data, isLoading } = guidelineService.getData('1');
@@ -36,12 +26,24 @@ const Home: NextPage = () => {
         isDragAccept,
         isDragReject,
     } = useDropzone({
-        accept: {
-            'image/jpeg': ['.jpeg', '.png'],
-        },
         noClick: true,
         noKeyboard: true,
+        onDrop: (files) => console.log(files),
     });
+
+    const {
+        ExcelIcon,
+        FolderIcon,
+        IdCardIcon,
+        ImageIcon,
+        MoreIcon,
+        PdfIcon,
+        TextIcon,
+        VideoIcon,
+        WordIcon,
+        MusicIcon,
+        ZipIcon,
+    } = FileTypeIcons;
 
     type ItemType = {
         [x: string]: any;
@@ -115,13 +117,13 @@ const Home: NextPage = () => {
         {
             key: 'tag_1',
             name: 'เอกสารทั้งหมด',
-            icon: <RiFileTextFill className="icon" />,
+            icon: <TextIcon className="icon" />,
             value: '22',
         },
         {
             key: 'tag_2',
             name: 'สำเนาบัตรประจำตัวประชาชน',
-            icon: <RiBankCardFill className="icon" />,
+            icon: <IdCardIcon className="icon" />,
             value: '2',
             onClick: () => {
                 console.log(`test`);
@@ -130,37 +132,49 @@ const Home: NextPage = () => {
         {
             key: 'tag_3',
             name: 'เอกสาร Excel',
-            icon: <RiFileExcelFill className="icon" />,
+            icon: <ExcelIcon className="icon" />,
             value: '5',
         },
         {
             key: 'tag_4',
             name: 'เอกสาร PDF',
-            icon: <RiFilePdfFill className="icon" />,
+            icon: <PdfIcon className="icon" />,
             value: '10',
         },
         {
             key: 'tag_5',
             name: 'เอกสาร Word',
-            icon: <RiFileWordFill className="icon" />,
+            icon: <WordIcon className="icon" />,
             value: '2',
         },
         {
             key: 'tag_6',
             name: 'รูปภาพ',
-            icon: <RiImage2Fill className="icon" />,
+            icon: <ImageIcon className="icon" />,
             value: '2',
         },
         {
             key: 'tag_7',
             name: 'วิดีโอ',
-            icon: <RiVideoFill className="icon" />,
+            icon: <VideoIcon className="icon" />,
             value: '2',
         },
         {
             key: 'tag_8',
+            name: 'เสียง',
+            icon: <MusicIcon className="icon" />,
+            value: '1',
+        },
+        {
+            key: 'tag_9',
+            name: 'บีบอัด',
+            icon: <ZipIcon className="icon" />,
+            value: '2',
+        },
+        {
+            key: 'tag_10',
             name: 'เอกสารอื่นๆ',
-            icon: <RiFileList2Fill className="icon" />,
+            icon: <MoreIcon className="icon" />,
             value: '2',
         },
     ];
@@ -191,7 +205,7 @@ const Home: NextPage = () => {
                         <ProCard
                             title={
                                 <Typography.Title level={4} className="inline">
-                                    โฟลเดอร์ที่ใช้บ่อย (2)
+                                    โฟลเดอร์ที่ใช้บ่อย
                                 </Typography.Title>
                             }
                             bordered
@@ -203,7 +217,7 @@ const Home: NextPage = () => {
                                         className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-gray-200 bg-white py-5 pl-4 pr-6 "
                                         style={{ borderStyle: 'solid' }}
                                     >
-                                        <RiFolder5Fill className="icon text-gray-500 transition group-hover:text-primary" />
+                                        <FolderIcon className="icon text-gray-500 transition group-hover:text-primary" />
                                         <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
                                             น้องสมชาย
                                         </span>
@@ -214,7 +228,7 @@ const Home: NextPage = () => {
                                         className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-gray-200 bg-white py-5 pl-4 pr-6 "
                                         style={{ borderStyle: 'solid' }}
                                     >
-                                        <RiFolder5Fill className="icon text-gray-500 transition group-hover:text-primary" />
+                                        <FolderIcon className="icon text-gray-500 transition group-hover:text-primary" />
                                         <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
                                             น้องสมชาย
                                         </span>
@@ -235,7 +249,7 @@ const Home: NextPage = () => {
                                             level={4}
                                             className="inline"
                                         >
-                                            เอกสารที่เปิดล่าสุด (1)
+                                            เอกสารที่เปิดล่าสุด
                                         </Typography.Title>
                                     ),
                                 }}

@@ -19,6 +19,7 @@ import {
     RiSettings5Line,
     RiArrowDropDownLine,
     RiLogoutBoxLine,
+    RiArrowLeftSLine,
 } from 'react-icons/ri';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -106,22 +107,40 @@ const BaseLayout = {
                     style={{
                         background: colorBgContainer,
                         boxShadow: '6px 0px 24px rgba(0, 0, 0, 0.1)',
+                        overflow: 'auto',
+                        height: '100vh',
+                        position: 'fixed',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        zIndex: 2,
                     }}
                     width={120}
                 >
                     <Logo className="m-4" />
                     <Menu selectedKeys={[path]} mode="inline" items={items} />
                 </Layout.Sider>
-                <Layout>
+                <Layout className="ml-[120px]">
                     <Layout.Header
                         style={{
                             padding: 0,
                             backgroundColor: colorBgContainer,
                             boxShadow: '0px 4px 30px 4px rgba(0, 0, 0, 0.1)',
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 1,
+                            width: '100%',
                         }}
                     >
                         <div className="flex items-center justify-between px-6 ">
-                            <h1 className="font-bold">Workspace</h1>
+                            <Space>
+                                <RiArrowLeftSLine
+                                    onClick={() => router.back()}
+                                    className="icon cursor-pointer"
+                                />
+                                <h1 className="font-bold">Workspace</h1>
+                            </Space>
+
                             <div>
                                 <Dropdown
                                     menu={{

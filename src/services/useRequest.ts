@@ -1,5 +1,6 @@
 import useSwr, { Key } from 'swr';
 import { RequestOptionsInit, extend } from 'umi-request';
+import progressMiddleware from 'umi-request-progress';
 
 const BASE_URL = 'https://pokeapi.co/api/v2/';
 
@@ -28,6 +29,8 @@ type Method =
 const request = extend({
     prefix: BASE_URL,
 });
+
+request.use(progressMiddleware, { core: true });
 
 function fetcher(
     path: string,

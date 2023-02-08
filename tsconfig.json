@@ -25,6 +25,7 @@
       "@services/*": ["services/*"],  
       "@utilities/*": ["utilities/*"],  
       "@locales/*": ["locales/*"],  
+      "@interfaces/*": ["interfaces/*"],  
     },
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prettier.config.js"],

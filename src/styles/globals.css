@@ -15,6 +15,10 @@
     @apply inline-flex h-6 w-6 items-center justify-center;
 }
 
+.icon-upload {
+    @apply h-4 w-4 text-gray-400;
+}
+
 .hover-btn {
     @apply transition-all duration-200 hover:bg-primary/10 hover:text-primary;
 }
@@ -44,6 +48,16 @@
     background: #f9fafb;
 }
 
+.ant-collapse .ant-collapse-content > .ant-collapse-content-box {
+    padding: 0;
+}
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    padding: 0;
+}
+
+.ant-modal .ant-modal-header {
+    margin-bottom: 16px;
+}
 /* .ant-form-item {
     margin-bottom: 16px;
 } */
