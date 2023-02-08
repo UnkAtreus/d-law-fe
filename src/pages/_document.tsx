@@ -5,6 +5,7 @@ export default function Document() {
         <Html lang="en">
             <Head></Head>
             <body>
+                <title>D-Law | DMS-Platform</title>
                 <Main />
                 <NextScript />
             </body>
