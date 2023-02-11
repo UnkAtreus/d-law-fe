@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import {
     RiBankCardFill,
     RiFileExcelFill,
@@ -10,6 +11,7 @@ import {
     RiVideoFill,
     RiFileZipFill,
     RiFileMusicFill,
+    RiFilePptFill,
 } from 'react-icons/ri';
 
 export function changeNumberTo1k(number: string): string {
@@ -19,6 +21,20 @@ export function changeNumberTo1k(number: string): string {
     } else {
         return number;
     }
+}
+
+export enum FileTypes {
+    FOLDER = 'folder',
+    PDF = 'pdf',
+    DOC = 'word',
+    XLS = 'excel',
+    PTT = 'powerpoint',
+    IMAGE = 'image',
+    VIDEO = 'video',
+    MUSIC = 'music',
+    ZIP = 'compress',
+    TEXT = 'text',
+    ID = 'idCard',
 }
 
 export const FileTypeIcons = {
@@ -40,6 +56,9 @@ export const FileTypeIcons = {
     WordIcon(props: any) {
         return <RiFileWordFill {...props} />;
     },
+    PowerPointIcon(props: any) {
+        return <RiFilePptFill {...props} />;
+    },
     FolderIcon(props: any) {
         return <RiFolder5Fill {...props} />;
     },
@@ -56,3 +75,49 @@ export const FileTypeIcons = {
         return <RiFileZipFill {...props} />;
     },
 };
+
+export function showFileIcon(fileType: FileTypes, color = 'text-gray-500') {
+    const { DOC, FOLDER, ID, IMAGE, MUSIC, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
+        FileTypes;
+    const {
+        ExcelIcon,
+        FolderIcon,
+        IdCardIcon,
+        PowerPointIcon,
+        ImageIcon,
+        MoreIcon,
+        MusicIcon,
+        PdfIcon,
+        TextIcon,
+        VideoIcon,
+        WordIcon,
+        ZipIcon,
+    } = FileTypeIcons;
+    switch (fileType) {
+        case FOLDER:
+            return <FolderIcon className={`icon ${color}`} />;
+        case ID:
+            return <IdCardIcon className={`icon ${color}`} />;
+        case DOC:
+            return <WordIcon className={`icon ${color}`} />;
+        case XLS:
+            return <ExcelIcon className={`icon ${color}`} />;
+        case PTT:
+            return <PowerPointIcon className={`icon ${color}`} />;
+        case PDF:
+            return <PdfIcon className={`icon ${color}`} />;
+        case TEXT:
+            return <TextIcon className={`icon ${color}`} />;
+        case ZIP:
+            return <ZipIcon className={`icon ${color}`} />;
+        case VIDEO:
+            return <VideoIcon className={`icon ${color}`} />;
+        case IMAGE:
+            return <ImageIcon className={`icon ${color}`} />;
+        case MUSIC:
+            return <MusicIcon className={`icon ${color}`} />;
+
+        default:
+            return <MoreIcon className={`icon ${color}`} />;
+    }
+}

@@ -138,7 +138,10 @@ const BaseLayout = {
                                     onClick={() => router.back()}
                                     className="icon cursor-pointer"
                                 />
-                                <h1 className="font-bold">Workspace</h1>
+                                <h1 className="font-bold">
+                                    {path.charAt(0).toUpperCase() +
+                                        path.slice(1)}
+                                </h1>
                             </Space>
 
                             <div>

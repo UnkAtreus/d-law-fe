@@ -8,29 +8,27 @@ import {
     Col,
     Collapse,
     ConfigProvider,
-    FloatButton,
     Form,
-    Progress,
+    Input,
     Row,
     Space,
     Tag,
     Typography,
-    Upload,
 } from 'antd';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import en_US from 'antd/locale/en_US';
 import {
+    RiEqualizerLine,
     RiFile2Fill,
-    RiFileUploadFill,
     RiFolder5Fill,
     RiFolderAddFill,
-    RiUploadLine,
+    RiSearchLine,
 } from 'react-icons/ri';
 import dayjs from 'dayjs';
 import thTH from '@locales/th_TH';
-import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
+import useUpload from '@utilities/useUpload';
 import { useRouter } from 'next/router';
 import { TCreateFolder, TCaseFolder } from '@interfaces/index';
 
@@ -237,32 +235,15 @@ function CaseFolder() {
                                                 </Collapse>
                                             </ModalForm>
                                         </ConfigProvider>
-                                        <Upload
-                                            multiple
-                                            showUploadList={false}
-                                            onChange={(info) => {
-                                                const file = info.file;
-                                                if (
-                                                    info.file.status !==
-                                                    'uploading'
-                                                ) {
-                                                    console.log(
-                                                        info.file,
-                                                        info.fileList
-                                                    );
-                                                }
-                                                if (
-                                                    info.file.status === 'done'
-                                                ) {
-                                                    setFileLists((prev) => [
-                                                        ...prev,
-                                                        file,
-                                                    ]);
-                                                }
-                                            }}
-                                        >
-                                            <Button></Button>
-                                        </Upload>
+                                        <Input
+                                            placeholder="ค้นหาเอกสาร"
+                                            prefix={
+                                                <RiSearchLine className="cursor-pointer text-gray-500" />
+                                            }
+                                            suffix={
+                                                <RiEqualizerLine className="cursor-pointer text-gray-500" />
+                                            }
+                                        />
                                     </Space>
                                 ),
                             }}
@@ -273,103 +254,20 @@ function CaseFolder() {
                                 density: false,
                             }}
                             search={false}
-                            onRow={(record, rowIndex) => {
+                            onRow={(record) => {
                                 return {
-                                    onDoubleClick: (event) => {
+                                    onDoubleClick: () => {
                                         console.log(record.path);
-                                        router.push(`/document/${record.path}`);
+                                        router.push(`/document${record.path}`);
                                     },
                                 };
                             }}
-                            pagination={{
-                                pageSize: 50,
-                                onChange: (page: any) => console.log(page),
-                            }}
+                            pagination={false}
                             dateFormatter="string"
-                            className="relative"
-                            footer={() => {
-                                if (isDragActive)
-                                    return (
-                                        <div
-                                            className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
-                                            style={{ borderStyle: 'solid' }}
-                                        >
-                                            <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
-                                                <div className="rounded-md bg-primary py-2 px-6 text-center">
-                                                    <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
-                                                    <div className="-mt-2 text-white">
-                                                        วางไฟล์
-                                                    </div>
-                                                    <div className="text-white">
-                                                        เพื่ออัพโหลด
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                            }}
                         />
                     </ConfigProvider>
                 </Col>
             </Row>
-
-            <FloatButton.Group
-                trigger="click"
-                type="primary"
-                className={`${fileLists.length > 0 ? 'block' : 'hidden'}`}
-                style={{ right: 24 }}
-                open={isUpload}
-                onOpenChange={(open) => {
-                    setIsUpload(!open);
-                }}
-                icon={<RiUploadLine className="text-white" />}
-            >
-                <div className="float-right mb-4 w-80 rounded border border-solid border-primary/70 bg-white px-2 py-2">
-                    <div className="mt-2 ml-4">อัพโหลดทั้งหมด {1} รายการ</div>
-                    <Upload
-                        customRequest={({ onSuccess }) => {
-                            setTimeout(() => {
-                                if (onSuccess) onSuccess('ok');
-                            }, 0);
-                        }}
-                        fileList={fileLists}
-                        itemRender={(_, file, fileList) => {
-                            // console.log('file', file);
-                            // console.log('fileList', fileList);
-
-                            const fileType = file.type?.split('/')[0] || '';
-                            // console.log(file.type?.split('/')[0]);
-
-                            return (
-                                <div className="relative  mt-1 flex items-center rounded px-4 py-2 transition hover:bg-primary/10">
-                                    <span role="img" className="mr-2 ">
-                                        {RenderIconUploadType(fileType)}
-                                    </span>
-
-                                    <div
-                                        className={`flex-1 ${
-                                            file ? 'mb-2' : ''
-                                        }`}
-                                    >
-                                        {file.name}
-                                    </div>
-                                    {/* <span className="">
-                                        {RenderUploadStatus(file.status)}
-                                    </span> */}
-                                    <div className="absolute -bottom-2 left-10 z-10 w-[calc(100%-48px)]">
-                                        <Progress
-                                            percent={30}
-                                            strokeWidth={2}
-                                            showInfo={false}
-                                            // status="exception"
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        }}
-                    ></Upload>
-                </div>
-            </FloatButton.Group>
         </BaseLayout.Main>
     );
 }

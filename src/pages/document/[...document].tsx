@@ -1,8 +1,10 @@
 import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import ProTable, { ProColumns } from '@ant-design/pro-table';
 import BaseLayout from '@baseComponents/BaseLayout';
+import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import { TCreateFolder, TCaseFolder } from '@interfaces/index';
 import thTH from '@locales/th_TH';
+import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
 import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
 import {
     Form,
@@ -27,7 +29,6 @@ import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
     RiFile2Fill,
-    RiFolder5Fill,
     RiFolderAddFill,
     RiFileUploadFill,
     RiUploadLine,
@@ -64,14 +65,26 @@ function Document({ path }: { path: string[] }) {
     });
 
     const basePath = path.join('/');
+    const {
+        ExcelIcon,
+        FolderIcon,
+        IdCardIcon,
+        ImageIcon,
+        MoreIcon,
+        PdfIcon,
+        TextIcon,
+        VideoIcon,
+        WordIcon,
+        MusicIcon,
+        ZipIcon,
+    } = FileTypeIcons;
+
     const columns: ProColumns<TCaseFolder>[] = [
         {
             title: <RiFile2Fill className="m-auto" />,
             dataIndex: 'type',
-            render: (type) => {
-                if (type === 'folder') {
-                    return <RiFolder5Fill className="icon text-gray-500" />;
-                }
+            render: (type: any) => {
+                return showFileIcon(type);
             },
             align: 'center',
             width: 48,
@@ -124,11 +137,85 @@ function Document({ path }: { path: string[] }) {
             ),
         },
     ];
+    const Tags: ITag[] = [
+        {
+            key: 'tag_1',
+            name: 'เอกสารทั้งหมด',
+            icon: <TextIcon className="icon" />,
+            value: '22',
+        },
+        {
+            key: 'tag_2',
+            name: 'สำเนาบัตรประจำตัวประชาชน',
+            icon: <IdCardIcon className="icon" />,
+            value: '2',
+            onClick: () => {
+                console.log(`test`);
+            },
+        },
+        {
+            key: 'tag_3',
+            name: 'เอกสาร Excel',
+            icon: <ExcelIcon className="icon" />,
+            value: '5',
+        },
+        {
+            key: 'tag_4',
+            name: 'เอกสาร PDF',
+            icon: <PdfIcon className="icon" />,
+            value: '10',
+        },
+        {
+            key: 'tag_5',
+            name: 'เอกสาร Word',
+            icon: <WordIcon className="icon" />,
+            value: '2',
+        },
+        {
+            key: 'tag_6',
+            name: 'รูปภาพ',
+            icon: <ImageIcon className="icon" />,
+            value: '2',
+        },
+        {
+            key: 'tag_7',
+            name: 'วิดีโอ',
+            icon: <VideoIcon className="icon" />,
+            value: '2',
+        },
+        {
+            key: 'tag_8',
+            name: 'เสียง',
+            icon: <MusicIcon className="icon" />,
+            value: '1',
+        },
+        {
+            key: 'tag_9',
+            name: 'บีบอัด',
+            icon: <ZipIcon className="icon" />,
+            value: '2',
+        },
+        {
+            key: 'tag_10',
+            name: 'เอกสารอื่นๆ',
+            icon: <MoreIcon className="icon" />,
+            value: '2',
+        },
+    ];
 
     return (
         <BaseLayout.Main path={'document'}>
             <Row gutter={24}>
-                <Col {...getRootProps()}>
+                <Col xl={5} xxl={4}>
+                    <BaseTag
+                        items={Tags}
+                        defaultTag="tag_1"
+                        onChange={(key, tag) => {
+                            console.log(key, tag);
+                        }}
+                    />
+                </Col>
+                <Col xl={19} xxl={20} className="space-y-6" {...getRootProps()}>
                     <ConfigProvider locale={en_US}>
                         <ProTable<TCaseFolder>
                             columns={columns}
@@ -143,6 +230,17 @@ function Document({ path }: { path: string[] }) {
                                     share_with: ['KD'],
                                     last_edited: new Date(),
                                     path: '/11012323112',
+                                },
+                                {
+                                    id: '00000002',
+                                    type: 'pdf',
+                                    title: 'ไฟล์ทดสอบ.pdf',
+                                    tags: ['อ. 266/2565', 'ม.112'],
+                                    created_at: new Date(),
+                                    owner: 'Kittipat Dechkul',
+                                    share_with: ['KD'],
+                                    last_edited: new Date(),
+                                    path: '/11233546',
                                 },
                             ]}
                             cardBordered
@@ -284,11 +382,22 @@ function Document({ path }: { path: string[] }) {
                                 density: false,
                             }}
                             search={false}
-                            onRow={(record, rowIndex) => {
+                            onRow={(record) => {
                                 return {
-                                    onDoubleClick: (event) => {
-                                        console.log(record.path);
-                                        router.push(`/document/${record.path}`);
+                                    onDoubleClick: () => {
+                                        if (record.type === FileTypes.FOLDER) {
+                                            router.push(
+                                                `/document${record.path}`
+                                            );
+                                        } else if (
+                                            record.type === FileTypes.ZIP
+                                        ) {
+                                            console.log('download');
+                                        } else {
+                                            router.push(
+                                                `/preview${record.path}`
+                                            );
+                                        }
                                     },
                                 };
                             }}
@@ -336,7 +445,9 @@ function Document({ path }: { path: string[] }) {
                 icon={<RiUploadLine className="text-white" />}
             >
                 <div className="float-right mb-4 w-80 rounded border border-solid border-primary/70 bg-white px-2 py-2">
-                    <div className="mt-2 ml-4">อัพโหลดทั้งหมด {1} รายการ</div>
+                    <div className="mt-2 ml-4">
+                        อัพโหลดทั้งหมด {fileLists.length} รายการ
+                    </div>
                     <Upload
                         customRequest={({ onSuccess }) => {
                             setTimeout(() => {

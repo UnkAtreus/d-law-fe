@@ -6,7 +6,21 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-function Preview() {
+export async function getServerSideProps(ctx: any) {
+    const { params } = ctx;
+    const { preview } = params;
+
+    return {
+        props: {
+            path: preview || null,
+        },
+    };
+}
+
+function Preview({ path }: { path: string }) {
+    console.log(path);
+
+    // const FILE_PATH = path
     return (
         <div>
             Preview
