@@ -15,12 +15,20 @@
     @apply inline-flex h-6 w-6 items-center justify-center;
 }
 
+.icon-document__pagination {
+    @apply inline-flex h-4 w-4 items-center justify-center text-gray-700;
+}
+
 .icon-upload {
     @apply h-4 w-4 text-gray-400;
 }
 
 .hover-btn {
     @apply transition-all duration-200 hover:bg-primary/10 hover:text-primary;
+}
+
+.hover-document__pagination {
+    @apply flex h-6 w-6 cursor-pointer items-center justify-center rounded transition-all duration-200 hover:bg-primary/10 hover:text-primary;
 }
 
 .hover-text {
