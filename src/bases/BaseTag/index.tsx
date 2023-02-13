@@ -21,9 +21,11 @@ const BaseTag: FC<IBaseTag> = ({ items, defaultTag, onChange }) => {
         return (
             <div
                 onClick={onClick}
-                className={`group flex w-full cursor-pointer items-center justify-between rounded bg-white px-5 py-2 transition-all duration-200 hover:bg-primary/10 ${
-                    active && 'bg-primary hover:bg-primary/90'
-                } `}
+                className={`group flex w-full cursor-pointer items-center justify-between rounded  px-5 py-2 transition-all duration-200  ${
+                    active
+                        ? 'bg-primary hover:bg-primary/90'
+                        : 'bg-white hover:bg-primary/10'
+                }  `}
             >
                 <div className="flex items-center space-x-2 ">
                     <div
