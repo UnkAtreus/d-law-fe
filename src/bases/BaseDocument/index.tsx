@@ -12,6 +12,7 @@ import {
     RiZoomInLine,
     RiZoomOutLine,
 } from 'react-icons/ri';
+import BaseLoading from '@baseComponents/BaseLoading';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -19,6 +20,7 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
     const [numPages, setNumPages] = useState<number>(0);
     const [value, setValue] = useState('1');
     const [zoom, setZoom] = useState(0);
+    const [rendered, setRendered] = useState(false);
 
     const pdfRef = useRef<any>([]);
     const pageNumberRef = useRef<number>(1);
@@ -58,6 +60,7 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
                 onLoadSuccess={({ numPages }) => {
                     setNumPages(numPages);
                 }}
+                loading={<BaseLoading></BaseLoading>}
                 className="space-y-6"
             >
                 {Array(numPages)
@@ -71,11 +74,14 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
                                 pdfRef.current[i] = ref;
                             }}
                             renderTextLayer={false}
-                            className={`bg-transparent shadow-lg`}
+                            className={`bg-transparent shadow-lg ${
+                                rendered ? 'block' : 'hidden'
+                            }`}
                             width={containerRef.current.clientWidth - 48}
                             loading={''}
-                            onRenderSuccess={(page) => {
-                                console.log('onRenderSuccess', page);
+                            onRenderSuccess={() => {
+                                // console.log('onRenderSuccess', page);
+                                setRendered(true);
                             }}
                         />
                     ))}
@@ -154,7 +160,10 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
                             <Divider type="vertical" className="mx-1" />
                             <div
                                 onClick={() => {
-                                    if (zoom > 0) setZoom((prev) => prev - 1);
+                                    if (zoom > 0) {
+                                        setRendered(false);
+                                        setZoom((prev) => prev - 1);
+                                    }
                                 }}
                                 className={`${
                                     zoom === 0
@@ -172,14 +181,20 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
                             </div>
                             {zoom === 0 ? (
                                 <div
-                                    onClick={() => setZoom(ZOOM_SCALE.length)}
+                                    onClick={() => {
+                                        setRendered(false);
+                                        setZoom(ZOOM_SCALE.length);
+                                    }}
                                     className="hover-document__pagination"
                                 >
                                     <RiZoomInLine className="icon-document__pagination" />
                                 </div>
                             ) : (
                                 <div
-                                    onClick={() => setZoom(0)}
+                                    onClick={() => {
+                                        setRendered(false);
+                                        setZoom(0);
+                                    }}
                                     className="hover-document__pagination"
                                 >
                                     <RiZoomOutLine className="icon-document__pagination" />
@@ -188,8 +203,10 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
 
                             <div
                                 onClick={() => {
-                                    if (zoom < ZOOM_SCALE.length - 2)
+                                    if (zoom < ZOOM_SCALE.length - 2) {
+                                        setRendered(false);
                                         setZoom((prev) => prev + 1);
+                                    }
                                 }}
                                 className={`${
                                     zoom === ZOOM_SCALE.length - 2
