@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
-import pdfFile from '@assets/testpdf.pdf';
+import { Document as RenderDocument, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { Divider, Input, Space } from 'antd';
@@ -13,10 +12,11 @@ import {
     RiZoomOutLine,
 } from 'react-icons/ri';
 import BaseLoading from '@baseComponents/BaseLoading';
+import pdfFile from '@assets/testpdf.pdf';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-function BaseDocument({ containerRef }: { containerRef: any }) {
+function Document({ containerRef }: { containerRef: any }) {
     const [numPages, setNumPages] = useState<number>(0);
     const [value, setValue] = useState('1');
     const [zoom, setZoom] = useState(0);
@@ -55,7 +55,7 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
 
     return (
         <div>
-            <Document
+            <RenderDocument
                 file={pdfFile}
                 onLoadSuccess={({ numPages }) => {
                     setNumPages(numPages);
@@ -225,9 +225,9 @@ function BaseDocument({ containerRef }: { containerRef: any }) {
                         </Space>
                     </div>
                 </div>
-            </Document>
+            </RenderDocument>
         </div>
     );
 }
 
-export default BaseDocument;
+export default Document;

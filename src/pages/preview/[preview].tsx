@@ -12,7 +12,8 @@ import {
 } from 'react-icons/ri';
 import { GoLaw } from 'react-icons/go';
 import { useRouter } from 'next/router';
-import BaseDocument from '@baseComponents/BaseDocument';
+import Document from '@components/Document';
+import Media from '@components/Media';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -96,8 +97,11 @@ function Preview({ path }: { path: string }) {
         ),
     ];
 
-    const Document = memo(function Document() {
-        return <BaseDocument containerRef={containerRef} />;
+    const RenderDocument = memo(function RenderDocument() {
+        return <Document containerRef={containerRef} />;
+    });
+    const RenderMedia = memo(function RenderMedia() {
+        return <Media />;
     });
 
     return (
@@ -169,7 +173,8 @@ function Preview({ path }: { path: string }) {
                         ref={containerRef}
                     >
                         {/* Main Content */}
-                        <Document />
+                        {/* <RenderDocument /> */}
+                        <RenderMedia />
                     </Layout.Content>
                     <Layout.Sider
                         collapsed={isMoreInfo}

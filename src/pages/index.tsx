@@ -28,7 +28,9 @@ const Home: NextPage = () => {
     } = useDropzone({
         noClick: true,
         noKeyboard: true,
-        onDrop: (files) => console.log(files),
+        onDrop: (files) => {
+            console.log('🚀 ~ file: index.tsx:32 ~ files', files);
+        },
     });
 
     const {

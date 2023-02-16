@@ -13,7 +13,7 @@ module.exports = {
             },
         },
     },
-    plugins: [],
+    plugins: [require('vidstack/tailwind.cjs')],
     corePlugins: {
         preflight: false,
     },

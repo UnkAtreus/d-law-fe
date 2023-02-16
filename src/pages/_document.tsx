@@ -6,6 +6,7 @@ export default function Document() {
             <Head></Head>
             <body>
                 <title>D-Law | DMS-Platform</title>
+                <link rel="icon" href="logo.svg" type="image/x-icon"></link>
                 <Main />
                 <NextScript />
             </body>

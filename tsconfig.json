@@ -27,6 +27,7 @@
       "@locales/*": ["locales/*"],  
       "@interfaces/*": ["interfaces/*"],  
     },
+    "types": ["vidstack/globals"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prettier.config.js"],
   "exclude": ["node_modules"]
