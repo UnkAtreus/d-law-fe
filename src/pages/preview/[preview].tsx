@@ -149,7 +149,13 @@ function Preview({ path }: { path: string }) {
                         </Space>
 
                         <Space className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-                            <div>cneter1</div>
+                            <a
+                                target="_blank"
+                                href="https://twitter.com/"
+                                rel="noopener noreferrer"
+                            >
+                                <div>cneter1</div>
+                            </a>
                             <div>cneter2</div>
                         </Space>
 
