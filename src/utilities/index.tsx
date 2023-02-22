@@ -37,6 +37,19 @@ export enum FileTypes {
     ID = 'idCard',
 }
 
+export type TFileTypes =
+    | 'folder'
+    | 'pdf'
+    | 'word'
+    | 'excel'
+    | 'powerpoint'
+    | 'image'
+    | 'video'
+    | 'music'
+    | 'compress'
+    | 'text'
+    | 'idCard';
+
 export const FileTypeIcons = {
     IdCardIcon(props: any) {
         return <RiBankCardFill {...props} />;

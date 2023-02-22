@@ -7,12 +7,17 @@ const nextConfig = {
             use: ['@svgr/webpack'],
         });
         config.module.rules.push({
-            test: /\.(pdf)$/,
+            test: /\.(pdf|doc?x|xls?x)$/i,
             type: 'asset',
             generator: {
                 filename: 'static/chunks/[path][name].[hash][ext]',
             },
         });
+        config.module.rules.push({
+            test: /\.(txt)$/i,
+            use: 'raw-loader',
+        });
+
         return config;
     },
 };

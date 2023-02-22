@@ -1,19 +1,22 @@
-import { ActionType, ProColumns, ProTable } from '@ant-design/pro-table';
+import { ProColumns, ProTable } from '@ant-design/pro-table';
 import { ProCard } from '@ant-design/pro-card';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import en_US from 'antd/locale/en_US';
 
 import guidelineService from '@services/guidelineService';
-import { Col, ConfigProvider, Form, Row, Space, Tag, Typography } from 'antd';
+import { Avatar, Col, ConfigProvider, Form, Row, Tag, Typography } from 'antd';
 
 import { NextPage } from 'next';
-import { useRef } from 'react';
 
-import request from 'umi-request';
 import { useDropzone } from 'react-dropzone';
 import BaseLoading from '@baseComponents/BaseLoading';
-import { FileTypeIcons } from '@utilities/index';
+import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
+import { TCaseFolder } from '@interfaces/index';
+import router from 'next/router';
+import { RiFile2Fill, RiFileUploadFill } from 'react-icons/ri';
+import dayjs from 'dayjs';
+import { DOCUMENT_DATASOURCE } from 'mocks/mockTable';
 
 const Home: NextPage = () => {
     const { data, isLoading } = guidelineService.getData('1');
@@ -47,73 +50,64 @@ const Home: NextPage = () => {
         ZipIcon,
     } = FileTypeIcons;
 
-    type ItemType = {
-        [x: string]: any;
-    };
-
-    const columns: ProColumns<ItemType>[] = [
+    const columns: ProColumns<TCaseFolder>[] = [
+        {
+            title: <RiFile2Fill className="m-auto" />,
+            dataIndex: 'type',
+            render: (type: any) => {
+                return showFileIcon(type);
+            },
+            align: 'center',
+            width: 48,
+        },
         {
             title: 'ชื่อไฟล์',
             dataIndex: 'title',
             ellipsis: true,
-            formItemProps: {
-                rules: [
-                    {
-                        required: true,
-                        message: 'message',
-                    },
-                ],
-            },
         },
         {
-            disable: true,
-            title: 'title',
-            dataIndex: 'labels',
-            search: false,
-            renderFormItem: (_: any, { defaultRender }: any) => {
-                return defaultRender(_);
-            },
-            render: (_: any, record: any) => (
-                <Space>
-                    {record.labels.map(
-                        ({ name, color }: { name: any; color: any }) => (
-                            <Tag color={color} key={name}>
-                                {name}
-                            </Tag>
-                        )
-                    )}
-                </Space>
+            title: 'แท๊ก',
+            dataIndex: 'tags',
+            render: (_, record) => (
+                <div className="flex flex-wrap">
+                    {record.tags.map((name) => (
+                        <Tag key={name}>{name}</Tag>
+                    ))}
+                </div>
             ),
         },
         {
-            title: 'showTime',
-            key: 'showTime',
+            title: 'วันที่สร้าง/เจ้าของ',
             dataIndex: 'created_at',
-            valueType: 'date',
-            sorter: true,
-            hideInSearch: true,
+            // valueType: 'dateTime',
+            render: (text: any, record) => (
+                <div className="flex flex-col ">
+                    <div className="text-gray-400">
+                        {dayjs(text).format('DD MMM YYYY - HH:MM')}
+                    </div>
+                    <div>{record.owner}</div>
+                </div>
+            ),
         },
         {
-            title: 'created_at',
-            dataIndex: 'created_at',
-            valueType: 'dateRange',
-            hideInTable: true,
-            search: {
-                transform: (value: any[]) => {
-                    return {
-                        startTime: value[0],
-                        endTime: value[1],
-                    };
-                },
-            },
+            title: 'แชร์ร่วมกับ',
+            dataIndex: 'share_with',
+            render: (text, record) => (
+                <Avatar.Group>
+                    <Avatar>{text}</Avatar>
+                </Avatar.Group>
+            ),
         },
         {
-            title: 'title',
-            valueType: 'option',
-            key: 'option',
+            title: 'แก้ไขล่าสุด',
+            dataIndex: 'last_edited',
+            render: (text: any) => (
+                <div className="text-gray-400">
+                    {dayjs(text).format('DD MMM YYYY - HH:MM')}
+                </div>
+            ),
         },
     ];
-    const actionRef = useRef<ActionType>();
 
     const Tags: ITag[] = [
         {
@@ -221,18 +215,7 @@ const Home: NextPage = () => {
                                     >
                                         <FolderIcon className="icon text-gray-500 transition group-hover:text-primary" />
                                         <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
-                                            น้องสมชาย
-                                        </span>
-                                    </div>
-                                </Col>
-                                <Col span={4}>
-                                    <div
-                                        className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-gray-200 bg-white py-5 pl-4 pr-6 "
-                                        style={{ borderStyle: 'solid' }}
-                                    >
-                                        <FolderIcon className="icon text-gray-500 transition group-hover:text-primary" />
-                                        <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
-                                            น้องสมชาย
+                                            นายสมชาย
                                         </span>
                                     </div>
                                 </Col>
@@ -240,9 +223,9 @@ const Home: NextPage = () => {
                         </ProCard>
 
                         <ConfigProvider locale={en_US}>
-                            <ProTable<ItemType>
+                            <ProTable<TCaseFolder>
                                 columns={columns}
-                                actionRef={actionRef}
+                                dataSource={DOCUMENT_DATASOURCE}
                                 cardBordered
                                 cardProps={{
                                     collapsible: true,
@@ -255,20 +238,20 @@ const Home: NextPage = () => {
                                         </Typography.Title>
                                     ),
                                 }}
-                                request={async (
-                                    params = {},
-                                    sort: any,
-                                    filter: any
-                                ) => {
-                                    return request<{
-                                        data: ItemType[];
-                                    }>(
-                                        'https://proapi.azurewebsites.net/github/issues',
-                                        {
-                                            params,
-                                        }
-                                    );
-                                }}
+                                // request={async (
+                                //     params = {},
+                                //     sort: any,
+                                //     filter: any
+                                // ) => {
+                                //     return request<{
+                                //         data: ItemType[];
+                                //     }>(
+                                //         'https://proapi.azurewebsites.net/github/issues',
+                                //         {
+                                //             params,
+                                //         }
+                                //     );
+                                // }}
                                 rowKey="id"
                                 options={{
                                     setting: false,
@@ -276,12 +259,54 @@ const Home: NextPage = () => {
                                     density: false,
                                 }}
                                 search={false}
+                                onRow={(record) => {
+                                    return {
+                                        onDoubleClick: () => {
+                                            if (
+                                                record.type === FileTypes.FOLDER
+                                            ) {
+                                                router.push(
+                                                    `/document${record.path}`
+                                                );
+                                            } else if (
+                                                record.type === FileTypes.ZIP
+                                            ) {
+                                                console.log('download');
+                                            } else {
+                                                router.push(
+                                                    `/preview${record.path}`
+                                                );
+                                            }
+                                        },
+                                    };
+                                }}
                                 pagination={{
                                     pageSize: 50,
                                     onChange: (page: any) => console.log(page),
                                 }}
                                 dateFormatter="string"
-                                headerTitle=" "
+                                className="relative"
+                                footer={() => {
+                                    if (isDragActive)
+                                        return (
+                                            <div
+                                                className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
+                                                style={{ borderStyle: 'solid' }}
+                                            >
+                                                <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
+                                                    <div className="rounded-md bg-primary py-2 px-6 text-center">
+                                                        <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
+                                                        <div className="-mt-2 text-white">
+                                                            วางไฟล์
+                                                        </div>
+                                                        <div className="text-white">
+                                                            เพื่ออัพโหลด
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                }}
                             />
                         </ConfigProvider>
                     </Col>

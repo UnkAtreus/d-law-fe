@@ -19,6 +19,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
                         wireframe: false,
                         colorBgLayout: '#F1F5F9',
                         colorTextBase: '#4b5563',
+                        colorFillSecondary: 'rgb(142 84 49 / 0.06)',
                     },
                     components: {
                         Menu: {

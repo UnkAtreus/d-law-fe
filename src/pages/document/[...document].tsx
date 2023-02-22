@@ -24,6 +24,7 @@ import {
 } from 'antd';
 import en_US from 'antd/locale/en_US';
 import dayjs from 'dayjs';
+import { DOCUMENT_DATASOURCE } from 'mocks/mockTable';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -219,30 +220,7 @@ function Document({ path }: { path: string[] }) {
                     <ConfigProvider locale={en_US}>
                         <ProTable<TCaseFolder>
                             columns={columns}
-                            dataSource={[
-                                {
-                                    id: '00000001',
-                                    type: 'folder',
-                                    title: 'น้องสมชาย',
-                                    tags: ['อ. 266/2565', 'ม.112'],
-                                    created_at: new Date(),
-                                    owner: 'Kittipat Dechkul',
-                                    share_with: ['KD'],
-                                    last_edited: new Date(),
-                                    path: '/11012323112',
-                                },
-                                {
-                                    id: '00000002',
-                                    type: 'pdf',
-                                    title: 'ไฟล์ทดสอบ.pdf',
-                                    tags: ['อ. 266/2565', 'ม.112'],
-                                    created_at: new Date(),
-                                    owner: 'Kittipat Dechkul',
-                                    share_with: ['KD'],
-                                    last_edited: new Date(),
-                                    path: '/11233546',
-                                },
-                            ]}
+                            dataSource={DOCUMENT_DATASOURCE}
                             cardBordered
                             cardProps={{
                                 headStyle: { marginBottom: '16px' },

@@ -1,19 +1,39 @@
 import React, { memo, useRef, useState } from 'react';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
-import { Button, Layout, Menu, MenuProps, Space, theme, Tooltip } from 'antd';
+import {
+    Button,
+    Divider,
+    Dropdown,
+    Layout,
+    Menu,
+    MenuProps,
+    Space,
+    theme,
+    Tooltip,
+} from 'antd';
 import {
     RiComputerLine,
     RiFileCopy2Line,
     RiCalendarTodoLine,
     RiSettings5Line,
     RiArrowLeftSLine,
+    RiDownloadFill,
+    RiShareForward2Fill,
+    RiMore2Fill,
     RiInformationLine,
+    RiFolderTransferLine,
+    RiEditLine,
 } from 'react-icons/ri';
 import { GoLaw } from 'react-icons/go';
 import { useRouter } from 'next/router';
 import Document from '@components/Document';
 import Media from '@components/Media';
+import { FileTypes } from '@utilities/index';
+
+import Text from '@components/Text';
+import FileNotFound from '@components/FileNotFound';
+import dayjs from 'dayjs';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -40,11 +60,18 @@ export async function getServerSideProps(ctx: any) {
     return {
         props: {
             path: preview || null,
+            type: 'pdf',
         },
     };
 }
 
-function Preview({ path }: { path: string }) {
+function Preview({
+    path: FILE_PATH,
+    type: FILE_TYPE,
+}: {
+    path: string;
+    type: FileTypes;
+}) {
     const [isMoreInfo, setIsMoreInfo] = useState<boolean>(true);
 
     const containerRef = useRef<any>();
@@ -54,7 +81,6 @@ function Preview({ path }: { path: string }) {
     } = theme.useToken();
 
     const router = useRouter();
-    const FILE_PATH = path;
 
     const items: MenuProps['items'] = [
         getItem(
@@ -97,11 +123,47 @@ function Preview({ path }: { path: string }) {
         ),
     ];
 
+    const info_items: MenuProps['items'] = [
+        getItem(
+            <div className="flex space-x-2">
+                <RiFolderTransferLine className="icon text-gray-500" />
+                <span className="self-center">ย้ายไปที่</span>
+            </div>,
+            'movefile'
+        ),
+        getItem(
+            <div className="flex space-x-2">
+                <RiEditLine className="icon text-gray-500" />
+                <span className="self-center">เปลี่ยนชื่อ</span>
+            </div>,
+            'changename'
+        ),
+        getItem(
+            <div
+                className="flex space-x-2"
+                onClick={() => {
+                    console.log(isMoreInfo);
+                    setIsMoreInfo(!isMoreInfo);
+                }}
+            >
+                <RiInformationLine className="icon text-gray-500" />
+                <span className="self-center">รายละเอียด</span>
+            </div>,
+            'moreinfo'
+        ),
+    ];
+
     const RenderDocument = memo(function RenderDocument() {
         return <Document containerRef={containerRef} />;
     });
+    const RenderTxt = memo(function RenderTxt() {
+        return <Text />;
+    });
     const RenderMedia = memo(function RenderMedia() {
-        return <Media />;
+        return <Media type={'video'} />;
+    });
+    const RenderNotFound = memo(function RenderNotFound() {
+        return <FileNotFound />;
     });
 
     return (
@@ -138,17 +200,22 @@ function Preview({ path }: { path: string }) {
                 >
                     <div className="relative flex items-center justify-between px-6">
                         <Space>
-                            <RiArrowLeftSLine
+                            <Button
+                                shape="circle"
+                                type="text"
                                 onClick={() => router.back()}
-                                className="icon cursor-pointer"
+                                icon={
+                                    <RiArrowLeftSLine className="icon__button " />
+                                }
                             />
+
                             <h1 className="font-bold">
                                 {FILE_PATH.charAt(0).toUpperCase() +
                                     FILE_PATH.slice(1)}
                             </h1>
                         </Space>
 
-                        <Space className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+                        {/* <Space className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
                             <a
                                 target="_blank"
                                 href="https://twitter.com/"
@@ -157,19 +224,38 @@ function Preview({ path }: { path: string }) {
                                 <div>cneter1</div>
                             </a>
                             <div>cneter2</div>
-                        </Space>
+                        </Space> */}
 
                         <Space>
-                            <Button>เผยแพร่</Button>
-                            <div
-                                className="z-10"
-                                onClick={() => {
-                                    console.log(isMoreInfo);
-                                    setIsMoreInfo(!isMoreInfo);
-                                }}
+                            <Button
+                                icon={
+                                    <RiDownloadFill className="icon__button mr-2" />
+                                }
                             >
-                                <RiInformationLine className="icon text-gray-500" />
-                            </div>
+                                ดาวน์โหลดไฟล์
+                            </Button>
+                            <Button
+                                type="primary"
+                                icon={
+                                    <RiShareForward2Fill className="icon__button mr-2" />
+                                }
+                            >
+                                เผยแพร่
+                            </Button>
+
+                            <Dropdown
+                                menu={{ items: info_items }}
+                                trigger={['click']}
+                                overlayClassName="w-64"
+                            >
+                                <Button
+                                    shape="circle"
+                                    type="text"
+                                    icon={
+                                        <RiMore2Fill className="icon__button w-" />
+                                    }
+                                />
+                            </Dropdown>
                         </Space>
                     </div>
                 </Layout.Header>
@@ -179,8 +265,11 @@ function Preview({ path }: { path: string }) {
                         ref={containerRef}
                     >
                         {/* Main Content */}
-                        {/* <RenderDocument /> */}
-                        <RenderMedia />
+                        <RenderDocument />
+                        {/* <RenderMedia /> */}
+                        {/* <RenderMicrosoft /> */}
+                        {/* <RenderTxt /> */}
+                        {/* <RenderNotFound /> */}
                     </Layout.Content>
                     <Layout.Sider
                         collapsed={isMoreInfo}
@@ -193,7 +282,44 @@ function Preview({ path }: { path: string }) {
                         }}
                         width={320}
                     >
-                        <div>test</div>
+                        <div>
+                            <div className="px-6 pt-6 text-xl">
+                                รายละเอียดไฟล์
+                            </div>
+                        </div>
+                        <Divider className="my-6" />
+                        <div className="flex flex-col space-y-4 px-6 pb-6">
+                            <div>
+                                <div>ชนิดไฟล์</div>
+                                <div className="text-base text-gray-500">
+                                    เอกสาร PDF
+                                </div>
+                            </div>
+                            <div>
+                                <div>ขนาดไฟล์</div>
+                                <div className="text-base text-gray-500">
+                                    37.4 ไบต์
+                                </div>
+                            </div>
+                            <div>
+                                <div>เจ้าของไฟล์</div>
+                                <div className="text-base text-gray-500">
+                                    Kittipat Dechkul
+                                </div>
+                            </div>
+                            <div>
+                                <div>แก้ไขวันที่</div>
+                                <div className="text-base text-gray-500">
+                                    {'-'}
+                                </div>
+                            </div>
+                            <div>
+                                <div>สร้างขึ้นวันที่</div>
+                                <div className="text-base text-gray-500">
+                                    {dayjs().format('DD MMM YYYY')}
+                                </div>
+                            </div>
+                        </div>
                     </Layout.Sider>
                 </Layout>
             </Layout>

@@ -1,0 +1,2 @@
+FLAG_WTCTT_04{c971f0a3e40893bd1453bcd4bfa3904c}
+test

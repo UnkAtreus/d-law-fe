@@ -15,6 +15,10 @@
     @apply inline-flex h-6 w-6 items-center justify-center;
 }
 
+.icon__button {
+    @apply inline-flex h-5 w-5 items-center justify-center;
+}
+
 .icon-document__pagination {
     @apply inline-flex h-4 w-4 items-center justify-center text-gray-700;
 }
@@ -163,6 +167,10 @@ img,
 video {
     max-width: 100%;
     height: auto;
+}
+
+audio::-webkit-media-controls-panel {
+    @apply bg-white/70;
 }
 
 [hidden] {
