@@ -367,10 +367,6 @@ function Document({ path }: { path: string[] }) {
                                             router.push(
                                                 `/document${record.path}`
                                             );
-                                        } else if (
-                                            record.type === FileTypes.ZIP
-                                        ) {
-                                            console.log('download');
                                         } else {
                                             router.push(
                                                 `/preview${record.path}?type=${record.type}`,

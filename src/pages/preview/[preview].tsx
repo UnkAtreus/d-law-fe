@@ -77,6 +77,7 @@ function Preview({
     console.log('🚀 ~ file: [preview].tsx:75 ~ FILE_TYPE', FILE_TYPE);
 
     const [isMoreInfo, setIsMoreInfo] = useState<boolean>(true);
+    const [fileType, setFileType] = useState<string>(FILE_TYPE);
 
     const containerRef = useRef<any>();
 
@@ -163,8 +164,12 @@ function Preview({
     const RenderTxt = memo(function RenderTxt() {
         return <Text />;
     });
-    const RenderMedia = memo(function RenderMedia() {
-        return <Media type={'video'} />;
+    const RenderMedia = memo(function RenderMedia({
+        type,
+    }: {
+        type: 'video' | 'music';
+    }) {
+        return <Media type={type} />;
     });
     const RenderImage = memo(function RenderImage() {
         // eslint-disable-next-line jsx-a11y/alt-text
@@ -172,6 +177,33 @@ function Preview({
     });
     const RenderNotFound = memo(function RenderNotFound() {
         return <FileNotFound />;
+    });
+
+    const RenderFile = memo(function RenderFile() {
+        const { DOC, IMAGE, MUSIC, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
+            FileTypes;
+        switch (fileType) {
+            case VIDEO:
+                return <RenderMedia type={'video'} />;
+            case MUSIC:
+                return <RenderMedia type={'music'} />;
+            case PDF:
+                return <RenderDocument />;
+            case DOC:
+                return <RenderDocument />;
+            case PTT:
+                return <RenderDocument />;
+            case XLS:
+                return <RenderDocument />;
+            case IMAGE:
+                return <RenderImage />;
+            case TEXT:
+                return <RenderTxt />;
+            case ZIP:
+                return <RenderNotFound />;
+            default:
+                return <RenderNotFound />;
+        }
     });
 
     return (
@@ -240,7 +272,7 @@ function Preview({
                                     <RiDownloadFill className="icon__button mr-2" />
                                 }
                             >
-                                ดาวน์โหลดไฟล์
+                                ดาวน์โหลด
                             </Button>
                             <Button
                                 type="primary"
@@ -273,12 +305,7 @@ function Preview({
                         ref={containerRef}
                     >
                         {/* Main Content */}
-                        {/* <RenderDocument /> */}
-                        {/* <RenderMedia /> */}
-                        {/* <RenderMicrosoft /> */}
-                        {/* <RenderTxt /> */}
-                        {/* <RenderNotFound /> */}
-                        <RenderImage />
+                        <RenderFile />
                     </Layout.Content>
                     <Layout.Sider
                         collapsed={isMoreInfo}
