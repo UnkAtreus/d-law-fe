@@ -373,6 +373,7 @@ function Document({ path }: { path: string[] }) {
                                             console.log('download');
                                         } else {
                                             router.push(
+                                                `/preview${record.path}?type=${record.type}`,
                                                 `/preview${record.path}`
                                             );
                                         }

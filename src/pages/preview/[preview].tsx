@@ -34,6 +34,7 @@ import { FileTypes } from '@utilities/index';
 import Text from '@components/Text';
 import FileNotFound from '@components/FileNotFound';
 import dayjs from 'dayjs';
+import Image from '@components/Image';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -54,13 +55,13 @@ function getItem(
 }
 
 export async function getServerSideProps(ctx: any) {
-    const { params } = ctx;
+    const { params, query } = ctx;
     const { preview } = params;
 
     return {
         props: {
             path: preview || null,
-            type: 'pdf',
+            type: query?.type || 'pdf',
         },
     };
 }
@@ -72,6 +73,9 @@ function Preview({
     path: string;
     type: FileTypes;
 }) {
+    // TODO: Check file type if does not exist in query parameter, using useEffect and SWR
+    console.log('🚀 ~ file: [preview].tsx:75 ~ FILE_TYPE', FILE_TYPE);
+
     const [isMoreInfo, setIsMoreInfo] = useState<boolean>(true);
 
     const containerRef = useRef<any>();
@@ -161,6 +165,10 @@ function Preview({
     });
     const RenderMedia = memo(function RenderMedia() {
         return <Media type={'video'} />;
+    });
+    const RenderImage = memo(function RenderImage() {
+        // eslint-disable-next-line jsx-a11y/alt-text
+        return <Image />;
     });
     const RenderNotFound = memo(function RenderNotFound() {
         return <FileNotFound />;
@@ -265,11 +273,12 @@ function Preview({
                         ref={containerRef}
                     >
                         {/* Main Content */}
-                        <RenderDocument />
+                        {/* <RenderDocument /> */}
                         {/* <RenderMedia /> */}
                         {/* <RenderMicrosoft /> */}
                         {/* <RenderTxt /> */}
                         {/* <RenderNotFound /> */}
+                        <RenderImage />
                     </Layout.Content>
                     <Layout.Sider
                         collapsed={isMoreInfo}

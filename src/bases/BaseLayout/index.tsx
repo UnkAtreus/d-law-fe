@@ -99,7 +99,7 @@ const BaseLayout = {
             getItem(
                 'Logout',
                 'logout',
-                <RiLogoutBoxLine className="m-auto h-6 w-6" />
+                <RiLogoutBoxLine className="icon__button m-auto" />
             ),
         ];
 
@@ -136,9 +136,13 @@ const BaseLayout = {
                     >
                         <div className="flex items-center justify-between px-6 ">
                             <Space>
-                                <RiArrowLeftSLine
+                                <Button
+                                    shape="circle"
+                                    type="text"
                                     onClick={() => router.back()}
-                                    className="icon cursor-pointer"
+                                    icon={
+                                        <RiArrowLeftSLine className="icon__button " />
+                                    }
                                 />
                                 <h1 className="font-bold">
                                     {path.charAt(0).toUpperCase() +
@@ -302,10 +306,15 @@ const BaseLayout = {
                     >
                         <div className="flex items-center justify-between px-6 ">
                             <Space>
-                                <RiArrowLeftSLine
+                                <Button
+                                    shape="circle"
+                                    type="text"
                                     onClick={() => router.back()}
-                                    className="icon cursor-pointer"
+                                    icon={
+                                        <RiArrowLeftSLine className="icon__button " />
+                                    }
                                 />
+
                                 <h1 className="font-bold">
                                     {fileName.charAt(0).toUpperCase() +
                                         fileName.slice(1)}
