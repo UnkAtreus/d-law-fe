@@ -164,7 +164,7 @@ function CaseFolder() {
                                                 title={
                                                     <Space>
                                                         <RiFolderAddFill className="icon" />
-                                                        <span>
+                                                        <span className="text-base">
                                                             สร้างเคสใหม่
                                                         </span>
                                                     </Space>

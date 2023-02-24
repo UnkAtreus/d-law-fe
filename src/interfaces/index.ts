@@ -17,3 +17,7 @@ export interface TCreateFolder {
     title?: string;
     discription?: string;
 }
+
+export interface TCreateSubFolder {
+    name: string;
+}

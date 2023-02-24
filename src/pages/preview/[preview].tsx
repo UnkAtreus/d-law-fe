@@ -24,6 +24,7 @@ import {
     RiInformationLine,
     RiFolderTransferLine,
     RiEditLine,
+    RiCloseFill,
 } from 'react-icons/ri';
 import { GoLaw } from 'react-icons/go';
 import { useRouter } from 'next/router';
@@ -318,10 +319,19 @@ function Preview({
                         }}
                         width={320}
                     >
-                        <div>
+                        <div className="flex items-end justify-between">
                             <div className="px-6 pt-6 text-xl">
                                 รายละเอียดไฟล์
                             </div>
+                            <Button
+                                type="text"
+                                shape="circle"
+                                className="mr-4"
+                                onClick={() => setIsMoreInfo(!isMoreInfo)}
+                                icon={
+                                    <RiCloseFill className="icon text-gray-600" />
+                                }
+                            />
                         </div>
                         <Divider className="my-6" />
                         <div className="flex flex-col space-y-4 px-6 pb-6">

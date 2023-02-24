@@ -1,8 +1,12 @@
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import ProTable, { ProColumns } from '@ant-design/pro-table';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
-import { TCreateFolder, TCaseFolder } from '@interfaces/index';
+import {
+    TCreateFolder,
+    TCaseFolder,
+    TCreateSubFolder,
+} from '@interfaces/index';
 import thTH from '@locales/th_TH';
 import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
 import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
@@ -13,18 +17,20 @@ import {
     Row,
     Col,
     ConfigProvider,
-    Typography,
-    Badge,
     Space,
     Button,
-    Collapse,
     Upload,
     FloatButton,
     Progress,
+    Input,
+    Drawer,
+    Divider,
+    Breadcrumb,
 } from 'antd';
 import en_US from 'antd/locale/en_US';
 import dayjs from 'dayjs';
 import { DOCUMENT_DATASOURCE } from 'mocks/mockTable';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -33,6 +39,13 @@ import {
     RiFolderAddFill,
     RiFileUploadFill,
     RiUploadLine,
+    RiEqualizerLine,
+    RiSearchLine,
+    RiTeamFill,
+    RiHistoryFill,
+    RiAddFill,
+    RiUserAddFill,
+    RiUserLine,
 } from 'react-icons/ri';
 
 export async function getServerSideProps(ctx: any) {
@@ -48,10 +61,13 @@ export async function getServerSideProps(ctx: any) {
 
 function Document({ path }: { path: string[] }) {
     const [isUpload, setIsUpload] = useState(false);
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [openMoreInfo, setOpenMoreInfo] = useState<boolean>(false);
 
     const router = useRouter();
     const { fileLists, setFileLists } = useUpload();
-    const [form] = Form.useForm<TCreateFolder>();
+    const [subfolder_form] = Form.useForm<TCreateSubFolder>();
+    const [share_form] = Form.useForm<TCreateFolder>();
     const { getRootProps, isDragActive } = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -208,13 +224,39 @@ function Document({ path }: { path: string[] }) {
         <BaseLayout.Main path={'document'}>
             <Row gutter={24}>
                 <Col xl={5} xxl={4}>
-                    <BaseTag
-                        items={Tags}
-                        defaultTag="tag_1"
-                        onChange={(key, tag) => {
-                            console.log(key, tag);
-                        }}
-                    />
+                    <div className="space-y-4">
+                        <Upload
+                            multiple
+                            showUploadList={false}
+                            onChange={(info) => {
+                                const file = info.file;
+                                if (info.file.status !== 'uploading') {
+                                    console.log(info.file, info.fileList);
+                                }
+                                if (info.file.status === 'done') {
+                                    setFileLists((prev) => [...prev, file]);
+                                }
+                            }}
+                            className="document-upload"
+                        >
+                            <Button
+                                icon={
+                                    <RiFileUploadFill className="icon__button mr-2" />
+                                }
+                                size="large"
+                                block
+                            >
+                                อัพโหลดไฟล์เอกสาร
+                            </Button>
+                        </Upload>
+                        <BaseTag
+                            items={Tags}
+                            defaultTag="tag_1"
+                            onChange={(key, tag) => {
+                                console.log(key, tag);
+                            }}
+                        />
+                    </div>
                 </Col>
                 <Col xl={19} xxl={20} className="space-y-6" {...getRootProps()}>
                     <ConfigProvider locale={en_US}>
@@ -225,42 +267,56 @@ function Document({ path }: { path: string[] }) {
                             cardProps={{
                                 headStyle: { marginBottom: '16px' },
                                 title: (
-                                    <Typography.Title
-                                        level={4}
-                                        className="inline"
-                                        style={{ marginBottom: '24px' }}
-                                    >
-                                        โฟลเดอร์เคส{' '}
-                                        <Badge count={1} color={'#8e5531'} />
-                                    </Typography.Title>
+                                    <div className="mb-6 inline">
+                                        <Breadcrumb
+                                            separator=">"
+                                            className="items-cennter"
+                                        >
+                                            <Breadcrumb.Item className="text-lg font-medium">
+                                                <Link href={'/document'}>
+                                                    โฟลเดอร์เคส
+                                                </Link>
+                                            </Breadcrumb.Item>
+                                            <Breadcrumb.Item className="h-full text-base font-medium ">
+                                                นายทดสอบ
+                                            </Breadcrumb.Item>
+                                        </Breadcrumb>
+                                    </div>
                                 ),
                                 extra: (
-                                    <Space>
+                                    <Space size={'middle'}>
                                         <ConfigProvider locale={thTH}>
-                                            <ModalForm<TCreateFolder>
+                                            <ModalForm<TCreateSubFolder>
                                                 trigger={
                                                     <Button
-                                                        type="primary"
-                                                        size="middle"
+                                                        type="text"
+                                                        size="large"
+                                                        shape="circle"
                                                         icon={
-                                                            <RiFolderAddFill className="icon mr-2" />
+                                                            <RiFolderAddFill className="icon text-gray-500" />
                                                         }
-                                                    >
-                                                        สร้างเคสใหม่
-                                                    </Button>
+                                                    />
                                                 }
-                                                form={form}
+                                                form={subfolder_form}
                                                 title={
                                                     <Space>
                                                         <RiFolderAddFill className="icon" />
                                                         <span>
-                                                            สร้างเคสใหม่
+                                                            สร้างโฟลเดอร์ใหม่
                                                         </span>
                                                     </Space>
                                                 }
                                                 autoFocusFirstInput
                                                 modalProps={{
                                                     destroyOnClose: true,
+                                                    okText: (
+                                                        <div className="flex items-center space-x-2">
+                                                            <RiAddFill className="icon__button" />
+                                                            <span className="text-base">
+                                                                สร้างโฟลเดอร์
+                                                            </span>
+                                                        </div>
+                                                    ),
                                                 }}
                                                 onFinish={async (values) => {
                                                     console.log(values);
@@ -268,88 +324,172 @@ function Document({ path }: { path: string[] }) {
                                             >
                                                 <ProFormText
                                                     name="name"
-                                                    label="ชื่อเคส"
-                                                    placeholder={'ชื่อเคส'}
+                                                    label="ชื่อโฟลเดอร์"
+                                                    placeholder={'ชื่อโฟลเดอร์'}
                                                     rules={[{ required: true }]}
                                                 />
-                                                <ProFormText
-                                                    name="caseNumber"
-                                                    label="หมายเลขคดี"
-                                                    rules={[{ required: true }]}
-                                                    placeholder={
-                                                        'หมายเลขคดีดำ/แดง'
-                                                    }
-                                                />
-                                                <Collapse
-                                                    ghost
-                                                    expandIconPosition="end"
-                                                >
-                                                    <Collapse.Panel
-                                                        header={
-                                                            <div className="p-0">
-                                                                รายละเอียดเพิ่มเติม
-                                                            </div>
-                                                        }
-                                                        key="moreDetails"
-                                                    >
-                                                        <ProFormText
-                                                            name="email"
-                                                            label="อีเมลลูกความ"
-                                                            placeholder={
-                                                                'อีเมลของลูกความ'
-                                                            }
-                                                            rules={[
-                                                                {
-                                                                    type: 'email',
-                                                                    message:
-                                                                        'กรุณากรอกอีเมลให้ถูกต้อง',
-                                                                },
-                                                            ]}
-                                                        />
-                                                        <ProFormText
-                                                            name="title"
-                                                            label="ข้อหา"
-                                                            placeholder={
-                                                                'ข้อหา'
-                                                            }
-                                                        />
-                                                        <ProFormTextArea
-                                                            name="discription"
-                                                            label="รายละเอียด"
-                                                            placeholder={
-                                                                'รายละเอียดเพิ่มเติม'
-                                                            }
-                                                        />
-                                                    </Collapse.Panel>
-                                                </Collapse>
                                             </ModalForm>
+                                            <ModalForm<TCreateFolder>
+                                                width="640px"
+                                                trigger={
+                                                    <Button
+                                                        type="text"
+                                                        size="large"
+                                                        shape="circle"
+                                                        icon={
+                                                            <RiTeamFill className="icon text-gray-500" />
+                                                        }
+                                                    ></Button>
+                                                }
+                                                form={share_form}
+                                                title={
+                                                    <Space>
+                                                        <RiUserAddFill className="icon" />
+                                                        <span className="text-base">
+                                                            จัดการสิทธิการเข้าถึง
+                                                        </span>
+                                                    </Space>
+                                                }
+                                                // autoFocusFirstInput
+                                                modalProps={{
+                                                    destroyOnClose: true,
+                                                    footer: (
+                                                        <Button key="back">
+                                                            Return
+                                                        </Button>
+                                                    ),
+                                                }}
+                                                onFinish={async (values) => {
+                                                    console.log(values);
+                                                }}
+                                                initialValues={{
+                                                    permission: 'watch',
+                                                }}
+                                            >
+                                                <div className="flex w-full items-end space-x-2">
+                                                    <ProFormSelect
+                                                        name="name"
+                                                        label="เพิ่มอีเมล"
+                                                        placeholder="อีเมล"
+                                                        mode="multiple"
+                                                        formItemProps={{
+                                                            className: 'w-full',
+                                                        }}
+                                                        fieldProps={{
+                                                            filterOption: true,
+                                                            onChange: (
+                                                                item
+                                                            ) => {
+                                                                setSelectedItems(
+                                                                    item
+                                                                );
+                                                            },
+                                                            optionItemRender(
+                                                                item
+                                                            ) {
+                                                                return (
+                                                                    <div className="flex items-center space-x-2">
+                                                                        <Avatar
+                                                                            icon={
+                                                                                <RiUserLine className="icon__button" />
+                                                                            }
+                                                                        />
+                                                                        <div className="-space-y-1">
+                                                                            <div className="text-base font-medium">
+                                                                                {
+                                                                                    item.label
+                                                                                }
+                                                                            </div>
+                                                                            <div className="text-gray-500">
+                                                                                {
+                                                                                    item.value
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            },
+                                                            options: [
+                                                                {
+                                                                    label: 'Choolerk T',
+                                                                    value: 'choolerk@gmail.com',
+                                                                },
+                                                                {
+                                                                    label: 'Unresolved',
+                                                                    value: 'open',
+                                                                },
+                                                                {
+                                                                    label: 'Resolved',
+                                                                    value: 'closed',
+                                                                },
+                                                                {
+                                                                    label: 'Resolving',
+                                                                    value: 'processing',
+                                                                },
+                                                            ].filter(
+                                                                (item) =>
+                                                                    !selectedItems.includes(
+                                                                        item.value
+                                                                    )
+                                                            ),
+                                                        }}
+                                                    />
+                                                    <ProFormSelect
+                                                        name="permission"
+                                                        valueEnum={{
+                                                            watch: 'สามารถดู',
+                                                            edit: 'สามารถแก้ไข',
+                                                        }}
+                                                        allowClear={false}
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center space-x-4">
+                                                            <Avatar
+                                                                size={'large'}
+                                                                icon={
+                                                                    <RiUserLine className="icon" />
+                                                                }
+                                                            />
+                                                            <div className="">
+                                                                <div className="text-base font-medium">
+                                                                    Kittipat
+                                                                    Dechkul
+                                                                </div>
+                                                                <div className="text-gray-500">
+                                                                    kittipat2544@gmail.com
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <span>เจ้าของ</span>
+                                                    </div>
+                                                </div>
+                                            </ModalForm>
+                                            <Button
+                                                type="text"
+                                                size="large"
+                                                shape="circle"
+                                                icon={
+                                                    <RiHistoryFill className="icon text-gray-500" />
+                                                }
+                                                onClick={() =>
+                                                    setOpenMoreInfo(true)
+                                                }
+                                            ></Button>
                                         </ConfigProvider>
-                                        <Upload
-                                            multiple
-                                            showUploadList={false}
-                                            onChange={(info) => {
-                                                const file = info.file;
-                                                if (
-                                                    info.file.status !==
-                                                    'uploading'
-                                                ) {
-                                                    console.log(
-                                                        info.file,
-                                                        info.fileList
-                                                    );
-                                                }
-                                                if (
-                                                    info.file.status === 'done'
-                                                ) {
-                                                    setFileLists((prev) => [
-                                                        ...prev,
-                                                        file,
-                                                    ]);
-                                                }
-                                            }}
-                                        >
-                                            <Button></Button>
-                                        </Upload>
+                                        <Input
+                                            size="large"
+                                            placeholder="ค้นหาเอกสาร"
+                                            prefix={
+                                                <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
+                                            }
+                                            suffix={
+                                                <RiEqualizerLine className="h-5 w-5 cursor-pointer text-gray-500" />
+                                            }
+                                            className="w-96"
+                                        />
                                     </Space>
                                 ),
                             }}
@@ -407,6 +547,58 @@ function Document({ path }: { path: string[] }) {
                     </ConfigProvider>
                 </Col>
             </Row>
+
+            <Drawer
+                title="บันทึกกิจกรรม"
+                placement="right"
+                onClose={() => setOpenMoreInfo(false)}
+                open={openMoreInfo}
+            >
+                <div className="space-y-4">
+                    <div className="text-gray-500">
+                        {dayjs().format('DD MMM YYYY')}
+                    </div>
+                    <div className="flex space-x-4">
+                        <Avatar
+                            size={'large'}
+                            icon={<RiUserLine className="icon" />}
+                        />
+                        <div className="flex-1">
+                            <div className="h-10 space-x-2 line-clamp-2">
+                                <span className="font-medium text-gray-600">
+                                    Kittipat Dechkul
+                                </span>
+                                <span className="text-gray-400">
+                                    สร้าง 1 รายการ
+                                </span>
+                            </div>
+                            <div className="space-x-2">
+                                <FileTypeIcons.IdCardIcon className="icon text-gray-500" />
+                                <span className="text-gray-500">
+                                    บัตรประชาชน_171121.pdf
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <Avatar
+                                size={'small'}
+                                icon={
+                                    <RiUserLine className="inline-flex h-4 w-4 items-center justify-center" />
+                                }
+                            />
+                            <span className="text-xs text-gray-500">
+                                Chooleark T
+                            </span>
+                        </div>
+                        <span className="text-xs text-gray-500">
+                            สามารถดู , แก้ไข
+                        </span>
+                    </div>
+                </div>
+                <Divider />
+            </Drawer>
 
             <FloatButton.Group
                 trigger="click"

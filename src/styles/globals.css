@@ -76,9 +76,17 @@
 .ant-modal .ant-modal-header {
     margin-bottom: 16px;
 }
+
+.ant-breadcrumb ol {
+    @apply items-center;
+}
 /* .ant-form-item {
     margin-bottom: 16px;
 } */
+
+.document-upload .ant-upload-select {
+    @apply w-full;
+}
 
 *,
 ::before,

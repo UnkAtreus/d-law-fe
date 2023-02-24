@@ -3,6 +3,10 @@ import { ConfigProvider } from 'antd';
 import '@styles/globals.css';
 import thTH from '@locales/th_TH';
 import { authContext, useAuthState } from '@services/useAuth';
+import dayjs from 'dayjs';
+require('dayjs/locale/th');
+
+dayjs.locale('th');
 
 export default function App({ Component, pageProps, router }: AppProps) {
     const { user } = useAuthState();

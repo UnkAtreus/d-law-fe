@@ -13,7 +13,10 @@ module.exports = {
             },
         },
     },
-    plugins: [require('vidstack/tailwind.cjs')],
+    plugins: [
+        require('vidstack/tailwind.cjs'),
+        require('@tailwindcss/line-clamp'),
+    ],
     corePlugins: {
         preflight: false,
     },

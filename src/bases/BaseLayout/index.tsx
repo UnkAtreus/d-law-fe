@@ -115,7 +115,7 @@ const BaseLayout = {
                         left: 0,
                         top: 0,
                         bottom: 0,
-                        zIndex: 2,
+                        zIndex: 20,
                     }}
                     width={120}
                 >
@@ -130,7 +130,7 @@ const BaseLayout = {
                             boxShadow: '0px 4px 30px 4px rgba(0, 0, 0, 0.1)',
                             position: 'sticky',
                             top: 0,
-                            zIndex: 1,
+                            zIndex: 10,
                             width: '100%',
                         }}
                     >
@@ -285,7 +285,7 @@ const BaseLayout = {
                         left: 0,
                         top: 0,
                         bottom: 0,
-                        zIndex: 2,
+                        zIndex: 20,
                     }}
                     width={80}
                 >
@@ -300,7 +300,7 @@ const BaseLayout = {
                             boxShadow: '0px 4px 30px 4px rgba(0, 0, 0, 0.1)',
                             position: 'sticky',
                             top: 0,
-                            zIndex: 1,
+                            zIndex: 10,
                             width: '100%',
                         }}
                     >
