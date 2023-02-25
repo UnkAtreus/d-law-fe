@@ -1,7 +1,7 @@
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
 import { FormInstance, Modal, ModalFuncProps, Space } from 'antd';
 import React, { useState } from 'react';
-import { RiEditFill } from 'react-icons/ri';
+import { RiEditFill, RiEditLine } from 'react-icons/ri';
 
 const BaseModal = {
     Form({ children }: { children: React.ReactNode }) {
@@ -52,7 +52,8 @@ const BaseModal = {
             <ModalForm<T>
                 form={form}
                 trigger={
-                    <div className="flex">
+                    <div className="flex space-x-2">
+                        <RiEditLine className="icon__button text-gray-500" />
                         <span className="self-center">เปลี่ยนชื่อ</span>
                     </div>
                 }

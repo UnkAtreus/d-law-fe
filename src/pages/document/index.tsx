@@ -12,7 +12,6 @@ import {
     Button,
     Col,
     Collapse,
-    ConfigProvider,
     Form,
     Input,
     Row,
@@ -23,7 +22,6 @@ import {
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-import en_US from 'antd/locale/en_US';
 import {
     RiEqualizerLine,
     RiFile2Fill,
@@ -32,7 +30,6 @@ import {
     RiSearchLine,
 } from 'react-icons/ri';
 import dayjs from 'dayjs';
-import thTH from '@locales/th_TH';
 import useUpload from '@utilities/useUpload';
 import { useRouter } from 'next/router';
 import { TCreateFolder, TCaseFolder } from '@interfaces/index';
@@ -121,159 +118,152 @@ function CaseFolder() {
         <BaseLayout.Main path={'document'}>
             <Row gutter={24}>
                 <Col {...getRootProps()}>
-                    <ConfigProvider locale={en_US}>
-                        <ProTable<TCaseFolder>
-                            columns={columns}
-                            dataSource={[
-                                {
-                                    id: '00000001',
-                                    type: 'folder',
-                                    title: 'น้องสมชาย',
-                                    tags: ['อ. 266/2565', 'ม.112'],
-                                    created_at: new Date(),
-                                    owner: 'Kittipat Dechkul',
-                                    share_with: ['KD'],
-                                    last_edited: new Date(),
-                                    path: '/11012323112',
-                                },
-                            ]}
-                            cardBordered
-                            cardProps={{
-                                headStyle: { marginBottom: '16px' },
-                                title: (
-                                    <Typography.Title
-                                        level={4}
-                                        className="inline"
-                                        style={{ marginBottom: '24px' }}
+                    <ProTable<TCaseFolder>
+                        columns={columns}
+                        dataSource={[
+                            {
+                                id: '00000001',
+                                type: 'folder',
+                                title: 'น้องสมชาย',
+                                tags: ['อ. 266/2565', 'ม.112'],
+                                created_at: new Date(),
+                                owner: 'Kittipat Dechkul',
+                                share_with: ['KD'],
+                                last_edited: new Date(),
+                                path: '/11012323112',
+                            },
+                        ]}
+                        cardBordered
+                        cardProps={{
+                            headStyle: { marginBottom: '16px' },
+                            title: (
+                                <Typography.Title
+                                    level={4}
+                                    className="inline"
+                                    style={{ marginBottom: '24px' }}
+                                >
+                                    โฟลเดอร์เคส{' '}
+                                    <Badge count={1} color={'#8e5531'} />
+                                </Typography.Title>
+                            ),
+                            extra: (
+                                <Space>
+                                    <ModalForm<TCreateFolder>
+                                        trigger={
+                                            <Button
+                                                type="primary"
+                                                size="large"
+                                                icon={
+                                                    <RiFolderAddFill className="icon mr-2" />
+                                                }
+                                            >
+                                                สร้างเคสใหม่
+                                            </Button>
+                                        }
+                                        form={form}
+                                        title={
+                                            <Space>
+                                                <RiFolderAddFill className="icon" />
+                                                <span className="text-base">
+                                                    สร้างเคสใหม่
+                                                </span>
+                                            </Space>
+                                        }
+                                        autoFocusFirstInput
+                                        modalProps={{
+                                            destroyOnClose: true,
+                                        }}
+                                        onFinish={async (values) => {
+                                            console.log(values);
+                                        }}
                                     >
-                                        โฟลเดอร์เคส{' '}
-                                        <Badge count={1} color={'#8e5531'} />
-                                    </Typography.Title>
-                                ),
-                                extra: (
-                                    <Space>
-                                        <ConfigProvider locale={thTH}>
-                                            <ModalForm<TCreateFolder>
-                                                trigger={
-                                                    <Button
-                                                        type="primary"
-                                                        size="large"
-                                                        icon={
-                                                            <RiFolderAddFill className="icon mr-2" />
-                                                        }
-                                                    >
-                                                        สร้างเคสใหม่
-                                                    </Button>
+                                        <ProFormText
+                                            name="name"
+                                            label="ชื่อเคส"
+                                            placeholder={'ชื่อเคส'}
+                                            rules={[{ required: true }]}
+                                        />
+                                        <ProFormText
+                                            name="caseNumber"
+                                            label="หมายเลขคดี"
+                                            rules={[{ required: true }]}
+                                            placeholder={'หมายเลขคดีดำ/แดง'}
+                                        />
+                                        <Collapse
+                                            ghost
+                                            expandIconPosition="end"
+                                        >
+                                            <Collapse.Panel
+                                                header={
+                                                    <div className="p-0">
+                                                        รายละเอียดเพิ่มเติม
+                                                    </div>
                                                 }
-                                                form={form}
-                                                title={
-                                                    <Space>
-                                                        <RiFolderAddFill className="icon" />
-                                                        <span className="text-base">
-                                                            สร้างเคสใหม่
-                                                        </span>
-                                                    </Space>
-                                                }
-                                                autoFocusFirstInput
-                                                modalProps={{
-                                                    destroyOnClose: true,
-                                                }}
-                                                onFinish={async (values) => {
-                                                    console.log(values);
-                                                }}
+                                                key="moreDetails"
                                             >
                                                 <ProFormText
-                                                    name="name"
-                                                    label="ชื่อเคส"
-                                                    placeholder={'ชื่อเคส'}
-                                                    rules={[{ required: true }]}
+                                                    name="email"
+                                                    label="อีเมลลูกความ"
+                                                    placeholder={
+                                                        'อีเมลของลูกความ'
+                                                    }
+                                                    rules={[
+                                                        {
+                                                            type: 'email',
+                                                            message:
+                                                                'กรุณากรอกอีเมลให้ถูกต้อง',
+                                                        },
+                                                    ]}
                                                 />
                                                 <ProFormText
-                                                    name="caseNumber"
-                                                    label="หมายเลขคดี"
-                                                    rules={[{ required: true }]}
+                                                    name="title"
+                                                    label="ข้อหา"
+                                                    placeholder={'ข้อหา'}
+                                                />
+                                                <ProFormTextArea
+                                                    name="discription"
+                                                    label="รายละเอียด"
                                                     placeholder={
-                                                        'หมายเลขคดีดำ/แดง'
+                                                        'รายละเอียดเพิ่มเติม'
                                                     }
                                                 />
-                                                <Collapse
-                                                    ghost
-                                                    expandIconPosition="end"
-                                                >
-                                                    <Collapse.Panel
-                                                        header={
-                                                            <div className="p-0">
-                                                                รายละเอียดเพิ่มเติม
-                                                            </div>
-                                                        }
-                                                        key="moreDetails"
-                                                    >
-                                                        <ProFormText
-                                                            name="email"
-                                                            label="อีเมลลูกความ"
-                                                            placeholder={
-                                                                'อีเมลของลูกความ'
-                                                            }
-                                                            rules={[
-                                                                {
-                                                                    type: 'email',
-                                                                    message:
-                                                                        'กรุณากรอกอีเมลให้ถูกต้อง',
-                                                                },
-                                                            ]}
-                                                        />
-                                                        <ProFormText
-                                                            name="title"
-                                                            label="ข้อหา"
-                                                            placeholder={
-                                                                'ข้อหา'
-                                                            }
-                                                        />
-                                                        <ProFormTextArea
-                                                            name="discription"
-                                                            label="รายละเอียด"
-                                                            placeholder={
-                                                                'รายละเอียดเพิ่มเติม'
-                                                            }
-                                                        />
-                                                    </Collapse.Panel>
-                                                </Collapse>
-                                            </ModalForm>
-                                        </ConfigProvider>
-                                        <Input
-                                            size="large"
-                                            placeholder="ค้นหาเอกสาร"
-                                            prefix={
-                                                <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
-                                            }
-                                            suffix={
-                                                <RiEqualizerLine className="h-5 w-5 cursor-pointer text-gray-500" />
-                                            }
-                                        />
-                                    </Space>
-                                ),
-                            }}
-                            rowKey="id"
-                            options={{
-                                setting: false,
-                                reload: false,
-                                density: false,
-                            }}
-                            search={false}
-                            onRow={(record) => {
-                                return {
-                                    onDoubleClick: () => {
-                                        console.log(record.path);
-                                        router.push(`/document${record.path}`);
-                                    },
-                                };
-                            }}
-                            pagination={false}
-                            dateFormatter={(value) =>
-                                dayjs(value).format('DD MMM YYYY')
-                            }
-                        />
-                    </ConfigProvider>
+                                            </Collapse.Panel>
+                                        </Collapse>
+                                    </ModalForm>
+
+                                    <Input
+                                        size="large"
+                                        placeholder="ค้นหาเอกสาร"
+                                        prefix={
+                                            <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
+                                        }
+                                        suffix={
+                                            <RiEqualizerLine className="h-5 w-5 cursor-pointer text-gray-500" />
+                                        }
+                                    />
+                                </Space>
+                            ),
+                        }}
+                        rowKey="id"
+                        options={{
+                            setting: false,
+                            reload: false,
+                            density: false,
+                        }}
+                        search={false}
+                        onRow={(record) => {
+                            return {
+                                onDoubleClick: () => {
+                                    console.log(record.path);
+                                    router.push(`/document${record.path}`);
+                                },
+                            };
+                        }}
+                        pagination={false}
+                        dateFormatter={(value) =>
+                            dayjs(value).format('DD MMM YYYY')
+                        }
+                    />
                 </Col>
             </Row>
         </BaseLayout.Main>

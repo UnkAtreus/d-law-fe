@@ -1,10 +1,9 @@
 import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
-import en_US from 'antd/locale/en_US';
 
 import guidelineService from '@services/guidelineService';
-import { Avatar, Col, ConfigProvider, Form, Row, Tag, Typography } from 'antd';
+import { Avatar, Col, Form, Row, Tag, Typography } from 'antd';
 
 import { NextPage } from 'next';
 
@@ -221,93 +220,89 @@ const Home: NextPage = () => {
                             </Row>
                         </ProCard>
 
-                        <ConfigProvider locale={en_US}>
-                            <ProTable<TCaseFolder>
-                                columns={columns}
-                                dataSource={DOCUMENT_DATASOURCE}
-                                cardBordered
-                                cardProps={{
-                                    collapsible: true,
-                                    title: (
-                                        <Typography.Title
-                                            level={4}
-                                            className="inline"
+                        <ProTable<TCaseFolder>
+                            columns={columns}
+                            dataSource={DOCUMENT_DATASOURCE}
+                            cardBordered
+                            cardProps={{
+                                collapsible: true,
+                                title: (
+                                    <Typography.Title
+                                        level={4}
+                                        className="inline"
+                                    >
+                                        เอกสารที่เปิดล่าสุด
+                                    </Typography.Title>
+                                ),
+                            }}
+                            // request={async (
+                            //     params = {},
+                            //     sort: any,
+                            //     filter: any
+                            // ) => {
+                            //     return request<{
+                            //         data: ItemType[];
+                            //     }>(
+                            //         'https://proapi.azurewebsites.net/github/issues',
+                            //         {
+                            //             params,
+                            //         }
+                            //     );
+                            // }}
+                            rowKey="id"
+                            options={{
+                                setting: false,
+                                reload: false,
+                                density: false,
+                            }}
+                            search={false}
+                            onRow={(record) => {
+                                return {
+                                    onDoubleClick: () => {
+                                        if (record.type === FileTypes.FOLDER) {
+                                            router.push(
+                                                `/document${record.path}`
+                                            );
+                                        } else if (
+                                            record.type === FileTypes.ZIP
+                                        ) {
+                                            console.log('download');
+                                        } else {
+                                            router.push(
+                                                `/preview${record.path}`
+                                            );
+                                        }
+                                    },
+                                };
+                            }}
+                            pagination={{
+                                pageSize: 50,
+                                onChange: (page: any) => console.log(page),
+                            }}
+                            dateFormatter="string"
+                            className="relative"
+                            footer={() => {
+                                if (isDragActive)
+                                    return (
+                                        <div
+                                            className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
+                                            style={{ borderStyle: 'solid' }}
                                         >
-                                            เอกสารที่เปิดล่าสุด
-                                        </Typography.Title>
-                                    ),
-                                }}
-                                // request={async (
-                                //     params = {},
-                                //     sort: any,
-                                //     filter: any
-                                // ) => {
-                                //     return request<{
-                                //         data: ItemType[];
-                                //     }>(
-                                //         'https://proapi.azurewebsites.net/github/issues',
-                                //         {
-                                //             params,
-                                //         }
-                                //     );
-                                // }}
-                                rowKey="id"
-                                options={{
-                                    setting: false,
-                                    reload: false,
-                                    density: false,
-                                }}
-                                search={false}
-                                onRow={(record) => {
-                                    return {
-                                        onDoubleClick: () => {
-                                            if (
-                                                record.type === FileTypes.FOLDER
-                                            ) {
-                                                router.push(
-                                                    `/document${record.path}`
-                                                );
-                                            } else if (
-                                                record.type === FileTypes.ZIP
-                                            ) {
-                                                console.log('download');
-                                            } else {
-                                                router.push(
-                                                    `/preview${record.path}`
-                                                );
-                                            }
-                                        },
-                                    };
-                                }}
-                                pagination={{
-                                    pageSize: 50,
-                                    onChange: (page: any) => console.log(page),
-                                }}
-                                dateFormatter="string"
-                                className="relative"
-                                footer={() => {
-                                    if (isDragActive)
-                                        return (
-                                            <div
-                                                className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
-                                                style={{ borderStyle: 'solid' }}
-                                            >
-                                                <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
-                                                    <div className="rounded-md bg-primary py-2 px-6 text-center">
-                                                        <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
-                                                        <div className="-mt-2 text-white">
-                                                            วางไฟล์
-                                                        </div>
-                                                        <div className="text-white">
-                                                            เพื่ออัพโหลด
-                                                        </div>
+                                            <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
+                                                <div className="rounded-md bg-primary py-2 px-6 text-center">
+                                                    <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
+                                                    <div className="-mt-2 text-white">
+                                                        วางไฟล์
+                                                    </div>
+                                                    <div className="text-white">
+                                                        เพื่ออัพโหลด
                                                     </div>
                                                 </div>
                                             </div>
-                                        );
-                                }}
-                            />
-                        </ConfigProvider>
+                                        </div>
+                                    );
+                            }}
+                        />
                     </Col>
                 </Row>
             </BaseLayout.Main>

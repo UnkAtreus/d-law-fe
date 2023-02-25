@@ -14,7 +14,6 @@ import {
     TCreateSubFolder,
     TChangeDocumentName,
 } from '@interfaces/index';
-import thTH from '@locales/th_TH';
 import { getItem } from '@pages/preview/[preview]';
 import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
 import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
@@ -24,7 +23,6 @@ import {
     Avatar,
     Row,
     Col,
-    ConfigProvider,
     Space,
     Button,
     Upload,
@@ -37,7 +35,7 @@ import {
     Dropdown,
     MenuProps,
 } from 'antd';
-import en_US from 'antd/locale/en_US';
+
 import dayjs from 'dayjs';
 import { DOCUMENT_DATASOURCE } from 'mocks/mockTable';
 import Link from 'next/link';
@@ -55,7 +53,6 @@ import {
     RiHistoryFill,
     RiUserAddFill,
     RiUserLine,
-    RiEditLine,
     RiFolderTransferLine,
     RiDeleteBinLine,
     RiDownloadLine,
@@ -150,7 +147,7 @@ function Document({ path }: { path: string[] }) {
                 form={changeName_form}
             />,
             'changename',
-            <RiEditLine className="icon__button text-gray-500" />,
+            null,
             () => setOpenChangeNameModal(true)
         ),
         { type: 'divider' },
@@ -368,322 +365,303 @@ function Document({ path }: { path: string[] }) {
                     </div>
                 </Col>
                 <Col xl={19} xxl={20} className="space-y-6" {...getRootProps()}>
-                    <ConfigProvider locale={en_US}>
-                        <ProTable<TCaseFolder>
-                            columns={columns}
-                            dataSource={DOCUMENT_DATASOURCE}
-                            components={{
-                                body: {
-                                    wrapper: ({ ...props }) => {
-                                        return (
-                                            <Dropdown
-                                                menu={{
-                                                    items: info_items,
-                                                }}
-                                                trigger={['contextMenu']}
-                                            >
-                                                <tbody
-                                                    className={props.className}
-                                                >
-                                                    {props.children}
-                                                </tbody>
-                                            </Dropdown>
-                                        );
-                                    },
-                                },
-                            }}
-                            cardBordered
-                            cardProps={{
-                                headStyle: { marginBottom: '16px' },
-                                title: (
-                                    <div className="mb-6 inline">
-                                        <Breadcrumb
-                                            separator=">"
-                                            className="items-cennter"
+                    <ProTable<TCaseFolder>
+                        columns={columns}
+                        dataSource={DOCUMENT_DATASOURCE}
+                        components={{
+                            body: {
+                                wrapper: ({ ...props }) => {
+                                    return (
+                                        <Dropdown
+                                            menu={{
+                                                items: info_items,
+                                            }}
+                                            trigger={['contextMenu']}
                                         >
-                                            <Breadcrumb.Item className="text-lg font-medium">
-                                                <Link href={'/document'}>
-                                                    โฟลเดอร์เคส
-                                                </Link>
-                                            </Breadcrumb.Item>
-                                            <Breadcrumb.Item className="h-full text-base font-medium ">
-                                                นายทดสอบ
-                                            </Breadcrumb.Item>
-                                        </Breadcrumb>
-                                    </div>
-                                ),
-                                extra: (
-                                    <Space size={'middle'}>
-                                        <ConfigProvider locale={thTH}>
-                                            <ModalForm<TCreateSubFolder>
-                                                trigger={
-                                                    <Button
-                                                        type="text"
-                                                        size="large"
-                                                        shape="circle"
-                                                        icon={
-                                                            <RiFolderAddFill className="icon text-gray-500" />
-                                                        }
-                                                    />
-                                                }
-                                                form={subfolder_form}
-                                                title={
-                                                    <Space>
-                                                        <RiFolderAddFill className="icon" />
-                                                        <span>
-                                                            สร้างโฟลเดอร์ใหม่
-                                                        </span>
-                                                    </Space>
-                                                }
-                                                autoFocusFirstInput
-                                                modalProps={{
-                                                    destroyOnClose: true,
-                                                    okText: 'สร้างโฟลเดอร์',
-                                                }}
-                                                onFinish={async (values) => {
-                                                    console.log(values);
-                                                }}
-                                            >
-                                                <ProFormText
-                                                    name="name"
-                                                    label="ชื่อโฟลเดอร์"
-                                                    placeholder={'ชื่อโฟลเดอร์'}
-                                                    rules={[{ required: true }]}
-                                                />
-                                            </ModalForm>
-                                            <ModalForm<TCreateFolder>
-                                                width="640px"
-                                                trigger={
-                                                    <Button
-                                                        type="text"
-                                                        size="large"
-                                                        shape="circle"
-                                                        icon={
-                                                            <RiTeamFill className="icon text-gray-500" />
-                                                        }
-                                                    ></Button>
-                                                }
-                                                form={share_form}
-                                                title={
-                                                    <Space>
-                                                        <RiUserAddFill className="icon" />
-                                                        <span className="text-base">
-                                                            จัดการสิทธิการเข้าถึง
-                                                        </span>
-                                                    </Space>
-                                                }
-                                                // autoFocusFirstInput
-                                                modalProps={{
-                                                    destroyOnClose: true,
-                                                    footer: (
-                                                        <Button key="back">
-                                                            Return
-                                                        </Button>
-                                                    ),
-                                                }}
-                                                onFinish={async (values) => {
-                                                    console.log(values);
-                                                }}
-                                                initialValues={{
-                                                    permission: 'watch',
-                                                }}
-                                            >
-                                                <div className="flex w-full items-end space-x-2">
-                                                    <ProFormSelect
-                                                        name="name"
-                                                        label="เพิ่มอีเมล"
-                                                        placeholder="อีเมล"
-                                                        mode="multiple"
-                                                        formItemProps={{
-                                                            className: 'w-full',
-                                                        }}
-                                                        fieldProps={{
-                                                            filterOption: true,
-                                                            onChange: (
-                                                                item
-                                                            ) => {
-                                                                setSelectedItems(
-                                                                    item
-                                                                );
-                                                            },
-                                                            optionItemRender(
-                                                                item
-                                                            ) {
-                                                                return (
-                                                                    <div className="flex items-center space-x-2">
-                                                                        <Avatar
-                                                                            icon={
-                                                                                <RiUserLine className="icon__button" />
-                                                                            }
-                                                                        />
-                                                                        <div className="-space-y-1">
-                                                                            <div className="text-base font-medium">
-                                                                                {
-                                                                                    item.label
-                                                                                }
-                                                                            </div>
-                                                                            <div className="text-gray-500">
-                                                                                {
-                                                                                    item.value
-                                                                                }
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            },
-                                                            options: [
-                                                                {
-                                                                    label: 'Choolerk T',
-                                                                    value: 'choolerk@gmail.com',
-                                                                },
-                                                                {
-                                                                    label: 'Unresolved',
-                                                                    value: 'open',
-                                                                },
-                                                                {
-                                                                    label: 'Resolved',
-                                                                    value: 'closed',
-                                                                },
-                                                                {
-                                                                    label: 'Resolving',
-                                                                    value: 'processing',
-                                                                },
-                                                            ].filter(
-                                                                (item) =>
-                                                                    !selectedItems.includes(
-                                                                        item.value
-                                                                    )
-                                                            ),
-                                                        }}
-                                                    />
-                                                    <ProFormSelect
-                                                        name="permission"
-                                                        valueEnum={{
-                                                            watch: 'สามารถดู',
-                                                            edit: 'สามารถแก้ไข',
-                                                        }}
-                                                        allowClear={false}
-                                                        required
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center space-x-4">
-                                                            <Avatar
-                                                                size={'large'}
-                                                                icon={
-                                                                    <RiUserLine className="icon" />
-                                                                }
-                                                            />
-                                                            <div className="">
-                                                                <div className="text-base font-medium">
-                                                                    Kittipat
-                                                                    Dechkul
-                                                                </div>
-                                                                <div className="text-gray-500">
-                                                                    kittipat2544@gmail.com
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <span>เจ้าของ</span>
-                                                    </div>
-                                                </div>
-                                            </ModalForm>
+                                            <tbody className={props.className}>
+                                                {props.children}
+                                            </tbody>
+                                        </Dropdown>
+                                    );
+                                },
+                            },
+                        }}
+                        cardBordered
+                        cardProps={{
+                            headStyle: { marginBottom: '16px' },
+                            title: (
+                                <div className="mb-6 inline">
+                                    <Breadcrumb
+                                        separator=">"
+                                        className="items-cennter"
+                                    >
+                                        <Breadcrumb.Item className="text-lg font-medium">
+                                            <Link href={'/document'}>
+                                                โฟลเดอร์เคส
+                                            </Link>
+                                        </Breadcrumb.Item>
+                                        <Breadcrumb.Item className="h-full text-base font-medium ">
+                                            นายทดสอบ
+                                        </Breadcrumb.Item>
+                                    </Breadcrumb>
+                                </div>
+                            ),
+                            extra: (
+                                <Space size={'middle'}>
+                                    <ModalForm<TCreateSubFolder>
+                                        trigger={
                                             <Button
                                                 type="text"
                                                 size="large"
                                                 shape="circle"
                                                 icon={
-                                                    <RiHistoryFill className="icon text-gray-500" />
+                                                    <RiFolderAddFill className="icon text-gray-500" />
                                                 }
-                                                onClick={() =>
-                                                    setOpenMoreInfo(true)
+                                            />
+                                        }
+                                        form={subfolder_form}
+                                        title={
+                                            <Space>
+                                                <RiFolderAddFill className="icon" />
+                                                <span>สร้างโฟลเดอร์ใหม่</span>
+                                            </Space>
+                                        }
+                                        autoFocusFirstInput
+                                        modalProps={{
+                                            destroyOnClose: true,
+                                            okText: 'สร้างโฟลเดอร์',
+                                        }}
+                                        onFinish={async (values) => {
+                                            console.log(values);
+                                        }}
+                                    >
+                                        <ProFormText
+                                            name="name"
+                                            label="ชื่อโฟลเดอร์"
+                                            placeholder={'ชื่อโฟลเดอร์'}
+                                            rules={[{ required: true }]}
+                                        />
+                                    </ModalForm>
+                                    <ModalForm<TCreateFolder>
+                                        width="640px"
+                                        trigger={
+                                            <Button
+                                                type="text"
+                                                size="large"
+                                                shape="circle"
+                                                icon={
+                                                    <RiTeamFill className="icon text-gray-500" />
                                                 }
                                             ></Button>
-                                        </ConfigProvider>
-                                        <Input
-                                            size="large"
-                                            placeholder="ค้นหาเอกสาร"
-                                            prefix={
-                                                <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
-                                            }
-                                            suffix={
-                                                <Dropdown
-                                                    menu={{ items: [] }}
-                                                    trigger={['click']}
-                                                >
-                                                    <RiEqualizerLine className="icon__button cursor-pointer text-gray-500" />
-                                                </Dropdown>
-                                            }
-                                            className="w-96"
-                                        />
-                                    </Space>
-                                ),
-                            }}
-                            rowKey="id"
-                            options={{
-                                setting: false,
-                                reload: false,
-                                density: false,
-                            }}
-                            search={false}
-                            onRow={(record) => {
-                                return {
-                                    onDoubleClick: () => {
-                                        if (record.type === FileTypes.FOLDER) {
-                                            router.push(
-                                                `/document${record.path}`
-                                            );
-                                        } else {
-                                            router.push(
-                                                `/preview${record.path}?type=${record.type}`,
-                                                `/preview${record.path}`
-                                            );
                                         }
-                                    },
-                                    onContextMenu: (contextmenu) => {
-                                        console.log(
-                                            '🚀 ~ file: [...document].tsx:518 ~ Document ~ contextmenu',
-                                            contextmenu
-                                        );
-                                    },
-                                    onClick: (clickEvent) => {
-                                        console.log(
-                                            '🚀 ~ file: [...document].tsx:646 ~ Document ~ clickEvent:',
-                                            clickEvent
-                                        );
-                                    },
-                                };
-                            }}
-                            pagination={{
-                                pageSize: 50,
-                                onChange: (page: any) => console.log(page),
-                            }}
-                            dateFormatter="string"
-                            className="relative"
-                            footer={() => {
-                                if (isDragActive)
-                                    return (
-                                        <div
-                                            className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
-                                            style={{ borderStyle: 'solid' }}
-                                        >
-                                            <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
-                                                <div className="rounded-md bg-primary py-2 px-6 text-center">
-                                                    <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
-                                                    <div className="-mt-2 text-white">
-                                                        วางไฟล์
+                                        form={share_form}
+                                        title={
+                                            <Space>
+                                                <RiUserAddFill className="icon" />
+                                                <span className="text-base">
+                                                    จัดการสิทธิการเข้าถึง
+                                                </span>
+                                            </Space>
+                                        }
+                                        // autoFocusFirstInput
+                                        modalProps={{
+                                            destroyOnClose: true,
+                                            footer: (
+                                                <Button key="back">
+                                                    Return
+                                                </Button>
+                                            ),
+                                        }}
+                                        onFinish={async (values) => {
+                                            console.log(values);
+                                        }}
+                                        initialValues={{
+                                            permission: 'watch',
+                                        }}
+                                    >
+                                        <div className="flex w-full items-end space-x-2">
+                                            <ProFormSelect
+                                                name="name"
+                                                label="เพิ่มอีเมล"
+                                                placeholder="อีเมล"
+                                                mode="multiple"
+                                                formItemProps={{
+                                                    className: 'w-full',
+                                                }}
+                                                fieldProps={{
+                                                    filterOption: true,
+                                                    onChange: (item) => {
+                                                        setSelectedItems(item);
+                                                    },
+                                                    optionItemRender(item) {
+                                                        return (
+                                                            <div className="flex items-center space-x-2">
+                                                                <Avatar
+                                                                    icon={
+                                                                        <RiUserLine className="icon__button" />
+                                                                    }
+                                                                />
+                                                                <div className="-space-y-1">
+                                                                    <div className="text-base font-medium">
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </div>
+                                                                    <div className="text-gray-500">
+                                                                        {
+                                                                            item.value
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    },
+                                                    options: [
+                                                        {
+                                                            label: 'Choolerk T',
+                                                            value: 'choolerk@gmail.com',
+                                                        },
+                                                        {
+                                                            label: 'Unresolved',
+                                                            value: 'open',
+                                                        },
+                                                        {
+                                                            label: 'Resolved',
+                                                            value: 'closed',
+                                                        },
+                                                        {
+                                                            label: 'Resolving',
+                                                            value: 'processing',
+                                                        },
+                                                    ].filter(
+                                                        (item) =>
+                                                            !selectedItems.includes(
+                                                                item.value
+                                                            )
+                                                    ),
+                                                }}
+                                            />
+                                            <ProFormSelect
+                                                name="permission"
+                                                valueEnum={{
+                                                    watch: 'สามารถดู',
+                                                    edit: 'สามารถแก้ไข',
+                                                }}
+                                                allowClear={false}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-4">
+                                                    <Avatar
+                                                        size={'large'}
+                                                        icon={
+                                                            <RiUserLine className="icon" />
+                                                        }
+                                                    />
+                                                    <div className="">
+                                                        <div className="text-base font-medium">
+                                                            Kittipat Dechkul
+                                                        </div>
+                                                        <div className="text-gray-500">
+                                                            kittipat2544@gmail.com
+                                                        </div>
                                                     </div>
-                                                    <div className="text-white">
-                                                        เพื่ออัพโหลด
-                                                    </div>
+                                                </div>
+                                                <span>เจ้าของ</span>
+                                            </div>
+                                        </div>
+                                    </ModalForm>
+                                    <Button
+                                        type="text"
+                                        size="large"
+                                        shape="circle"
+                                        icon={
+                                            <RiHistoryFill className="icon text-gray-500" />
+                                        }
+                                        onClick={() => setOpenMoreInfo(true)}
+                                    ></Button>
+                                    <Input
+                                        size="large"
+                                        placeholder="ค้นหาเอกสาร"
+                                        prefix={
+                                            <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
+                                        }
+                                        suffix={
+                                            <Dropdown
+                                                menu={{ items: [] }}
+                                                trigger={['click']}
+                                            >
+                                                <RiEqualizerLine className="icon__button cursor-pointer text-gray-500" />
+                                            </Dropdown>
+                                        }
+                                        className="w-96"
+                                    />
+                                </Space>
+                            ),
+                        }}
+                        rowKey="id"
+                        options={{
+                            setting: false,
+                            reload: false,
+                            density: false,
+                        }}
+                        search={false}
+                        onRow={(record) => {
+                            return {
+                                onDoubleClick: () => {
+                                    if (record.type === FileTypes.FOLDER) {
+                                        router.push(`/document${record.path}`);
+                                    } else {
+                                        router.push(
+                                            `/preview${record.path}?type=${record.type}`,
+                                            `/preview${record.path}`
+                                        );
+                                    }
+                                },
+                                onContextMenu: (contextmenu) => {
+                                    console.log(
+                                        '🚀 ~ file: [...document].tsx:518 ~ Document ~ contextmenu',
+                                        contextmenu
+                                    );
+                                },
+                                onClick: (clickEvent) => {
+                                    console.log(
+                                        '🚀 ~ file: [...document].tsx:646 ~ Document ~ clickEvent:',
+                                        clickEvent
+                                    );
+                                },
+                            };
+                        }}
+                        pagination={{
+                            pageSize: 50,
+                            onChange: (page: any) => console.log(page),
+                        }}
+                        dateFormatter="string"
+                        className="relative"
+                        footer={() => {
+                            if (isDragActive)
+                                return (
+                                    <div
+                                        className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
+                                        style={{ borderStyle: 'solid' }}
+                                    >
+                                        <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
+                                            <div className="rounded-md bg-primary py-2 px-6 text-center">
+                                                <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
+                                                <div className="-mt-2 text-white">
+                                                    วางไฟล์
+                                                </div>
+                                                <div className="text-white">
+                                                    เพื่ออัพโหลด
                                                 </div>
                                             </div>
                                         </div>
-                                    );
-                            }}
-                        />
-                    </ConfigProvider>
+                                    </div>
+                                );
+                        }}
+                    />
                 </Col>
             </Row>
 
