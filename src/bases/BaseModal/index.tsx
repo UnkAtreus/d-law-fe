@@ -1,4 +1,4 @@
-import { ModalForm, ProFormText } from '@ant-design/pro-form';
+import { ModalForm, ProFormText } from '@ant-design/pro-components';
 import { FormInstance, Modal, ModalFuncProps, Space } from 'antd';
 import React, { useState } from 'react';
 import { RiEditFill } from 'react-icons/ri';

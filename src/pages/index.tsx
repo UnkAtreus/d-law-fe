@@ -1,5 +1,4 @@
-import { ProColumns, ProTable } from '@ant-design/pro-table';
-import { ProCard } from '@ant-design/pro-card';
+import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import en_US from 'antd/locale/en_US';

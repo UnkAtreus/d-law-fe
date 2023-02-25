@@ -1,5 +1,10 @@
-import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form';
-import ProTable, { ProColumns } from '@ant-design/pro-table';
+import {
+    ProTable,
+    ProColumns,
+    ModalForm,
+    ProFormSelect,
+    ProFormText,
+} from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseModal from '@baseComponents/BaseModal';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';

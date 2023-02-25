@@ -1,5 +1,10 @@
-import ProTable, { ProColumns } from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import {
+    ModalForm,
+    ProFormText,
+    ProFormTextArea,
+    ProColumns,
+    ProTable,
+} from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import {
     Avatar,
