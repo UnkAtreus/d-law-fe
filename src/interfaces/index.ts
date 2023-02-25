@@ -21,3 +21,7 @@ export interface TCreateFolder {
 export interface TCreateSubFolder {
     name: string;
 }
+
+export interface TChangeDocumentName {
+    name: string;
+}

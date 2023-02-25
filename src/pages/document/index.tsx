@@ -152,7 +152,7 @@ function CaseFolder() {
                                                 trigger={
                                                     <Button
                                                         type="primary"
-                                                        size="middle"
+                                                        size="large"
                                                         icon={
                                                             <RiFolderAddFill className="icon mr-2" />
                                                         }
@@ -236,12 +236,13 @@ function CaseFolder() {
                                             </ModalForm>
                                         </ConfigProvider>
                                         <Input
+                                            size="large"
                                             placeholder="ค้นหาเอกสาร"
                                             prefix={
-                                                <RiSearchLine className="cursor-pointer text-gray-500" />
+                                                <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
                                             }
                                             suffix={
-                                                <RiEqualizerLine className="cursor-pointer text-gray-500" />
+                                                <RiEqualizerLine className="h-5 w-5 cursor-pointer text-gray-500" />
                                             }
                                         />
                                     </Space>
@@ -263,7 +264,9 @@ function CaseFolder() {
                                 };
                             }}
                             pagination={false}
-                            dateFormatter="string"
+                            dateFormatter={(value) =>
+                                dayjs(value).format('DD MMM YYYY')
+                            }
                         />
                     </ConfigProvider>
                 </Col>

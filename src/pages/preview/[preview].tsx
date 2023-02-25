@@ -39,19 +39,21 @@ import Image from '@components/Image';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-function getItem(
+export function getItem(
     label: React.ReactNode,
     key: React.Key,
     icon?: React.ReactNode,
-    children?: MenuItem[],
-    type?: 'group'
+    onClick?: () => void,
+    type?: 'group',
+    danger?: boolean
 ): MenuItem {
     return {
         key,
         icon,
-        children,
+        onClick,
         label,
         type,
+        danger,
     } as MenuItem;
 }
 

@@ -1,5 +1,7 @@
-import { Modal, ModalFuncProps } from 'antd';
+import { ModalForm, ProFormText } from '@ant-design/pro-form';
+import { FormInstance, Modal, ModalFuncProps, Space } from 'antd';
 import React, { useState } from 'react';
+import { RiEditFill } from 'react-icons/ri';
 
 const BaseModal = {
     Form({ children }: { children: React.ReactNode }) {
@@ -38,6 +40,47 @@ const BaseModal = {
             onOk: onOk,
             onCancel: onCancel,
         });
+    },
+    ChangeName<T>({
+        form,
+        type = 'file',
+    }: {
+        form: FormInstance<T>;
+        type?: 'file' | 'folder';
+    }) {
+        return (
+            <ModalForm<T>
+                form={form}
+                trigger={
+                    <div className="flex">
+                        <span className="self-center">เปลี่ยนชื่อ</span>
+                    </div>
+                }
+                title={
+                    <Space>
+                        <RiEditFill className="icon" />
+                        <span>
+                            เปลี่ยนชื่อ{type === 'file' ? 'ไฟล์' : 'โฟลเดอร์'}
+                        </span>
+                    </Space>
+                }
+                autoFocusFirstInput
+                modalProps={{
+                    destroyOnClose: true,
+                    okText: 'เปลี่ยนชื่อ',
+                }}
+                onFinish={async (values) => {
+                    console.log(values);
+                }}
+            >
+                <ProFormText
+                    name="name"
+                    label={`ชื่อ${type === 'file' ? 'ไฟล์' : 'โฟลเดอร์'}`}
+                    placeholder={'ชื่อโฟลเดอร์หรือไฟล์ใหม่'}
+                    rules={[{ required: true }]}
+                />
+            </ModalForm>
+        );
     },
 };
 

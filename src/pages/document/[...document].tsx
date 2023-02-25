@@ -1,13 +1,16 @@
 import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import ProTable, { ProColumns } from '@ant-design/pro-table';
 import BaseLayout from '@baseComponents/BaseLayout';
+import BaseModal from '@baseComponents/BaseModal';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 import {
     TCreateFolder,
     TCaseFolder,
     TCreateSubFolder,
+    TChangeDocumentName,
 } from '@interfaces/index';
 import thTH from '@locales/th_TH';
+import { getItem } from '@pages/preview/[preview]';
 import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
 import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
 import {
@@ -26,6 +29,8 @@ import {
     Drawer,
     Divider,
     Breadcrumb,
+    Dropdown,
+    MenuProps,
 } from 'antd';
 import en_US from 'antd/locale/en_US';
 import dayjs from 'dayjs';
@@ -43,9 +48,15 @@ import {
     RiSearchLine,
     RiTeamFill,
     RiHistoryFill,
-    RiAddFill,
     RiUserAddFill,
     RiUserLine,
+    RiEditLine,
+    RiFolderTransferLine,
+    RiDeleteBinLine,
+    RiDownloadLine,
+    RiFileCopyLine,
+    RiEyeLine,
+    RiMore2Fill,
 } from 'react-icons/ri';
 
 export async function getServerSideProps(ctx: any) {
@@ -63,11 +74,14 @@ function Document({ path }: { path: string[] }) {
     const [isUpload, setIsUpload] = useState(false);
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [openMoreInfo, setOpenMoreInfo] = useState<boolean>(false);
+    const [openChangeNameModal, setOpenChangeNameModal] =
+        useState<boolean>(false);
 
     const router = useRouter();
     const { fileLists, setFileLists } = useUpload();
     const [subfolder_form] = Form.useForm<TCreateSubFolder>();
     const [share_form] = Form.useForm<TCreateFolder>();
+    const [changeName_form] = Form.useForm<TChangeDocumentName>();
     const { getRootProps, isDragActive } = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -96,6 +110,57 @@ function Document({ path }: { path: string[] }) {
         ZipIcon,
     } = FileTypeIcons;
 
+    const info_items: MenuProps['items'] = [
+        getItem(
+            <div className="flex">
+                <span className="self-center">ดูตัวอย่างไฟล์</span>
+            </div>,
+            'openfile',
+            <RiEyeLine className="icon__button text-gray-500" />
+        ),
+        getItem(
+            <div className="flex">
+                <span className="self-center">คัดลอกลิงค์</span>
+            </div>,
+            'copylink',
+            <RiFileCopyLine className="icon__button text-gray-500" />
+        ),
+        { type: 'divider' },
+        getItem(
+            <div className="flex">
+                <span className="self-center">ดาวน์โหลดไฟล์</span>
+            </div>,
+            'downloadfile',
+            <RiDownloadLine className="icon__button text-gray-500" />
+        ),
+        getItem(
+            <div className="flex">
+                <span className="self-center">ย้ายไฟล์ไปที่</span>
+            </div>,
+            'movefile',
+            <RiFolderTransferLine className="icon__button text-gray-500" />
+        ),
+        getItem(
+            <BaseModal.ChangeName<TChangeDocumentName>
+                form={changeName_form}
+            />,
+            'changename',
+            <RiEditLine className="icon__button text-gray-500" />,
+            () => setOpenChangeNameModal(true)
+        ),
+        { type: 'divider' },
+        getItem(
+            <div className="flex">
+                <span className="self-center">ลบไฟล์</span>
+            </div>,
+            'delete',
+            <RiDeleteBinLine className="icon__button " />,
+            undefined,
+            undefined,
+            true
+        ),
+    ];
+
     const columns: ProColumns<TCaseFolder>[] = [
         {
             title: <RiFile2Fill className="m-auto" />,
@@ -110,6 +175,29 @@ function Document({ path }: { path: string[] }) {
             title: 'ชื่อไฟล์',
             dataIndex: 'title',
             ellipsis: true,
+            render: (value) => (
+                <Dropdown
+                    menu={{
+                        items: [
+                            {
+                                label: '1st menu item',
+                                key: '1',
+                            },
+                            {
+                                label: '2nd menu item',
+                                key: '2',
+                            },
+                            {
+                                label: '3rd menu item',
+                                key: '3',
+                            },
+                        ],
+                    }}
+                    trigger={['contextMenu']}
+                >
+                    {value}
+                </Dropdown>
+            ),
         },
         {
             title: 'แท๊ก',
@@ -139,7 +227,7 @@ function Document({ path }: { path: string[] }) {
             title: 'แชร์ร่วมกับ',
             dataIndex: 'share_with',
             render: (text, record) => (
-                <Avatar.Group>
+                <Avatar.Group maxCount={4}>
                     <Avatar>{text}</Avatar>
                 </Avatar.Group>
             ),
@@ -152,6 +240,22 @@ function Document({ path }: { path: string[] }) {
                     {dayjs(text).format('DD MMM YYYY - HH:MM')}
                 </div>
             ),
+        },
+        {
+            dataIndex: 'operation',
+            key: 'operation',
+            render: () => (
+                <Dropdown menu={{ items: info_items }} trigger={['click']}>
+                    <Button
+                        type="text"
+                        shape="circle"
+                        icon={
+                            <RiMore2Fill className="icon__button text-gray-500" />
+                        }
+                    ></Button>
+                </Dropdown>
+            ),
+            width: 48,
         },
     ];
     const Tags: ITag[] = [
@@ -263,6 +367,26 @@ function Document({ path }: { path: string[] }) {
                         <ProTable<TCaseFolder>
                             columns={columns}
                             dataSource={DOCUMENT_DATASOURCE}
+                            components={{
+                                body: {
+                                    wrapper: ({ ...props }) => {
+                                        return (
+                                            <Dropdown
+                                                menu={{
+                                                    items: info_items,
+                                                }}
+                                                trigger={['contextMenu']}
+                                            >
+                                                <tbody
+                                                    className={props.className}
+                                                >
+                                                    {props.children}
+                                                </tbody>
+                                            </Dropdown>
+                                        );
+                                    },
+                                },
+                            }}
                             cardBordered
                             cardProps={{
                                 headStyle: { marginBottom: '16px' },
@@ -309,14 +433,7 @@ function Document({ path }: { path: string[] }) {
                                                 autoFocusFirstInput
                                                 modalProps={{
                                                     destroyOnClose: true,
-                                                    okText: (
-                                                        <div className="flex items-center space-x-2">
-                                                            <RiAddFill className="icon__button" />
-                                                            <span className="text-base">
-                                                                สร้างโฟลเดอร์
-                                                            </span>
-                                                        </div>
-                                                    ),
+                                                    okText: 'สร้างโฟลเดอร์',
                                                 }}
                                                 onFinish={async (values) => {
                                                     console.log(values);
@@ -486,7 +603,12 @@ function Document({ path }: { path: string[] }) {
                                                 <RiSearchLine className="h-5 w-5 cursor-pointer text-gray-500" />
                                             }
                                             suffix={
-                                                <RiEqualizerLine className="h-5 w-5 cursor-pointer text-gray-500" />
+                                                <Dropdown
+                                                    menu={{ items: [] }}
+                                                    trigger={['click']}
+                                                >
+                                                    <RiEqualizerLine className="icon__button cursor-pointer text-gray-500" />
+                                                </Dropdown>
                                             }
                                             className="w-96"
                                         />
@@ -513,6 +635,18 @@ function Document({ path }: { path: string[] }) {
                                                 `/preview${record.path}`
                                             );
                                         }
+                                    },
+                                    onContextMenu: (contextmenu) => {
+                                        console.log(
+                                            '🚀 ~ file: [...document].tsx:518 ~ Document ~ contextmenu',
+                                            contextmenu
+                                        );
+                                    },
+                                    onClick: (clickEvent) => {
+                                        console.log(
+                                            '🚀 ~ file: [...document].tsx:646 ~ Document ~ clickEvent:',
+                                            clickEvent
+                                        );
                                     },
                                 };
                             }}
