@@ -146,10 +146,9 @@ function Document({ path }: { path: string[] }) {
             <BaseModal.ChangeName<TChangeDocumentName>
                 form={changeName_form}
             />,
-            'changename',
-            null,
-            () => setOpenChangeNameModal(true)
+            'changeDocumentName'
         ),
+
         { type: 'divider' },
         getItem(
             <div className="flex">
@@ -177,29 +176,6 @@ function Document({ path }: { path: string[] }) {
             title: 'ชื่อไฟล์',
             dataIndex: 'title',
             ellipsis: true,
-            render: (value) => (
-                <Dropdown
-                    menu={{
-                        items: [
-                            {
-                                label: '1st menu item',
-                                key: '1',
-                            },
-                            {
-                                label: '2nd menu item',
-                                key: '2',
-                            },
-                            {
-                                label: '3rd menu item',
-                                key: '3',
-                            },
-                        ],
-                    }}
-                    trigger={['contextMenu']}
-                >
-                    {value}
-                </Dropdown>
-            ),
         },
         {
             title: 'แท๊ก',
