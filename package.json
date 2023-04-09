@@ -28,6 +28,7 @@
         "eslint-config-next": "13.1.1",
         "mockjs": "^1.1.0",
         "next": "13.1.1",
+        "nextjs-progressbar": "^0.0.16",
         "puppeteer": "^19.7.2",
         "puppeteer-extra": "^3.3.4",
         "puppeteer-extra-plugin-stealth": "^2.11.1",

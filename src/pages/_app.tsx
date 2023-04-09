@@ -4,6 +4,7 @@ import '@styles/globals.css';
 import thTHIntl from 'antd/es/locale/th_TH';
 import { authContext, useAuthState } from '@services/useAuth';
 import dayjs from 'dayjs';
+import NextNProgress from 'nextjs-progressbar';
 require('dayjs/locale/th');
 
 dayjs.locale('th');
@@ -37,6 +38,14 @@ export default function App({ Component, pageProps, router }: AppProps) {
                     },
                 }}
             >
+                <NextNProgress
+                    color="#1677ff"
+                    startPosition={0.3}
+                    stopDelayMs={200}
+                    height={2}
+                    showOnShallow={true}
+                    options={{ showSpinner: false }}
+                />
                 <Component {...pageProps} {...router} />
             </ConfigProvider>
         </authContext.Provider>
