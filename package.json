@@ -11,6 +11,8 @@
         "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
     },
     "dependencies": {
+        "@ant-design/charts": "^1.4.2",
+        "@ant-design/icons": "4.6.0",
         "@ant-design/pro-card": "^2.1.10",
         "@ant-design/pro-components": "^2.3.57",
         "@ant-design/pro-form": "^2.5.4",
@@ -26,6 +28,7 @@
         "dayjs": "^1.11.7",
         "eslint": "8.31.0",
         "eslint-config-next": "13.1.1",
+        "lodash": "4.17.20",
         "mockjs": "^1.1.0",
         "next": "13.1.1",
         "nextjs-progressbar": "^0.0.16",
