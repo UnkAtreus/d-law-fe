@@ -80,14 +80,20 @@ const BaseLayout = {
                 'document'
             ),
             getItem(
-                <div className="flex flex-col items-center justify-center py-5">
+                <div
+                    onClick={() => router.push('/appointment')}
+                    className="flex flex-col items-center justify-center py-5"
+                >
                     <RiCalendarTodoLine className="menu-icon" />
                     <div className="menu-text">APPOINTMENT</div>
                 </div>,
                 'appointment'
             ),
             getItem(
-                <div className="flex flex-col items-center justify-center py-5">
+                <div
+                    onClick={() => router.push('/setting')}
+                    className="flex flex-col items-center justify-center py-5"
+                >
                     <RiSettings5Line className="menu-icon" />
                     <div className="menu-text">SETTING</div>
                 </div>,
@@ -257,7 +263,10 @@ const BaseLayout = {
                     title={'Appointment'}
                     color={'#4a4a4a'}
                 >
-                    <div className="flex flex-col items-center justify-center py-4">
+                    <div
+                        onClick={() => router.push('/appointment')}
+                        className="flex flex-col items-center justify-center py-4"
+                    >
                         <RiCalendarTodoLine className="menu-icon text-gray-500" />
                     </div>
                 </Tooltip>,
@@ -265,7 +274,10 @@ const BaseLayout = {
             ),
             getItem(
                 <Tooltip placement="right" title={'Setting'} color={'#4a4a4a'}>
-                    <div className="flex flex-col items-center justify-center py-4">
+                    <div
+                        onClick={() => router.push('/setting')}
+                        className="flex flex-col items-center justify-center py-4"
+                    >
                         <RiSettings5Line className="menu-icon text-gray-500" />
                     </div>
                 </Tooltip>,
