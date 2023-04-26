@@ -26,9 +26,10 @@
       "@utilities/*": ["utilities/*"],  
       "@locales/*": ["locales/*"],  
       "@interfaces/*": ["interfaces/*"],  
+      "@hoc/*": ["hoc/*"],  
     },
     "types": ["vidstack/globals"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prettier.config.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "prettier.config.js", "src/hoc/cookies.js"],
   "exclude": ["node_modules"]
 }

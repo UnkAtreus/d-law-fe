@@ -12,34 +12,97 @@ import {
     Button,
     Col,
     Collapse,
+    Dropdown,
     Form,
     Input,
+    MenuProps,
     Row,
     Space,
-    Tag,
+    Tooltip,
     Typography,
+    message,
 } from 'antd';
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 import {
+    RiDeleteBinLine,
     RiEqualizerLine,
+    RiEyeLine,
     RiFile2Fill,
+    RiFileCopyLine,
     RiFolder5Fill,
     RiFolderAddFill,
+    RiMore2Fill,
     RiSearchLine,
 } from 'react-icons/ri';
 import dayjs from 'dayjs';
 import useUpload from '@utilities/useUpload';
 import { useRouter } from 'next/router';
-import { TCreateFolder, TCaseFolder } from '@interfaces/index';
+import {
+    TCreateFolder,
+    TCaseFolder,
+    TAuthUser,
+    TChangeDocumentName,
+    ResponseData,
+} from '@interfaces/index';
+import withAuthUserSSR from '@hoc/withAuthUserSSR';
+import AuthAction from '@hoc/AuthAction';
+import useRequest, { fetcher } from '@services/useRequest';
+import { getItem } from '@pages/preview/[preview]';
+import BaseModal from '@baseComponents/BaseModal';
+import useCopyToClipboard from '@utilities/useCopyToClipboard';
+import logDebug from '@utilities/logDebug';
+import caseFolderService from '@services/caseFolderService';
+import request from 'umi-request';
+import CaseFolderServicePath from '@services/caseFolderService';
 
-function CaseFolder() {
+function CaseFolder({
+    data,
+    authUser,
+}: {
+    data: ResponseData<TCaseFolder[]>;
+    authUser: TAuthUser;
+}) {
+    const token = authUser.token || '';
+    const {
+        mutate,
+        data: initData,
+        isLoading,
+    } = useRequest({
+        url: caseFolderService.GET_ALL_CASE,
+        token,
+        initData: data,
+    });
+
+    const casesFolderData =
+        (initData &&
+            initData.data?.filter((item: TCaseFolder) => item.id !== '')) ||
+        [];
+
     const [isUpload, setIsUpload] = useState(false);
+
+    const selectedRecordRef = useRef<TCaseFolder>(data.data[0]);
+
+    // useEffect(() => {
+    //     (async () => {
+    //         if (mutationg) {
+    //             console.log('🚀 ~ useEffect ~ mutationg:', mutationg.data);
+    //             const res = await mutate();
+    //             console.log('🚀 ~ useEffect ~ res:', res);
+    //             console.log('🚀 ~ useEffect ~ getData:', getData);
+    //         }
+    //     })();
+    // }, [mutationg]);
+    // useEffect(() => {
+    //     console.log(getData);
+    // }, [getData]);
 
     const router = useRouter();
     const { fileLists, setFileLists } = useUpload();
+    const [value, copy] = useCopyToClipboard();
     const [form] = Form.useForm<TCreateFolder>();
+    const [changeName_form] = Form.useForm<TChangeDocumentName>();
     const { getRootProps, isDragActive } = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -53,21 +116,81 @@ function CaseFolder() {
         },
     });
 
+    const info_items: MenuProps['items'] = [
+        getItem(
+            <div className="flex">
+                <span className="self-center">เปิดโฟลเดอร์</span>
+            </div>,
+            'openfile',
+            <RiEyeLine className="icon__button text-gray-500" />
+        ),
+        getItem(
+            <div className="flex">
+                <span className="self-center">คัดลอกลิงค์</span>
+            </div>,
+            'copylink',
+            <RiFileCopyLine className="icon__button text-gray-500" />
+        ),
+        { type: 'divider' },
+        getItem(
+            <BaseModal.ChangeName<TChangeDocumentName>
+                onFinish={async (value) => {
+                    const caseFolderId = selectedRecordRef.current.id;
+                    console.log(value);
+                }}
+                type="folder"
+            />,
+            'changeDocumentName'
+        ),
+
+        { type: 'divider' },
+        getItem(
+            <div className="flex">
+                <span className="self-center">ลบโฟลเดอร์</span>
+            </div>,
+            'delete',
+            <RiDeleteBinLine className="icon__button " />,
+            undefined,
+            undefined,
+            true
+        ),
+    ];
+
+    const contextMenuHandler = useCallback(
+        async (key: string, record: TCaseFolder) => {
+            logDebug('🚀 ~ key:', key);
+            if (key === 'openfile') {
+                console.log('🚀 ~ CaseFolder ~ openfile:');
+                router.push(`/document/${record.folderId}`);
+            }
+            if (key === 'copylink') {
+                const origin = window.location.origin;
+                const isCopy = await copy(
+                    `${origin}/document/${record.folderId}`
+                );
+                if (isCopy) {
+                    message.success('คัดลองลิงค์สำเร็จ');
+                } else {
+                    message.error('เกิดข้อผิดพลาดในการคัดลอกลิงค์');
+                }
+            }
+        },
+        []
+    );
+
     const columns: ProColumns<TCaseFolder>[] = [
         {
             title: <RiFile2Fill className="m-auto" />,
             dataIndex: 'type',
-            render: (type) => {
-                if (type === 'folder') {
-                    return <RiFolder5Fill className="icon text-gray-500" />;
-                }
+            render: () => {
+                return <RiFolder5Fill className="icon text-gray-500" />;
             },
             align: 'center',
             width: 48,
         },
         {
             title: 'ชื่อไฟล์',
-            dataIndex: 'title',
+            dataIndex: 'name',
             ellipsis: true,
         },
         {
@@ -75,42 +198,84 @@ function CaseFolder() {
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">
-                    {record.tags.map((name) => (
+                    {/* {record.Folders[0].Tags.map((name) => (
                         <Tag key={name}>{name}</Tag>
-                    ))}
+                    ))} */}
                 </div>
             ),
         },
         {
             title: 'วันที่สร้าง/เจ้าของ',
-            dataIndex: 'created_at',
+            dataIndex: 'createdAt',
             // valueType: 'dateTime',
             render: (text: any, record) => (
                 <div className="flex flex-col ">
                     <div className="text-gray-400">
                         {dayjs(text).format('DD MMM YYYY - HH:MM')}
                     </div>
-                    <div>{record.owner}</div>
+                    <div>{record.owner.email}</div>
                 </div>
             ),
         },
         {
             title: 'แชร์ร่วมกับ',
-            dataIndex: 'share_with',
+            dataIndex: 'shareWith',
             render: (text, record) => (
-                <Avatar.Group>
-                    <Avatar>{text}</Avatar>
+                <Avatar.Group
+                    maxCount={4}
+                    maxStyle={{
+                        color: '#ffffff',
+                        backgroundColor: '#8e5531bf',
+                    }}
+                >
+                    {record.shareWith.map((item) => (
+                        <Tooltip
+                            title={item.email}
+                            placement="top"
+                            key={item.id}
+                        >
+                            <Avatar className="bg-primary/90" alt="tset">
+                                {item.firstName.charAt(0) +
+                                    item.lastName.charAt(0)}
+                            </Avatar>
+                        </Tooltip>
+                    ))}
                 </Avatar.Group>
             ),
         },
         {
             title: 'แก้ไขล่าสุด',
-            dataIndex: 'last_edited',
+            dataIndex: 'updatedAt',
             render: (text: any) => (
                 <div className="text-gray-400">
                     {dayjs(text).format('DD MMM YYYY - HH:MM')}
                 </div>
             ),
+        },
+        {
+            dataIndex: 'operation',
+            key: 'operation',
+            render: (_, record) => (
+                <Dropdown
+                    menu={{
+                        onClick: ({ key }) => {
+                            selectedRecordRef.current = record;
+                            contextMenuHandler(key, record);
+                        },
+                        items: info_items,
+                    }}
+                    trigger={['click']}
+                >
+                    <Button
+                        type="text"
+                        shape="circle"
+                        icon={
+                            <RiMore2Fill className="icon__button text-gray-500" />
+                        }
+                    ></Button>
+                </Dropdown>
+            ),
+            width: 48,
         },
     ];
 
@@ -120,19 +285,8 @@ function CaseFolder() {
                 <Col {...getRootProps()}>
                     <ProTable<TCaseFolder>
                         columns={columns}
-                        dataSource={[
-                            {
-                                id: '00000001',
-                                type: 'folder',
-                                title: 'น้องสมชาย',
-                                tags: ['อ. 266/2565', 'ม.112'],
-                                created_at: new Date(),
-                                owner: 'Kittipat Dechkul',
-                                share_with: ['KD'],
-                                last_edited: new Date(),
-                                path: '/11012323112',
-                            },
-                        ]}
+                        dataSource={casesFolderData}
+                        loading={isLoading}
                         cardBordered
                         cardProps={{
                             headStyle: { marginBottom: '16px' },
@@ -143,7 +297,10 @@ function CaseFolder() {
                                     style={{ marginBottom: '24px' }}
                                 >
                                     โฟลเดอร์เคส{' '}
-                                    <Badge count={1} color={'#8e5531'} />
+                                    <Badge
+                                        count={casesFolderData?.length}
+                                        color={'#8e5531'}
+                                    />
                                 </Typography.Title>
                             ),
                             extra: (
@@ -175,6 +332,75 @@ function CaseFolder() {
                                         }}
                                         onFinish={async (values) => {
                                             console.log(values);
+                                            // const casenum = 'อ.6/2566'
+                                            try {
+                                                const caseNumberSplit =
+                                                    values.caseNumber
+                                                        .trim()
+                                                        .match(
+                                                            '^([ก-ฮ]{1,3}).?([0-9]{1,4})/([0-9]{1,4})$'
+                                                        );
+                                                if (caseNumberSplit) {
+                                                    const { data } =
+                                                        await request.post(
+                                                            '/api/searchcase',
+                                                            {
+                                                                data: {
+                                                                    title: caseNumberSplit[1],
+                                                                    id: caseNumberSplit[2],
+                                                                    year: caseNumberSplit[3],
+                                                                },
+                                                            }
+                                                        );
+                                                    const caseTitle =
+                                                        values.caseTitle ||
+                                                        data.caseTitle;
+                                                    const caseContent =
+                                                        values.caseContent ||
+                                                        data.caseContent;
+
+                                                    const payload = {
+                                                        blackCaseNumber:
+                                                            values.caseNumber,
+                                                        RedCaseNumber:
+                                                            data.RedCaseNumber ||
+                                                            '',
+                                                        name: values.name,
+                                                        email:
+                                                            values.email || '',
+                                                        caseTitle:
+                                                            caseTitle || '',
+                                                        caseContent:
+                                                            caseContent || '',
+                                                    };
+                                                    logDebug(
+                                                        '🚀 ~ onFinish={ ~ payload:',
+                                                        payload
+                                                    );
+                                                    await fetcher(
+                                                        CaseFolderServicePath.CREATE_CASE,
+                                                        'POST',
+                                                        {
+                                                            headers: {
+                                                                Authorization:
+                                                                    'Bearer ' +
+                                                                    token,
+                                                            },
+                                                            data: payload,
+                                                        }
+                                                    );
+                                                    await mutate();
+                                                    message.success(
+                                                        'สร้างเคสโฟลเดอร์สำเร็จ'
+                                                    );
+                                                    return true;
+                                                }
+                                            } catch (error) {
+                                                message.error(
+                                                    'สร้างเคสโฟลเดอร์ไม่สำเร็จ'
+                                                );
+                                                return false;
+                                            }
                                         }}
                                     >
                                         <ProFormText
@@ -183,12 +409,24 @@ function CaseFolder() {
                                             placeholder={'ชื่อเคส'}
                                             rules={[{ required: true }]}
                                         />
+
                                         <ProFormText
                                             name="caseNumber"
                                             label="หมายเลขคดี"
-                                            rules={[{ required: true }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                },
+                                                {
+                                                    pattern:
+                                                        /^[ก-ฮ]{1,3}.?[0-9]{1,4}\/[0-9]{1,4}$/,
+                                                    message:
+                                                        'กรุณากรอกหมายเลขคดีให้ถูกต้อง',
+                                                },
+                                            ]}
                                             placeholder={'หมายเลขคดีดำ/แดง'}
                                         />
+
                                         <Collapse
                                             ghost
                                             expandIconPosition="end"
@@ -216,12 +454,12 @@ function CaseFolder() {
                                                     ]}
                                                 />
                                                 <ProFormText
-                                                    name="title"
+                                                    name="caseTitle"
                                                     label="ข้อหา"
                                                     placeholder={'ข้อหา'}
                                                 />
                                                 <ProFormTextArea
-                                                    name="discription"
+                                                    name="caseContent"
                                                     label="รายละเอียด"
                                                     placeholder={
                                                         'รายละเอียดเพิ่มเติม'
@@ -254,8 +492,11 @@ function CaseFolder() {
                         onRow={(record) => {
                             return {
                                 onDoubleClick: () => {
-                                    console.log(record.path);
-                                    router.push(`/document${record.path}`);
+                                    logDebug(record.folderId);
+                                    router.push(`/document/${record.folderId}`);
+                                },
+                                onContextMenu: () => {
+                                    selectedRecordRef.current = record;
                                 },
                             };
                         }}
@@ -263,11 +504,55 @@ function CaseFolder() {
                         dateFormatter={(value) =>
                             dayjs(value).format('DD MMM YYYY')
                         }
+                        components={{
+                            body: {
+                                wrapper: ({ ...props }) => {
+                                    return (
+                                        <Dropdown
+                                            menu={{
+                                                onClick: ({ key }) =>
+                                                    contextMenuHandler(
+                                                        key,
+                                                        selectedRecordRef.current
+                                                    ),
+                                                items: info_items,
+                                            }}
+                                            trigger={['contextMenu']}
+                                        >
+                                            <tbody className={props.className}>
+                                                {props.children}
+                                            </tbody>
+                                        </Dropdown>
+                                    );
+                                },
+                            },
+                        }}
                     />
                 </Col>
             </Row>
         </BaseLayout.Main>
     );
 }
+
+export const getServerSideProps = withAuthUserSSR({
+    whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})(async (ctx: any) => {
+    const authUser: TAuthUser = ctx.AuthUser;
+    const token = authUser.token;
+
+    const data = await fetcher(caseFolderService.GET_ALL_CASE, 'GET', {
+        headers: {
+            Authorization: 'Bearer ' + token,
+        },
+    });
+    // const data = res.data.filter((item: TCaseFolder) => item.id !== '');
+
+    return {
+        props: {
+            authUser,
+            data,
+        },
+    };
+});
 
 export default CaseFolder;

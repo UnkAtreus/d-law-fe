@@ -89,7 +89,7 @@ export const FileTypeIcons = {
     },
 };
 
-export function showFileIcon(fileType: FileTypes, color = 'text-gray-500') {
+export function showFileIcon(fileType: TFileTypes, color = 'text-gray-500') {
     const { DOC, FOLDER, ID, IMAGE, MUSIC, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
         FileTypes;
     const {

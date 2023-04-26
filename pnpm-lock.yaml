@@ -17,12 +17,14 @@ specifiers:
   '@vidstack/react': ^0.2.3
   antd: ^5.2.0
   autoprefixer: ^10.4.13
+  cookies: ^0.8.0
   dayjs: ^1.11.7
   eslint: 8.31.0
   eslint-config-next: 13.1.1
   eslint-config-prettier: ^8.6.0
   eslint-plugin-unused-imports: ^2.0.0
   file-loader: ^6.2.0
+  hoist-non-react-statics: ^3.3.2
   mockjs: ^1.1.0
   next: 13.1.1
   nextjs-progressbar: ^0.0.16
@@ -58,9 +60,11 @@ dependencies:
   '@types/react-dom': 18.0.10
   '@vidstack/react': 0.2.3_fdjt3cknydrldmrrp7l2sfjhdq
   antd: 5.2.0_biqbaboplfbrettd7655fr4n2y
+  cookies: 0.8.0
   dayjs: 1.11.7
   eslint: 8.31.0
   eslint-config-next: 13.1.1_iukboom6ndih5an6iafl45j2fe
+  hoist-non-react-statics: 3.3.2
   mockjs: 1.1.0
   next: 13.1.1_pjwopsidmaokadturxaafygjp4
   nextjs-progressbar: 0.0.16_next@13.1.1+react@18.2.0
@@ -3177,6 +3181,14 @@ packages:
   /convert-source-map/1.9.0:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
 
+  /cookies/0.8.0:
+    resolution: {integrity: sha512-8aPsApQfebXnuI+537McwYsDtjVxGm8gTIzQI3FDW6t5t/DAhERxtnbEPN/8RX+uZthoz4eCOgloXaE5cYyNow==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      depd: 2.0.0
+      keygrip: 1.1.0
+    dev: false
+
   /copy-to-clipboard/3.3.3:
     resolution: {integrity: sha512-2KV8NhB5JqC3ky0r9PMCAZKbUHSwtEo4CwCs0KXgruG43gX5PMqDEBbVU4OUzw2MuAWUfsuFmWvEKG5QRfSnJA==}
     dependencies:
@@ -3364,6 +3376,11 @@ packages:
 
   /defined/1.0.1:
     resolution: {integrity: sha512-hsBd2qSVCRE+5PmNdHt1uzyrFu5d3RwmFDKzyNZMFq/EwDNJF7Ee5+D5oEKF0hU6LhtoUF1macFvOe4AskQC1Q==}
+
+  /depd/2.0.0:
+    resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
+    engines: {node: '>= 0.8'}
+    dev: false
 
   /detective/5.2.1:
     resolution: {integrity: sha512-v9XE1zRnz1wRtgurGu0Bs8uHKFSTdteYZNbIPFVhUZ39L/S79ppMpdmVOZAnoz1jfEFodc48n6MX483Xo3t1yw==}
@@ -4553,6 +4570,13 @@ packages:
     dependencies:
       array-includes: 3.1.6
       object.assign: 4.1.4
+    dev: false
+
+  /keygrip/1.1.0:
+    resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
+    engines: {node: '>= 0.6'}
+    dependencies:
+      tsscmp: 1.0.6
     dev: false
 
   /kind-of/2.0.1:
@@ -6645,6 +6669,11 @@ packages:
 
   /tslib/2.4.1:
     resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
+    dev: false
+
+  /tsscmp/1.0.6:
+    resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
+    engines: {node: '>=0.6.x'}
     dev: false
 
   /tsutils/3.21.0_typescript@4.9.4:

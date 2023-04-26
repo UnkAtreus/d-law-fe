@@ -1,26 +1,9 @@
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
-import { FormInstance, Modal, ModalFuncProps, Space } from 'antd';
-import React, { useState } from 'react';
+import { Modal, ModalFuncProps, Space } from 'antd';
+import React from 'react';
 import { RiEditFill, RiEditLine } from 'react-icons/ri';
 
 const BaseModal = {
-    Form({ children }: { children: React.ReactNode }) {
-        const [isModalOpen, setIsModalOpen] = useState(true);
-
-        return (
-            <Modal
-                title="Basic Modal"
-                open={isModalOpen}
-                onOk={() => setIsModalOpen(false)}
-                onCancel={() => setIsModalOpen(false)}
-            >
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                <p>Some contents...</p>
-                {children}
-            </Modal>
-        );
-    },
     delete({
         title,
         content,
@@ -42,15 +25,17 @@ const BaseModal = {
         });
     },
     ChangeName<T>({
-        form,
+        onFinish,
         type = 'file',
     }: {
-        form: FormInstance<T>;
+        onFinish:
+            | (((formData: T) => Promise<boolean | void>) &
+                  ((formData: T) => Promise<any>))
+            | undefined;
         type?: 'file' | 'folder';
     }) {
         return (
             <ModalForm<T>
-                form={form}
                 trigger={
                     <div className="flex space-x-2">
                         <RiEditLine className="icon__button text-gray-500" />
@@ -70,9 +55,7 @@ const BaseModal = {
                     destroyOnClose: true,
                     okText: 'เปลี่ยนชื่อ',
                 }}
-                onFinish={async (values) => {
-                    console.log(values);
-                }}
+                onFinish={onFinish}
             >
                 <ProFormText
                     name="name"

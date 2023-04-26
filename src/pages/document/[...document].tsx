@@ -8,14 +8,21 @@ import {
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseModal from '@baseComponents/BaseModal';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
+import AuthAction from '@hoc/AuthAction';
+import withAuthUserSSR from '@hoc/withAuthUserSSR';
 import {
     TCreateFolder,
-    TCaseFolder,
     TCreateSubFolder,
     TChangeDocumentName,
+    TAuthUser,
+    TMyCaseFolder,
+    TDocument,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
-import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
+import FolderServicePath from '@services/FolderService';
+import useRequest, { fetcher } from '@services/useRequest';
+import { FileTypeIcons, showFileIcon } from '@utilities/index';
+import logDebug from '@utilities/logDebug';
 import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
 import {
     Form,
@@ -37,7 +44,6 @@ import {
 } from 'antd';
 
 import dayjs from 'dayjs';
-import { DOCUMENT_DATASOURCE } from 'mocks/mockTable';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -61,18 +67,30 @@ import {
     RiMore2Fill,
 } from 'react-icons/ri';
 
-export async function getServerSideProps(ctx: any) {
-    const { params } = ctx;
-    const { document } = params;
+function Document({
+    path,
+    authUser,
+    data,
+}: {
+    path: string[];
+    authUser: TAuthUser;
+    data: TMyCaseFolder;
+}) {
+    const { token } = authUser;
+    const { data: folderData } = useRequest({
+        url: FolderServicePath.GET_BY_ID + path,
+        token,
+        initData: data,
+    });
 
-    return {
-        props: {
-            path: document || null,
-        },
-    };
-}
+    const subFolders: TDocument[] = folderData ? folderData.subFolders : [];
+    const files: TDocument[] = folderData ? folderData.files : [];
 
-function Document({ path }: { path: string[] }) {
+    const hasFolder = subFolders && files;
+
+    const dataFileList: TDocument[] = hasFolder ? subFolders.concat(files) : [];
+    logDebug(dataFileList);
+
     const [isUpload, setIsUpload] = useState(false);
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [openMoreInfo, setOpenMoreInfo] = useState<boolean>(false);
@@ -144,7 +162,10 @@ function Document({ path }: { path: string[] }) {
         ),
         getItem(
             <BaseModal.ChangeName<TChangeDocumentName>
-                form={changeName_form}
+                onFinish={async (value) => {
+                    console.log(value);
+                }}
+                type="folder"
             />,
             'changeDocumentName'
         ),
@@ -162,57 +183,60 @@ function Document({ path }: { path: string[] }) {
         ),
     ];
 
-    const columns: ProColumns<TCaseFolder>[] = [
+    const columns: ProColumns<TDocument>[] = [
         {
             title: <RiFile2Fill className="m-auto" />,
             dataIndex: 'type',
-            render: (type: any) => {
-                return showFileIcon(type);
+            render: (_, record) => {
+                if (record.tags.length === 0) return showFileIcon('folder');
+                if (record.tags.length > 0)
+                    return showFileIcon(record.tags[0].name);
             },
             align: 'center',
             width: 48,
         },
         {
             title: 'ชื่อไฟล์',
-            dataIndex: 'title',
+            dataIndex: 'name',
             ellipsis: true,
+            width: 512,
         },
         {
             title: 'แท๊ก',
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">
-                    {record.tags.map((name) => (
-                        <Tag key={name}>{name}</Tag>
+                    {record.tags.map((item) => (
+                        <Tag key={item.id}>{item.name}</Tag>
                     ))}
                 </div>
             ),
         },
         {
             title: 'วันที่สร้าง/เจ้าของ',
-            dataIndex: 'created_at',
+            dataIndex: 'createdAt',
             // valueType: 'dateTime',
             render: (text: any, record) => (
                 <div className="flex flex-col ">
                     <div className="text-gray-400">
                         {dayjs(text).format('DD MMM YYYY - HH:MM')}
                     </div>
-                    <div>{record.owner}</div>
+                    {/* <div>{record}</div> */}
                 </div>
             ),
         },
-        {
-            title: 'แชร์ร่วมกับ',
-            dataIndex: 'share_with',
-            render: (text, record) => (
-                <Avatar.Group maxCount={4}>
-                    <Avatar>{text}</Avatar>
-                </Avatar.Group>
-            ),
-        },
+        // {
+        //     title: 'แชร์ร่วมกับ',
+        //     dataIndex: 'share_with',
+        //     render: (text, record) => (
+        //         <Avatar.Group maxCount={4}>
+        //             <Avatar>{text}</Avatar>
+        //         </Avatar.Group>
+        //     ),
+        // },
         {
             title: 'แก้ไขล่าสุด',
-            dataIndex: 'last_edited',
+            dataIndex: 'updatedAt',
             render: (text: any) => (
                 <div className="text-gray-400">
                     {dayjs(text).format('DD MMM YYYY - HH:MM')}
@@ -341,9 +365,9 @@ function Document({ path }: { path: string[] }) {
                     </div>
                 </Col>
                 <Col xl={19} xxl={20} className="space-y-6" {...getRootProps()}>
-                    <ProTable<TCaseFolder>
+                    <ProTable<TDocument>
                         columns={columns}
-                        dataSource={DOCUMENT_DATASOURCE}
+                        dataSource={dataFileList}
                         components={{
                             body: {
                                 wrapper: ({ ...props }) => {
@@ -377,7 +401,7 @@ function Document({ path }: { path: string[] }) {
                                             </Link>
                                         </Breadcrumb.Item>
                                         <Breadcrumb.Item className="h-full text-base font-medium ">
-                                            นายทดสอบ
+                                            {folderData?.name}
                                         </Breadcrumb.Item>
                                     </Breadcrumb>
                                 </div>
@@ -587,26 +611,11 @@ function Document({ path }: { path: string[] }) {
                         onRow={(record) => {
                             return {
                                 onDoubleClick: () => {
-                                    if (record.type === FileTypes.FOLDER) {
-                                        router.push(`/document${record.path}`);
+                                    if (record.caseId) {
+                                        router.push(`/document/${record.id}`);
                                     } else {
-                                        router.push(
-                                            `/preview${record.path}?type=${record.type}`,
-                                            `/preview${record.path}`
-                                        );
+                                        router.push(`/preview/${record.id}`);
                                     }
-                                },
-                                onContextMenu: (contextmenu) => {
-                                    console.log(
-                                        '🚀 ~ file: [...document].tsx:518 ~ Document ~ contextmenu',
-                                        contextmenu
-                                    );
-                                },
-                                onClick: (clickEvent) => {
-                                    console.log(
-                                        '🚀 ~ file: [...document].tsx:646 ~ Document ~ clickEvent:',
-                                        clickEvent
-                                    );
                                 },
                             };
                         }}
@@ -619,11 +628,8 @@ function Document({ path }: { path: string[] }) {
                         footer={() => {
                             if (isDragActive)
                                 return (
-                                    <div
-                                        className="justify-cente absolute bottom-16  left-0 flex h-[calc(100%-110px)] w-full items-center border border-primary bg-primary/20"
-                                        style={{ borderStyle: 'solid' }}
-                                    >
-                                        <div className="fixed bottom-4 left-1/2 z-10 flex h-max w-full -translate-x-1/2 flex-col items-center justify-center space-y-2">
+                                    <div className="absolute bottom-16 left-0  flex h-[calc(100%-110px)] w-full items-center justify-center border border-solid border-primary bg-primary/20">
+                                        <div className="fixed bottom-4 z-10 flex h-max w-full  flex-col items-center justify-center space-y-2 ">
                                             <div className="rounded-md bg-primary py-2 px-6 text-center">
                                                 <RiFileUploadFill className="-mt-4 inline-flex h-6 w-6 animate-bounce  items-center justify-center text-white shadow" />
                                                 <div className="-mt-2 text-white">
@@ -755,5 +761,34 @@ function Document({ path }: { path: string[] }) {
         </BaseLayout.Main>
     );
 }
+
+export const getServerSideProps = withAuthUserSSR({
+    whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})(async (ctx: any) => {
+    const authUser: TAuthUser = ctx.AuthUser;
+    const params = ctx.params;
+    const { document } = params;
+    const token = authUser.token;
+
+    const { data } = await fetcher(
+        FolderServicePath.GET_BY_ID + document,
+        'GET',
+        {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            },
+        }
+    );
+
+    console.log('🚀 ~ document:', document);
+    console.log('🚀 ~ data:', data);
+    return {
+        props: {
+            authUser,
+            data,
+            path: document || null,
+        },
+    };
+});
 
 export default Document;

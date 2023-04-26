@@ -18,7 +18,6 @@ export default async function searchCase(
     try {
         if (req.method === 'POST') {
             const body = req.body;
-            console.log('🚀 ~ file: index.tsx:21 ~ body:', body);
 
             const browser = await puppeteer.launch({
                 headless: true,
@@ -29,9 +28,9 @@ export default async function searchCase(
             await page.goto('https://aryasearch.coj.go.th/search200.php');
             await page.setViewport({ width: 1080, height: 1024 });
 
-            await page.select('#black_title', 'อ');
-            await page.type('#black_id', '6');
-            await page.type('#black_yy', '2566');
+            await page.select('#black_title', body.title);
+            await page.type('#black_id', body.id);
+            await page.type('#black_yy', body.year);
             await page.click('.btn.btn-primary');
             await page.click(
                 '#resultTable > div > div > div.panel-body.table-responsive > table > tbody > tr:nth-child(1) > td:nth-child(1) > a'
@@ -84,19 +83,25 @@ export default async function searchCase(
                     );
                     res.status(200).json({
                         data: {
-                            title: title?.trim() || '',
-                            blackCase: caseList[0] || '',
-                            blackCaseDate: caseDateList[0] || '',
-                            redCase: caseList[1] || '',
-                            redCaseDate: caseDateList[1] || '',
-                            judgement: judgement?.trim() || '',
+                            caseTitle: title?.trim() || null,
+                            blackCaseNumber: caseList[0] || null,
+                            blackCaseDate: caseDateList[0] || null,
+                            RedCaseNumber: caseList[1] || null,
+                            redCaseDate: caseDateList[1] || null,
+                            judgement: judgement?.trim() || null,
                         },
                         status: 'success',
                     });
                 }
             }
         }
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message.includes('No element found for selector')) {
+            res.status(200).json({
+                data: {},
+                status: 'success',
+            });
+        }
         res.status(502).json({
             data: {},
             status: 'error',

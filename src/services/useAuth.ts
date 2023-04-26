@@ -1,39 +1,21 @@
-import { createContext, useContext, useState } from 'react';
-import useRequest from './useRequest';
+import { TAuthUser } from '@interfaces/index';
+import request from 'umi-request';
 
-export const authContext = createContext(null);
-
-export const useAuth = () => {
-    return useContext(authContext);
-};
-
-export function useAuthState() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState();
-    const [user, setUser] = useState(null);
-
-    // useEffect(() => {
-    //     const { data, error, isLoading, isValidating, mutate } =
-    //         useRequest<null>(`profile`, 'GET');
-    //     // setUser(data);
-    //     if (error) setError(error);
-    //     if (isLoading) setLoading(true);
-    //     return () => {};
-    // }, []);
-
-    return {
-        loading,
-        error,
-        user,
-    };
-}
-
-export function signIn(email: string, password: string) {
-    const data = useRequest(`login`, 'POST', {
-        email,
-        password,
+export async function signIn(email: string, password: string) {
+    const data: {
+        status: boolean;
+        data?: TAuthUser;
+        error?: string;
+    } = await request.post('/api/login', {
+        data: {
+            email,
+            password,
+        },
     });
     return data;
 }
 
-export function signOut() {}
+export async function signOut() {
+    const data = await request.post('/api/logout');
+    return data;
+}

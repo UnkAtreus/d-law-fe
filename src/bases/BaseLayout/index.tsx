@@ -25,6 +25,7 @@ import {
 import { GoLaw } from 'react-icons/go';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { signOut } from '@services/useAuth';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -125,7 +126,14 @@ const BaseLayout = {
                     }}
                     width={120}
                 >
-                    <Logo className="m-4" />
+                    <div
+                        className="cursor-pointer"
+                        onClick={() => {
+                            router.push('/');
+                        }}
+                    >
+                        <Logo className="m-4" />
+                    </div>
                     <Menu selectedKeys={[path]} mode="inline" items={items} />
                 </Layout.Sider>
                 <Layout className="ml-[120px]">
@@ -159,6 +167,12 @@ const BaseLayout = {
                             <div>
                                 <Dropdown
                                     menu={{
+                                        onClick: async ({ key }) => {
+                                            if (key === 'logout') {
+                                                await signOut();
+                                                router.push('/login');
+                                            }
+                                        },
                                         items: nav_menu,
                                     }}
                                     trigger={['click']}
@@ -185,6 +199,8 @@ const BaseLayout = {
             token: { colorBgContainer },
         } = theme.useToken();
 
+        const router = useRouter();
+
         return (
             <Layout className="min-h-screen" hasSider>
                 <Layout>
@@ -196,7 +212,14 @@ const BaseLayout = {
                         }}
                     >
                         <div className="flex items-center justify-between px-6 ">
-                            <Logo className="m-4" />
+                            <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                    router.push('/');
+                                }}
+                            >
+                                <Logo className="m-4" />
+                            </div>
 
                             <div>
                                 <Space size={'middle'}>

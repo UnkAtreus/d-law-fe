@@ -2,22 +2,26 @@ import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 
-import guidelineService from '@services/guidelineService';
 import { Avatar, Col, Form, Row, Tag, Typography } from 'antd';
 
-import { NextPage } from 'next';
-
 import { useDropzone } from 'react-dropzone';
-import BaseLoading from '@baseComponents/BaseLoading';
-import { FileTypeIcons, FileTypes, showFileIcon } from '@utilities/index';
-import { TCaseFolder } from '@interfaces/index';
+import { FileTypeIcons, showFileIcon } from '@utilities/index';
+import { TAuthUser, TDocument, TFolder } from '@interfaces/index';
 import router from 'next/router';
 import { RiFile2Fill, RiFileUploadFill } from 'react-icons/ri';
 import dayjs from 'dayjs';
-import { DOCUMENT_DATASOURCE } from 'mocks/mockTable';
+import withAuthUserSSR from '@hoc/withAuthUserSSR';
+import AuthAction from '@hoc/AuthAction';
+import useRequest, { fetcher } from '@services/useRequest';
+import FolderServicePath from '@services/FolderService';
 
-const Home: NextPage = () => {
-    const { data, isLoading } = guidelineService.getData('1');
+const Home = ({ data, authUser }: { data: TFolder[]; authUser: TAuthUser }) => {
+    const { token } = authUser;
+    const { data: FeqFolderData } = useRequest({
+        url: FolderServicePath.GET_ALL_FOLDER,
+        token,
+        initData: data,
+    });
 
     const [form] = Form.useForm<{ name: string; company: string }>();
     const {
@@ -48,7 +52,7 @@ const Home: NextPage = () => {
         ZipIcon,
     } = FileTypeIcons;
 
-    const columns: ProColumns<TCaseFolder>[] = [
+    const columns: ProColumns<TDocument>[] = [
         {
             title: <RiFile2Fill className="m-auto" />,
             dataIndex: 'type',
@@ -68,8 +72,8 @@ const Home: NextPage = () => {
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">
-                    {record.tags.map((name) => (
-                        <Tag key={name}>{name}</Tag>
+                    {record.tags.map((tag) => (
+                        <Tag key={tag.id}>{tag.name}</Tag>
                     ))}
                 </div>
             ),
@@ -83,7 +87,7 @@ const Home: NextPage = () => {
                     <div className="text-gray-400">
                         {dayjs(text).format('DD MMM YYYY - HH:MM')}
                     </div>
-                    <div>{record.owner}</div>
+                    {/* <div>{record}</div> */}
                 </div>
             ),
         },
@@ -173,9 +177,9 @@ const Home: NextPage = () => {
         },
     ];
 
-    if (isLoading) {
-        return <BaseLoading />;
-    }
+    // if (isLoading) {
+    //     return <BaseLoading />;
+    // }
 
     return (
         <>
@@ -206,23 +210,30 @@ const Home: NextPage = () => {
                             collapsible
                         >
                             <Row gutter={[8, 8]}>
-                                <Col span={4}>
-                                    <div
-                                        className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-gray-200 bg-white py-5 pl-4 pr-6 "
-                                        style={{ borderStyle: 'solid' }}
-                                    >
-                                        <FolderIcon className="icon text-gray-500 transition group-hover:text-primary" />
-                                        <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
-                                            นายสมชาย
-                                        </span>
-                                    </div>
-                                </Col>
+                                {FeqFolderData &&
+                                    FeqFolderData.map((folder) => (
+                                        <Col span={4} key={folder.id}>
+                                            <div
+                                                className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-solid border-gray-200 bg-white py-5 pl-4 pr-6"
+                                                onClick={() => {
+                                                    router.push(
+                                                        `/document/${folder.id}`
+                                                    );
+                                                }}
+                                            >
+                                                <FolderIcon className="icon text-gray-500 transition group-hover:text-primary" />
+                                                <span className="overflow-hidden text-ellipsis whitespace-nowrap ">
+                                                    {folder.name}
+                                                </span>
+                                            </div>
+                                        </Col>
+                                    ))}
                             </Row>
                         </ProCard>
 
-                        <ProTable<TCaseFolder>
+                        <ProTable<TDocument>
                             columns={columns}
-                            dataSource={DOCUMENT_DATASOURCE}
+                            dataSource={[]}
                             cardBordered
                             cardProps={{
                                 collapsible: true,
@@ -259,19 +270,19 @@ const Home: NextPage = () => {
                             onRow={(record) => {
                                 return {
                                     onDoubleClick: () => {
-                                        if (record.type === FileTypes.FOLDER) {
-                                            router.push(
-                                                `/document${record.path}`
-                                            );
-                                        } else if (
-                                            record.type === FileTypes.ZIP
-                                        ) {
-                                            console.log('download');
-                                        } else {
-                                            router.push(
-                                                `/preview${record.path}`
-                                            );
-                                        }
+                                        // if (record.type === FileTypes.FOLDER) {
+                                        //     router.push(
+                                        //         `/document${record.path}`
+                                        //     );
+                                        // } else if (
+                                        //     record.type === FileTypes.ZIP
+                                        // ) {
+                                        //     console.log('download');
+                                        // } else {
+                                        //     router.push(
+                                        //         `/preview${record.path}`
+                                        //     );
+                                        // }
                                     },
                                 };
                             }}
@@ -309,5 +320,25 @@ const Home: NextPage = () => {
         </>
     );
 };
+
+export const getServerSideProps = withAuthUserSSR({
+    whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})(async (ctx: any) => {
+    const authUser: TAuthUser = ctx.AuthUser;
+    const token = authUser.token;
+
+    const { data } = await fetcher(FolderServicePath.GET_ALL_FOLDER, 'GET', {
+        headers: {
+            Authorization: 'Bearer ' + token,
+        },
+    });
+
+    return {
+        props: {
+            authUser,
+            data,
+        },
+    };
+});
 
 export default Home;

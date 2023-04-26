@@ -1,8 +1,9 @@
-import useSwr, { Key } from 'swr';
+import logDebug from '@utilities/logDebug';
+import useSwr from 'swr';
 import { RequestOptionsInit, extend } from 'umi-request';
 import progressMiddleware from 'umi-request-progress';
 
-const BASE_URL = 'https://pokeapi.co/api/v2/';
+export const BASE_URL = process.env.NEXT_PUBLIC_API_ROUTE;
 
 type Method =
     | 'get'
@@ -26,17 +27,18 @@ type Method =
     | 'unlink'
     | 'UNLINK';
 
-const request = extend({
+export const request = extend({
     prefix: BASE_URL,
 });
 
 request.use(progressMiddleware, { core: true });
 
-function fetcher(
+export function fetcher(
     path: string,
     method: Method,
     options?: RequestOptionsInit | undefined
 ) {
+    logDebug(path, method, options);
     try {
         switch (method.toUpperCase()) {
             case 'GET':
@@ -48,21 +50,40 @@ function fetcher(
             case 'PATCH':
                 return request.patch(path, options).then((res) => res);
             default:
-                return request.get(BASE_URL + path, options).then((res) => res);
+                return request.get(path, options).then((res) => res);
         }
     } catch (error: any) {
         return error;
     }
 }
-function useRequest<T>(
-    path: Key,
-    method: Method,
-    options?: RequestOptionsInit | undefined
-) {
+
+function useRequest<T>({
+    url,
+    payload,
+    token,
+    initData,
+}: {
+    url: string | null;
+    payload?: any;
+    token: string | null;
+    initData?: T;
+}) {
+    const method = payload ? 'POST' : 'GET';
+    const defaultOptions = {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    };
     const { data, error, isLoading, isValidating, mutate } = useSwr<T>(
-        [path, method, options],
-        ([path, method, options]: [string, Method, any]) =>
-            fetcher(path, method, options)
+        [url, token],
+        ([url, token]: [string, string]) =>
+            fetcher(url, method, {
+                headers: {
+                    Authorization: 'Bearer ' + token,
+                },
+                ...(payload && { data: payload }),
+            }),
+        { ...defaultOptions, fallbackData: initData }
     );
 
     return { data, error, isLoading, isValidating, mutate };

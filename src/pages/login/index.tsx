@@ -1,19 +1,34 @@
 /* eslint-disable @next/next/no-img-element */
 import BaseLayout from '@baseComponents/BaseLayout';
-import React from 'react';
+import React, { useState } from 'react';
 import HeroBanner from '@assets/hero_login.jpg';
-import { Button, Checkbox, Form, Input, Typography } from 'antd';
+import { Button, Checkbox, Form, Input, Typography, message } from 'antd';
 import Link from 'next/link';
 import { RiLockLine, RiUser3Line } from 'react-icons/ri';
 import { signIn } from '@services/useAuth';
+import { useRouter } from 'next/router';
 
 function Login() {
-    function onFinish(value: {
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
+    async function onFinish(value: {
         email: string;
         password: string;
         remember: boolean;
     }) {
-        const { data } = signIn(value.email, value.password);
+        try {
+            setIsLoading(true);
+            const { status } = await signIn(value.email, value.password);
+            if (status) {
+                message.success('เข้าสู่ระบบสำเร็จ');
+                router.push('/');
+            } else {
+                message.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+            }
+        } catch (error) {
+            message.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+        }
+        setIsLoading(false);
     }
 
     return (
@@ -89,7 +104,12 @@ function Login() {
                             </Form.Item>
 
                             <Form.Item>
-                                <Button type="primary" htmlType="submit" block>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    loading={isLoading}
+                                    block
+                                >
                                     เข้าสู่ระบบ
                                 </Button>
                             </Form.Item>
