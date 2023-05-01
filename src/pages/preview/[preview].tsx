@@ -170,7 +170,7 @@ function Preview({
     const RenderMedia = memo(function RenderMedia({
         type,
     }: {
-        type: 'video' | 'music';
+        type: 'video' | 'audio';
     }) {
         return <Media type={type} />;
     });
@@ -183,13 +183,13 @@ function Preview({
     });
 
     const RenderFile = memo(function RenderFile() {
-        const { DOC, IMAGE, MUSIC, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
+        const { DOC, IMAGE, AUDIO, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
             FileTypes;
         switch (fileType) {
             case VIDEO:
                 return <RenderMedia type={'video'} />;
-            case MUSIC:
-                return <RenderMedia type={'music'} />;
+            case AUDIO:
+                return <RenderMedia type={'audio'} />;
             case PDF:
                 return <RenderDocument />;
             case DOC:

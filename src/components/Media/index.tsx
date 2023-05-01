@@ -16,7 +16,7 @@ interface IMediaProps {
 
 function Media({ type, poster }: IMediaProps) {
     const RenderMedia = memo(function RenderMedia() {
-        const { MUSIC, VIDEO } = FileTypes;
+        const { AUDIO, VIDEO } = FileTypes;
         switch (type) {
             case VIDEO:
                 return (
@@ -28,7 +28,7 @@ function Media({ type, poster }: IMediaProps) {
                         <MediaOutlet />
                     </MediaPlayer>
                 );
-            case MUSIC:
+            case AUDIO:
                 return (
                     <MediaPlayer
                         src={[

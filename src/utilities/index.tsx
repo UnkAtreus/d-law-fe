@@ -31,7 +31,7 @@ export enum FileTypes {
     PTT = 'powerpoint',
     IMAGE = 'image',
     VIDEO = 'video',
-    MUSIC = 'music',
+    AUDIO = 'audio',
     ZIP = 'compress',
     TEXT = 'text',
     ID = 'idCard',
@@ -45,7 +45,7 @@ export type TFileTypes =
     | 'powerpoint'
     | 'image'
     | 'video'
-    | 'music'
+    | 'audio'
     | 'compress'
     | 'text'
     | 'idCard';
@@ -90,7 +90,7 @@ export const FileTypeIcons = {
 };
 
 export function showFileIcon(fileType: TFileTypes, color = 'text-gray-500') {
-    const { DOC, FOLDER, ID, IMAGE, MUSIC, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
+    const { DOC, FOLDER, ID, IMAGE, AUDIO, PDF, PTT, TEXT, VIDEO, XLS, ZIP } =
         FileTypes;
     const {
         ExcelIcon,
@@ -127,7 +127,7 @@ export function showFileIcon(fileType: TFileTypes, color = 'text-gray-500') {
             return <VideoIcon className={`icon ${color}`} />;
         case IMAGE:
             return <ImageIcon className={`icon ${color}`} />;
-        case MUSIC:
+        case AUDIO:
             return <MusicIcon className={`icon ${color}`} />;
 
         default:
