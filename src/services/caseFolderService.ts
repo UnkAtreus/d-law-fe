@@ -3,6 +3,7 @@ const CaseFolderServicePath = {
     GET_BY_ID: 'cases/',
     CREATE_CASE: 'cases',
     UPDATE_CASE: 'cases/',
+    DELETE_CASE: 'cases/',
 };
 
 export default CaseFolderServicePath;

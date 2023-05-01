@@ -67,7 +67,7 @@ function CaseFolder({
     const token = authUser.token || '';
     const {
         mutate,
-        data: initData,
+        data: casesFolderData,
         isLoading,
     } = useRequest({
         url: caseFolderService.GET_ALL_CASE,
@@ -75,28 +75,9 @@ function CaseFolder({
         initData: data,
     });
 
-    const casesFolderData =
-        (initData &&
-            initData.data?.filter((item: TCaseFolder) => item.id !== '')) ||
-        [];
-
     const [isUpload, setIsUpload] = useState(false);
 
     const selectedRecordRef = useRef<TCaseFolder>(data.data[0]);
-
-    // useEffect(() => {
-    //     (async () => {
-    //         if (mutationg) {
-    //             console.log('🚀 ~ useEffect ~ mutationg:', mutationg.data);
-    //             const res = await mutate();
-    //             console.log('🚀 ~ useEffect ~ res:', res);
-    //             console.log('🚀 ~ useEffect ~ getData:', getData);
-    //         }
-    //     })();
-    // }, [mutationg]);
-    // useEffect(() => {
-    //     console.log(getData);
-    // }, [getData]);
 
     const router = useRouter();
     const { fileLists, setFileLists } = useUpload();
@@ -134,9 +115,28 @@ function CaseFolder({
         { type: 'divider' },
         getItem(
             <BaseModal.ChangeName<TChangeDocumentName>
-                onFinish={async (value) => {
-                    const caseFolderId = selectedRecordRef.current.id;
-                    console.log(value);
+                onFinish={async (values) => {
+                    try {
+                        logDebug('🚀 ~ onFinish={ ~ payload:', values);
+                        await fetcher(
+                            CaseFolderServicePath.UPDATE_CASE +
+                                selectedRecordRef.current.id,
+                            'PATCH',
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + token,
+                                },
+                                data: values,
+                            }
+                        );
+                        message.success('แก้ไขชื่อเคสโฟลเดอร์สำเร็จ');
+                        await mutate();
+
+                        return true;
+                    } catch (error) {
+                        message.error('แก้ไขชื่อเคสโฟลเดอร์ไม่สำเร็จ');
+                        return false;
+                    }
                 }}
                 type="folder"
             />,
@@ -172,6 +172,23 @@ function CaseFolder({
                     message.success('คัดลองลิงค์สำเร็จ');
                 } else {
                     message.error('เกิดข้อผิดพลาดในการคัดลอกลิงค์');
+                }
+            }
+            if (key === 'delete') {
+                try {
+                    await fetcher(
+                        CaseFolderServicePath.DELETE_CASE + record.id,
+                        'DELETE',
+                        {
+                            headers: {
+                                Authorization: 'Bearer ' + token,
+                            },
+                        }
+                    );
+                    message.success('ลบเคสโฟลเดอร์สำเร็จ');
+                    await mutate();
+                } catch (error) {
+                    message.error('ลบเคสโฟลเดอร์ไม่สำเร็จ');
                 }
             }
         },
@@ -285,7 +302,7 @@ function CaseFolder({
                 <Col {...getRootProps()}>
                     <ProTable<TCaseFolder>
                         columns={columns}
-                        dataSource={casesFolderData}
+                        dataSource={casesFolderData?.data}
                         loading={isLoading}
                         cardBordered
                         cardProps={{
@@ -298,7 +315,7 @@ function CaseFolder({
                                 >
                                     โฟลเดอร์เคส{' '}
                                     <Badge
-                                        count={casesFolderData?.length}
+                                        count={casesFolderData?.data.length}
                                         color={'#8e5531'}
                                     />
                                 </Typography.Title>
@@ -331,7 +348,6 @@ function CaseFolder({
                                             destroyOnClose: true,
                                         }}
                                         onFinish={async (values) => {
-                                            console.log(values);
                                             // const casenum = 'อ.6/2566'
                                             try {
                                                 const caseNumberSplit =
@@ -389,10 +405,11 @@ function CaseFolder({
                                                             data: payload,
                                                         }
                                                     );
-                                                    await mutate();
                                                     message.success(
                                                         'สร้างเคสโฟลเดอร์สำเร็จ'
                                                     );
+                                                    await mutate();
+
                                                     return true;
                                                 }
                                             } catch (error) {
@@ -545,7 +562,6 @@ export const getServerSideProps = withAuthUserSSR({
             Authorization: 'Bearer ' + token,
         },
     });
-    // const data = res.data.filter((item: TCaseFolder) => item.id !== '');
 
     return {
         props: {
