@@ -68,7 +68,7 @@ const Home = ({ data, authUser }: { data: TFolder[]; authUser: TAuthUser }) => {
             ellipsis: true,
         },
         {
-            title: 'แท๊ก',
+            title: 'ชนิดไฟล์',
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">

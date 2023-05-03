@@ -22,7 +22,7 @@ import {
     Typography,
     message,
 } from 'antd';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef } from 'react';
 
 import {
     RiDeleteBinLine,
@@ -73,7 +73,6 @@ function CaseFolder({
         initData: data,
     });
 
-    const [isUpload, setIsUpload] = useState(false);
     const selectedRecordRef = useRef<TCaseFolder>(data.data[0]);
 
     const router = useRouter();
@@ -202,7 +201,7 @@ function CaseFolder({
             ellipsis: true,
         },
         {
-            title: 'แท๊ก',
+            title: 'ชนิดไฟล์',
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">

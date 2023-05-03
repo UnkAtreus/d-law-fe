@@ -20,6 +20,7 @@ import {
     ResponseData,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
+import FileServicePath from '@services/FileService';
 import FolderServicePath from '@services/FolderService';
 import useRequest, { fetcher } from '@services/useRequest';
 import { FileTypeIcons, showFileIcon } from '@utilities/index';
@@ -179,10 +180,30 @@ function Document({
         ),
         getItem(
             <BaseModal.ChangeName<TChangeDocumentName>
-                onFinish={async (value) => {
-                    console.log(value);
+                onFinish={async (values) => {
+                    try {
+                        logDebug('🚀 ~ onFinish={ ~ payload:', values);
+                        await fetcher(
+                            FileServicePath.UPDATE_FILE +
+                                selectedRecordRef.current.id,
+                            'PATCH',
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + token,
+                                },
+                                data: values,
+                            }
+                        );
+                        message.success('แก้ไขชื่อไฟล์สำเร็จ');
+                        await mutate();
+
+                        return true;
+                    } catch (error) {
+                        message.error('แก้ไขชื่อไฟล์ไม่สำเร็จ');
+                        return false;
+                    }
                 }}
-                type="folder"
+                type="file"
             />,
             'changeDocumentName'
         ),
@@ -225,8 +246,28 @@ function Document({
         ),
         getItem(
             <BaseModal.ChangeName<TChangeDocumentName>
-                onFinish={async (value) => {
-                    console.log(value);
+                onFinish={async (values) => {
+                    try {
+                        logDebug('🚀 ~ onFinish={ ~ payload:', values);
+                        await fetcher(
+                            FolderServicePath.UPDATE_FOLDER +
+                                selectedRecordRef.current.id,
+                            'PATCH',
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + token,
+                                },
+                                data: values,
+                            }
+                        );
+                        message.success('แก้ไขชื่อโฟลเดอร์สำเร็จ');
+                        await mutate();
+
+                        return true;
+                    } catch (error) {
+                        message.error('แก้ไขชื่อโฟลเดอร์ไม่สำเร็จ');
+                        return false;
+                    }
                 }}
                 type="folder"
             />,
@@ -247,16 +288,18 @@ function Document({
     ];
 
     const contextMenuHandler = useCallback(
-        async (key: string, record: TDocument) => {
-            console.log('🚀 ~ record:', record.caseId);
+        async (key: string, type: 'Folder' | 'File', record: TDocument) => {
+            const fileType = type === 'Folder' ? 'โฟลเดอร์' : 'ไฟล์';
             logDebug('🚀 ~ key:', key);
             if (key === 'openfile') {
-                console.log('🚀 ~ CaseFolder ~ openfile:');
+                router.push(`/preview/${record.id}`);
+            }
+            if (key === 'openfolder') {
                 router.push(`/document/${record.id}`);
             }
             if (key === 'copylink') {
                 const origin = window.location.origin;
-                const isCopy = await copy(`${origin}/document/${record.id}`);
+                const isCopy = await copy(`${origin}/preview/${record.id}`);
                 if (isCopy) {
                     message.success('คัดลองลิงค์สำเร็จ');
                 } else {
@@ -264,7 +307,29 @@ function Document({
                 }
             }
             if (key === 'delete') {
-                console.log('🚀 ~ delete:');
+                BaseModal.delete({
+                    title: `ลบ${fileType} ${record.name}`,
+                    content: `คุณต้องการที่จะลบ${fileType} ${record.name} ใช่หรือไม่`,
+                    onFinish: async () => {
+                        try {
+                            await fetcher(
+                                FileServicePath.DELETE_FILE + record.id,
+                                'DELETE',
+                                {
+                                    headers: {
+                                        Authorization: 'Bearer ' + token,
+                                    },
+                                }
+                            );
+                            message.success(`ลบเคส${fileType}สำเร็จ`);
+                            await mutate();
+                            return true;
+                        } catch (error) {
+                            message.error(`ลบเคส${fileType}ไม่สำเร็จ`);
+                            return false;
+                        }
+                    },
+                });
             }
         },
         []
@@ -289,7 +354,7 @@ function Document({
             width: 512,
         },
         {
-            title: 'แท๊ก',
+            title: 'ชนิดไฟล์',
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">
@@ -333,17 +398,33 @@ function Document({
         {
             dataIndex: 'operation',
             key: 'operation',
-            render: () => (
-                <Dropdown menu={{ items: info_file }} trigger={['click']}>
-                    <Button
-                        type="text"
-                        shape="circle"
-                        icon={
-                            <RiMore2Fill className="icon__button text-gray-500" />
-                        }
-                    ></Button>
-                </Dropdown>
-            ),
+            render: (_, record) => {
+                const isFolder = record.caseId;
+                return (
+                    <Dropdown
+                        menu={{
+                            onClick: ({ key }) => {
+                                selectedRecordRef.current = record;
+                                if (isFolder) {
+                                    contextMenuHandler(key, 'Folder', record);
+                                } else {
+                                    contextMenuHandler(key, 'File', record);
+                                }
+                            },
+                            items: isFolder ? info_folder : info_file,
+                        }}
+                        trigger={['click']}
+                    >
+                        <Button
+                            type="text"
+                            shape="circle"
+                            icon={
+                                <RiMore2Fill className="icon__button text-gray-500" />
+                            }
+                        ></Button>
+                    </Dropdown>
+                );
+            },
             width: 48,
         },
     ];
@@ -470,21 +551,47 @@ function Document({
                                     const isFolder =
                                         props.children[0]?.props.record.caseId;
                                     if (props.children[0]) {
+                                        const record =
+                                            props.children[0]?.props.record;
+                                        selectedRecordRef.current = record;
                                         return (
                                             <Dropdown
                                                 menu={{
-                                                    onClick: ({ key }) =>
-                                                        contextMenuHandler(
-                                                            key,
-                                                            selectedRecordRef.current
-                                                        ),
+                                                    onClick: ({ key }) => {
+                                                        if (isFolder) {
+                                                            contextMenuHandler(
+                                                                key,
+                                                                'Folder',
+                                                                record
+                                                            );
+                                                        } else {
+                                                            contextMenuHandler(
+                                                                key,
+                                                                'File',
+                                                                record
+                                                            );
+                                                        }
+                                                    },
                                                     items: isFolder
                                                         ? info_folder
                                                         : info_file,
                                                 }}
                                                 trigger={['contextMenu']}
                                             >
-                                                <tr className={props.className}>
+                                                <tr
+                                                    className={props.className}
+                                                    onDoubleClick={() => {
+                                                        if (record.caseId) {
+                                                            router.push(
+                                                                `/document/${record.id}`
+                                                            );
+                                                        } else {
+                                                            router.push(
+                                                                `/preview/${record.id}`
+                                                            );
+                                                        }
+                                                    }}
+                                                >
                                                     {props.children}
                                                 </tr>
                                             </Dropdown>
@@ -545,7 +652,39 @@ function Document({
                                             okText: 'สร้างโฟลเดอร์',
                                         }}
                                         onFinish={async (values) => {
-                                            console.log(values);
+                                            try {
+                                                logDebug(
+                                                    '🚀 ~ onFinish={ ~ payload:',
+                                                    values
+                                                );
+                                                await fetcher(
+                                                    FolderServicePath.CREATE_FOLDER,
+                                                    'POST',
+                                                    {
+                                                        headers: {
+                                                            Authorization:
+                                                                'Bearer ' +
+                                                                token,
+                                                        },
+                                                        data: {
+                                                            name: values.name,
+                                                            parentFolderId:
+                                                                path[0],
+                                                        },
+                                                    }
+                                                );
+                                                message.success(
+                                                    'สร้างโฟลเดอร์สำเร็จ'
+                                                );
+                                                await mutate();
+
+                                                return true;
+                                            } catch (error) {
+                                                message.error(
+                                                    'สร้างโฟลเดอร์ไม่สำเร็จ'
+                                                );
+                                                return false;
+                                            }
                                         }}
                                     >
                                         <ProFormText
@@ -729,9 +868,6 @@ function Document({
                                     } else {
                                         router.push(`/preview/${record.id}`);
                                     }
-                                },
-                                onContextMenu: () => {
-                                    selectedRecordRef.current = record;
                                 },
                             };
                         }}
