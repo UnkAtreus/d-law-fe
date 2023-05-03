@@ -145,3 +145,8 @@ export interface TFolder {
     }[];
     caseId: string;
 }
+export interface TFreqCaseFolder {
+    id: string;
+    name: string;
+    folderId: string;
+}
