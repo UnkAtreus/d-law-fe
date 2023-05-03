@@ -17,6 +17,7 @@ import {
     TAuthUser,
     TMyCaseFolder,
     TDocument,
+    ResponseData,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
 import FolderServicePath from '@services/FolderService';
@@ -75,19 +76,25 @@ function Document({
 }: {
     path: string;
     authUser: TAuthUser;
-    data: TMyCaseFolder;
+    data: ResponseData<TMyCaseFolder>;
 }) {
     const { token } = authUser;
-    const { data: folderData } = useRequest({
+    const {
+        data: folderData,
+        mutate,
+        isLoading,
+    } = useRequest({
         url: FolderServicePath.GET_BY_ID + path,
         token,
         initData: data,
     });
 
-    const subFolders: TDocument[] = folderData?.subFolders
-        ? folderData.subFolders
+    const subFolders: TDocument[] = folderData?.data.subFolders
+        ? folderData.data.subFolders
         : [];
-    const files: TDocument[] = folderData?.files ? folderData.files : [];
+    const files: TDocument[] = folderData?.data.files
+        ? folderData.data.files
+        : [];
 
     const dataFileList = [...subFolders, ...files];
 
@@ -110,11 +117,13 @@ function Document({
         onDrop: (files: any[]) => {
             if (files) {
                 if (!hasFiles) {
+                    setIsUpload(true);
                     setHasFiles(true);
                 }
 
-                files.forEach((file) => {
-                    handleUpload(file, token, path[0]);
+                files.forEach(async (file) => {
+                    const id = await handleUpload(file, token, path[0]);
+                    await mutate();
                 });
             }
         },
@@ -419,20 +428,17 @@ function Document({
                                 if (file && !hasFiles) {
                                     setHasFiles(true);
                                 }
-
-                                handleUpload(file, token, path[0]);
+                                try {
+                                    const id = await handleUpload(
+                                        file,
+                                        token,
+                                        path[0]
+                                    );
+                                    await mutate();
+                                } catch (error) {
+                                    /* empty */
+                                }
                             }}
-                            // onChange={async (info) => {
-                            //     const file = info.file;
-
-                            //     if (info.file.status !== 'uploading') {
-                            //         console.log(info.file, info.fileList);
-                            //     }
-                            //     if (info.file.status === 'done') {
-                            //         console.log('done');
-                            //         // await mutate();
-                            //     }
-                            // }}
                         >
                             <Button
                                 icon={
@@ -457,6 +463,7 @@ function Document({
                     <ProTable<TDocument>
                         columns={columns}
                         dataSource={dataFileList}
+                        loading={isLoading}
                         components={{
                             body: {
                                 row: ({ ...props }) => {
@@ -507,7 +514,7 @@ function Document({
                                             </Link>
                                         </Breadcrumb.Item>
                                         <Breadcrumb.Item className="h-full text-base font-medium ">
-                                            {folderData?.name}
+                                            {folderData?.data.name}
                                         </Breadcrumb.Item>
                                     </Breadcrumb>
                                 </div>
@@ -832,15 +839,11 @@ export const getServerSideProps = withAuthUserSSR({
     const { document } = params;
     const token = authUser.token;
 
-    const { data } = await fetcher(
-        FolderServicePath.GET_BY_ID + document,
-        'GET',
-        {
-            headers: {
-                Authorization: 'Bearer ' + token,
-            },
-        }
-    );
+    const data = await fetcher(FolderServicePath.GET_BY_ID + document, 'GET', {
+        headers: {
+            Authorization: 'Bearer ' + token,
+        },
+    });
 
     return {
         props: {

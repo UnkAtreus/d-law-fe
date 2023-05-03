@@ -22,9 +22,9 @@ function useUpload() {
         file: any,
         token: string | null,
         path: string
-    ) => {
+    ): Promise<string> => {
         const uid = file.name;
-        console.log('🚀 ~ useUpload ~ uid:', uid);
+
         const name = file.name;
         setFileLists((prev: any) => [...prev, file]);
 
@@ -39,7 +39,6 @@ function useUpload() {
             onReqProgress: function (ev: ProgressEvent) {
                 const { loaded, total } = ev;
                 const percent = Math.floor((loaded / total) * 100);
-                console.log('🚀 ~ useUpload ~ percent:', percent);
                 setProgress((prev) => {
                     return {
                         ...prev,
@@ -54,15 +53,17 @@ function useUpload() {
         };
 
         try {
-            const res = await fetcher(
+            const { data } = await fetcher(
                 FileServicePath.UPLOAD_FILE,
                 'POST',
                 config
             );
+            console.log('🚀 ~ useUpload ~ data:', data);
 
-            console.log('server res: ', res);
+            return data;
         } catch (err: any) {
-            console.log('Eroor: ', err);
+            console.log('Error: ', err);
+            return '';
         }
     };
 
@@ -80,18 +81,8 @@ function useUpload() {
                     }}
                     fileList={fileLists}
                     itemRender={(_, file, _fileList) => {
-                        // console.log('file', file);
-                        // console.log('fileList', fileList);
-
                         const fileType = file.type?.split('/')[0] || '';
                         const uid = file.name;
-                        console.log('🚀 ~ useUpload ~ uid:', uid);
-                        console.log('🚀 ~ useUpload ~ uid:', progress);
-                        // console.log(file.type?.split('/')[0]);
-                        console.log(
-                            'progress[uid]',
-                            progress[uid] && progress[uid].progress
-                        );
 
                         return (
                             <div className="relative  mt-1 flex items-center rounded px-4 py-2 transition hover:bg-primary/10">
@@ -114,7 +105,6 @@ function useUpload() {
                                         }
                                         strokeWidth={2}
                                         showInfo={false}
-                                        // status="exception"
                                     />
                                 </div>
                                 {/* <span className="ml-2">
