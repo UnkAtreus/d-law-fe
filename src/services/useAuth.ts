@@ -19,3 +19,13 @@ export async function signOut() {
     const data = await request.post('/api/logout');
     return data;
 }
+
+const UserServicePath = {
+    GET_ALL_USER: 'users',
+    GET_BY_ID: 'users/',
+    CREATE_FOLDER: 'users',
+    UPDATE_FOLDER: 'users/',
+    MY_USER: 'users/me',
+};
+
+export default UserServicePath;

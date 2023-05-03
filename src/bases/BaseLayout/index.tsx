@@ -104,7 +104,7 @@ const BaseLayout = {
 
         const nav_menu: MenuProps['items'] = [
             getItem(
-                'Logout',
+                'ออกจากระบบ',
                 'logout',
                 <RiLogoutBoxLine className="icon__button m-auto" />
             ),

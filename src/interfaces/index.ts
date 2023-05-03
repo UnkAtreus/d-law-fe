@@ -145,8 +145,16 @@ export interface TFolder {
     }[];
     caseId: string;
 }
+
 export interface TFreqCaseFolder {
     id: string;
     name: string;
     folderId: string;
+}
+
+export interface TUser {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
 }
