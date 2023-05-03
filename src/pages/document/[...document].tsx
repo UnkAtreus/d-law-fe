@@ -23,7 +23,8 @@ import FolderServicePath from '@services/FolderService';
 import useRequest, { fetcher } from '@services/useRequest';
 import { FileTypeIcons, showFileIcon } from '@utilities/index';
 import logDebug from '@utilities/logDebug';
-import useUpload, { RenderIconUploadType } from '@utilities/useUpload';
+import useCopyToClipboard from '@utilities/useCopyToClipboard';
+import useUpload from '@utilities/useUpload';
 import {
     Form,
     Tag,
@@ -33,26 +34,25 @@ import {
     Space,
     Button,
     Upload,
-    FloatButton,
-    Progress,
     Input,
     Drawer,
     Divider,
     Breadcrumb,
     Dropdown,
     MenuProps,
+    message,
+    FloatButton,
 } from 'antd';
 
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
     RiFile2Fill,
     RiFolderAddFill,
     RiFileUploadFill,
-    RiUploadLine,
     RiEqualizerLine,
     RiSearchLine,
     RiTeamFill,
@@ -65,6 +65,7 @@ import {
     RiFileCopyLine,
     RiEyeLine,
     RiMore2Fill,
+    RiUploadLine,
 } from 'react-icons/ri';
 
 function Document({
@@ -72,7 +73,7 @@ function Document({
     authUser,
     data,
 }: {
-    path: string[];
+    path: string;
     authUser: TAuthUser;
     data: TMyCaseFolder;
 }) {
@@ -83,39 +84,46 @@ function Document({
         initData: data,
     });
 
-    const subFolders: TDocument[] = folderData ? folderData.subFolders : [];
-    const files: TDocument[] = folderData ? folderData.files : [];
+    const subFolders: TDocument[] = folderData?.subFolders
+        ? folderData.subFolders
+        : [];
+    const files: TDocument[] = folderData?.files ? folderData.files : [];
 
-    const hasFolder = subFolders && files;
-
-    const dataFileList: TDocument[] = hasFolder ? subFolders.concat(files) : [];
-    logDebug(dataFileList);
+    const dataFileList = [...subFolders, ...files];
 
     const [isUpload, setIsUpload] = useState(false);
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [openMoreInfo, setOpenMoreInfo] = useState<boolean>(false);
-    const [openChangeNameModal, setOpenChangeNameModal] =
-        useState<boolean>(false);
+    const [hasFiles, setHasFiles] = useState<boolean>(false);
+
+    const selectedRecordRef = useRef<TDocument>(dataFileList[0]);
 
     const router = useRouter();
-    const { fileLists, setFileLists } = useUpload();
+    const [_, copy] = useCopyToClipboard();
     const [subfolder_form] = Form.useForm<TCreateSubFolder>();
     const [share_form] = Form.useForm<TCreateFolder>();
-    const [changeName_form] = Form.useForm<TChangeDocumentName>();
+
+    const { Render, handleUpload } = useUpload();
     const { getRootProps, isDragActive } = useDropzone({
         noClick: true,
         noKeyboard: true,
         onDrop: (files: any[]) => {
-            console.log(files);
-
             if (files) {
-                setFileLists([...fileLists, ...files]);
-                setIsUpload(true);
+                if (!hasFiles) {
+                    setHasFiles(true);
+                }
+
+                files.forEach((file) => {
+                    handleUpload(file, token, path[0]);
+                });
             }
         },
     });
 
-    const basePath = path.join('/');
+    const RenderFiles = memo(function RenderFiles() {
+        return <Render />;
+    });
+
     const {
         ExcelIcon,
         FolderIcon,
@@ -130,7 +138,7 @@ function Document({
         ZipIcon,
     } = FileTypeIcons;
 
-    const info_items: MenuProps['items'] = [
+    const info_file: MenuProps['items'] = [
         getItem(
             <div className="flex">
                 <span className="self-center">ดูตัวอย่างไฟล์</span>
@@ -182,6 +190,76 @@ function Document({
             true
         ),
     ];
+
+    const info_folder: MenuProps['items'] = [
+        getItem(
+            <div className="flex">
+                <span className="self-center">เปิดโฟลเดอร์</span>
+            </div>,
+            'openfolder',
+            <RiEyeLine className="icon__button text-gray-500" />
+        ),
+        getItem(
+            <div className="flex">
+                <span className="self-center">คัดลอกลิงค์โฟลเดอร์</span>
+            </div>,
+            'copylink',
+            <RiFileCopyLine className="icon__button text-gray-500" />
+        ),
+        { type: 'divider' },
+        getItem(
+            <div className="flex">
+                <span className="self-center">ย้ายโฟลเดอร์ไปที่</span>
+            </div>,
+            'movefile',
+            <RiFolderTransferLine className="icon__button text-gray-500" />
+        ),
+        getItem(
+            <BaseModal.ChangeName<TChangeDocumentName>
+                onFinish={async (value) => {
+                    console.log(value);
+                }}
+                type="folder"
+            />,
+            'changeDocumentName'
+        ),
+
+        { type: 'divider' },
+        getItem(
+            <div className="flex">
+                <span className="self-center">ลบโฟลเดอร์</span>
+            </div>,
+            'delete',
+            <RiDeleteBinLine className="icon__button " />,
+            undefined,
+            undefined,
+            true
+        ),
+    ];
+
+    const contextMenuHandler = useCallback(
+        async (key: string, record: TDocument) => {
+            console.log('🚀 ~ record:', record.caseId);
+            logDebug('🚀 ~ key:', key);
+            if (key === 'openfile') {
+                console.log('🚀 ~ CaseFolder ~ openfile:');
+                router.push(`/document/${record.id}`);
+            }
+            if (key === 'copylink') {
+                const origin = window.location.origin;
+                const isCopy = await copy(`${origin}/document/${record.id}`);
+                if (isCopy) {
+                    message.success('คัดลองลิงค์สำเร็จ');
+                } else {
+                    message.error('เกิดข้อผิดพลาดในการคัดลอกลิงค์');
+                }
+            }
+            if (key === 'delete') {
+                console.log('🚀 ~ delete:');
+            }
+        },
+        []
+    );
 
     const columns: ProColumns<TDocument>[] = [
         {
@@ -247,7 +325,7 @@ function Document({
             dataIndex: 'operation',
             key: 'operation',
             render: () => (
-                <Dropdown menu={{ items: info_items }} trigger={['click']}>
+                <Dropdown menu={{ items: info_file }} trigger={['click']}>
                     <Button
                         type="text"
                         shape="circle"
@@ -332,18 +410,29 @@ function Document({
                 <Col xl={5} xxl={4}>
                     <div className="space-y-4">
                         <Upload
+                            className="document-upload"
                             multiple
                             showUploadList={false}
-                            onChange={(info) => {
-                                const file = info.file;
-                                if (info.file.status !== 'uploading') {
-                                    console.log(info.file, info.fileList);
+                            customRequest={async (options) => {
+                                const { file } = options;
+
+                                if (file && !hasFiles) {
+                                    setHasFiles(true);
                                 }
-                                if (info.file.status === 'done') {
-                                    setFileLists((prev) => [...prev, file]);
-                                }
+
+                                handleUpload(file, token, path[0]);
                             }}
-                            className="document-upload"
+                            // onChange={async (info) => {
+                            //     const file = info.file;
+
+                            //     if (info.file.status !== 'uploading') {
+                            //         console.log(info.file, info.fileList);
+                            //     }
+                            //     if (info.file.status === 'done') {
+                            //         console.log('done');
+                            //         // await mutate();
+                            //     }
+                            // }}
                         >
                             <Button
                                 icon={
@@ -370,19 +459,36 @@ function Document({
                         dataSource={dataFileList}
                         components={{
                             body: {
-                                wrapper: ({ ...props }) => {
-                                    return (
-                                        <Dropdown
-                                            menu={{
-                                                items: info_items,
-                                            }}
-                                            trigger={['contextMenu']}
-                                        >
-                                            <tbody className={props.className}>
+                                row: ({ ...props }) => {
+                                    const isFolder =
+                                        props.children[0]?.props.record.caseId;
+                                    if (props.children[0]) {
+                                        return (
+                                            <Dropdown
+                                                menu={{
+                                                    onClick: ({ key }) =>
+                                                        contextMenuHandler(
+                                                            key,
+                                                            selectedRecordRef.current
+                                                        ),
+                                                    items: isFolder
+                                                        ? info_folder
+                                                        : info_file,
+                                                }}
+                                                trigger={['contextMenu']}
+                                            >
+                                                <tr className={props.className}>
+                                                    {props.children}
+                                                </tr>
+                                            </Dropdown>
+                                        );
+                                    } else {
+                                        return (
+                                            <tr className={props.className}>
                                                 {props.children}
-                                            </tbody>
-                                        </Dropdown>
-                                    );
+                                            </tr>
+                                        );
+                                    }
                                 },
                             },
                         }}
@@ -393,7 +499,7 @@ function Document({
                                 <div className="mb-6 inline">
                                     <Breadcrumb
                                         separator=">"
-                                        className="items-cennter"
+                                        className="items-center"
                                     >
                                         <Breadcrumb.Item className="text-lg font-medium">
                                             <Link href={'/document'}>
@@ -617,6 +723,9 @@ function Document({
                                         router.push(`/preview/${record.id}`);
                                     }
                                 },
+                                onContextMenu: () => {
+                                    selectedRecordRef.current = record;
+                                },
                             };
                         }}
                         pagination={{
@@ -698,65 +807,18 @@ function Document({
                 </div>
                 <Divider />
             </Drawer>
-
             <FloatButton.Group
                 trigger="click"
                 type="primary"
-                className={`${fileLists.length > 0 ? 'block' : 'hidden'}`}
-                style={{ right: 24 }}
+                className={`${hasFiles ? 'block' : 'hidden'}`}
+                style={{ right: 16, bottom: 24 }}
                 open={isUpload}
                 onOpenChange={(open) => {
                     setIsUpload(!open);
                 }}
                 icon={<RiUploadLine className="text-white" />}
             >
-                <div className="float-right mb-4 w-80 rounded border border-solid border-primary/70 bg-white px-2 py-2">
-                    <div className="mt-2 ml-4">
-                        อัพโหลดทั้งหมด {fileLists.length} รายการ
-                    </div>
-                    <Upload
-                        customRequest={({ onSuccess }) => {
-                            setTimeout(() => {
-                                if (onSuccess) onSuccess('ok');
-                            }, 0);
-                        }}
-                        fileList={fileLists}
-                        itemRender={(_, file, fileList) => {
-                            // console.log('file', file);
-                            // console.log('fileList', fileList);
-
-                            const fileType = file.type?.split('/')[0] || '';
-                            // console.log(file.type?.split('/')[0]);
-
-                            return (
-                                <div className="relative  mt-1 flex items-center rounded px-4 py-2 transition hover:bg-primary/10">
-                                    <span role="img" className="mr-2 ">
-                                        {RenderIconUploadType(fileType)}
-                                    </span>
-
-                                    <div
-                                        className={`flex-1 ${
-                                            file ? 'mb-2' : ''
-                                        }`}
-                                    >
-                                        {file.name}
-                                    </div>
-                                    {/* <span className="">
-                                        {RenderUploadStatus(file.status)}
-                                    </span> */}
-                                    <div className="absolute -bottom-2 left-10 z-10 w-[calc(100%-48px)]">
-                                        <Progress
-                                            percent={30}
-                                            strokeWidth={2}
-                                            showInfo={false}
-                                            // status="exception"
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        }}
-                    ></Upload>
-                </div>
+                <RenderFiles />
             </FloatButton.Group>
         </BaseLayout.Main>
     );
@@ -780,8 +842,6 @@ export const getServerSideProps = withAuthUserSSR({
         }
     );
 
-    console.log('🚀 ~ document:', document);
-    console.log('🚀 ~ data:', data);
     return {
         props: {
             authUser,

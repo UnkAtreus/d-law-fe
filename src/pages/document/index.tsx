@@ -23,7 +23,6 @@ import {
     message,
 } from 'antd';
 import React, { useCallback, useRef, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
 
 import {
     RiDeleteBinLine,
@@ -37,7 +36,6 @@ import {
     RiSearchLine,
 } from 'react-icons/ri';
 import dayjs from 'dayjs';
-import useUpload from '@utilities/useUpload';
 import { useRouter } from 'next/router';
 import {
     TCreateFolder,
@@ -76,26 +74,11 @@ function CaseFolder({
     });
 
     const [isUpload, setIsUpload] = useState(false);
-
     const selectedRecordRef = useRef<TCaseFolder>(data.data[0]);
 
     const router = useRouter();
-    const { fileLists, setFileLists } = useUpload();
-    const [value, copy] = useCopyToClipboard();
+    const [_, copy] = useCopyToClipboard();
     const [form] = Form.useForm<TCreateFolder>();
-    const [changeName_form] = Form.useForm<TChangeDocumentName>();
-    const { getRootProps, isDragActive } = useDropzone({
-        noClick: true,
-        noKeyboard: true,
-        onDrop: (files: any[]) => {
-            console.log(files);
-
-            if (files) {
-                setFileLists([...fileLists, ...files]);
-                setIsUpload(true);
-            }
-        },
-    });
 
     const info_items: MenuProps['items'] = [
         getItem(
@@ -175,21 +158,29 @@ function CaseFolder({
                 }
             }
             if (key === 'delete') {
-                try {
-                    await fetcher(
-                        CaseFolderServicePath.DELETE_CASE + record.id,
-                        'DELETE',
-                        {
-                            headers: {
-                                Authorization: 'Bearer ' + token,
-                            },
+                BaseModal.delete({
+                    title: `ลบโฟลเดอร์ ${record.name}`,
+                    content: `คุณต้องการที่จะลบโฟลเดอร์ ${record.name} ใช่หรือไม่`,
+                    onFinish: async () => {
+                        try {
+                            await fetcher(
+                                CaseFolderServicePath.DELETE_CASE + record.id,
+                                'DELETE',
+                                {
+                                    headers: {
+                                        Authorization: 'Bearer ' + token,
+                                    },
+                                }
+                            );
+                            message.success('ลบเคสโฟลเดอร์สำเร็จ');
+                            await mutate();
+                            return true;
+                        } catch (error) {
+                            message.error('ลบเคสโฟลเดอร์ไม่สำเร็จ');
+                            return false;
                         }
-                    );
-                    message.success('ลบเคสโฟลเดอร์สำเร็จ');
-                    await mutate();
-                } catch (error) {
-                    message.error('ลบเคสโฟลเดอร์ไม่สำเร็จ');
-                }
+                    },
+                });
             }
         },
         []
@@ -299,7 +290,7 @@ function CaseFolder({
     return (
         <BaseLayout.Main path={'document'}>
             <Row gutter={24}>
-                <Col {...getRootProps()}>
+                <Col>
                     <ProTable<TCaseFolder>
                         columns={columns}
                         dataSource={casesFolderData?.data}

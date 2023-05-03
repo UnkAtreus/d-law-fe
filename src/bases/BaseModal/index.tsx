@@ -1,5 +1,5 @@
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
-import { Modal, ModalFuncProps, Space } from 'antd';
+import { Modal, Space } from 'antd';
 import React from 'react';
 import { RiEditFill, RiEditLine } from 'react-icons/ri';
 
@@ -7,21 +7,18 @@ const BaseModal = {
     delete({
         title,
         content,
-        okText,
-        okType,
-        cancelText,
-        onOk,
-        onCancel,
-    }: ModalFuncProps) {
+        onFinish,
+    }: {
+        title: string;
+        content: string;
+        onFinish: () => void;
+    }) {
         return Modal.confirm({
             title: title,
             //  icon: <ExclamationCircleFilled />,
             content: content,
-            okText: okText || 'Yes',
-            okType: okType || 'danger',
-            cancelText: cancelText || 'No',
-            onOk: onOk,
-            onCancel: onCancel,
+            onOk: onFinish,
+            okType: 'danger',
         });
     },
     ChangeName<T>({
