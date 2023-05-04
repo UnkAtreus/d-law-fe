@@ -5,7 +5,7 @@
             "has": [
                 {
                     "type": "host",
-                    "value": "dlaw-dms.com"
+                    "value": "www.dlaw-dms.com"
                 }
             ],
             "destination": "/landing/:path*"
