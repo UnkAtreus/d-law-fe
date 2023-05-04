@@ -17,6 +17,7 @@ module.exports = {
     plugins: [
         require('vidstack/tailwind.cjs'),
         require('@tailwindcss/line-clamp'),
+        require('tailwind-scrollbar')({ nocompatible: true }),
     ],
     corePlugins: {
         preflight: false,

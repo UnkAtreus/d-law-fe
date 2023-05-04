@@ -209,6 +209,7 @@ const BaseLayout = {
                             padding: 0,
                             backgroundColor: colorBgContainer,
                             boxShadow: '0px 4px 30px 4px rgba(0, 0, 0, 0.1)',
+                            zIndex: 10,
                         }}
                     >
                         <div className="flex items-center justify-between px-6 ">
@@ -223,18 +224,24 @@ const BaseLayout = {
 
                             <div>
                                 <Space size={'middle'}>
-                                    <Link href={'/'}>
+                                    <Link href={`https://www.dlaw-dms.com/`}>
                                         <Typography.Text className="hover-text">
                                             ค้นหาคดี
                                         </Typography.Text>
                                     </Link>
-                                    <Link href={'/'}>
+                                    <Link href={`https://www.dlaw-dms.com/`}>
                                         <Typography.Text className="hover-text">
                                             นัดหมาย
                                         </Typography.Text>
                                     </Link>
                                     <Divider type="vertical" className="m-0" />
-                                    <Button type="primary">สำหรับทนาย</Button>
+                                    <Link
+                                        href={`https://app.dlaw-dms.com/workspace`}
+                                    >
+                                        <Button type="primary">
+                                            สำหรับทนาย
+                                        </Button>
+                                    </Link>
                                 </Space>
                             </div>
                         </div>

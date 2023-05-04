@@ -80,6 +80,9 @@
 .ant-breadcrumb ol {
     @apply items-center;
 }
+.ant-collapse-header {
+    padding-left: 0 !important;
+}
 /* .ant-form-item {
     margin-bottom: 16px;
 } */
