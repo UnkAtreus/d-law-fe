@@ -34,7 +34,7 @@ const withAuthUserSSR =
                 redirect: {
                     basePath: true,
                     permanent: false,
-                    destination: '/',
+                    destination: '/workspace',
                 },
             };
         }

@@ -19,6 +19,7 @@ const nextConfig = {
         'rc-tree',
         'rc-tooltip',
     ],
+
     webpack: (config) => {
         config.module.rules.push({
             test: /\.svg$/,

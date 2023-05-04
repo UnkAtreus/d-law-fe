@@ -94,7 +94,7 @@ function Preview({
         getItem(
             <Tooltip placement="right" title={'Workshop'} color={'#4a4a4a'}>
                 <div
-                    onClick={() => router.push('/')}
+                    onClick={() => router.push('/workspace')}
                     className="flex flex-col items-center justify-center py-4"
                 >
                     <RiComputerLine className="menu-icon text-gray-500" />

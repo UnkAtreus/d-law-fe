@@ -20,7 +20,7 @@ import useRequest, { fetcher } from '@services/useRequest';
 import FolderServicePath from '@services/FolderService';
 import CaseFolderServicePath from '@services/caseFolderService';
 
-const Home = ({
+const Workspace = ({
     data,
     authUser,
 }: {
@@ -264,23 +264,11 @@ export const getServerSideProps = withAuthUserSSR({
     const authUser: TAuthUser = ctx.AuthUser;
     const token = authUser.token;
 
-    const hostname = ctx.req.headers.host;
-    console.log('🚀 ~ hostname:', hostname);
-
     const data = await fetcher(CaseFolderServicePath.FREQ_USED, 'GET', {
         headers: {
             Authorization: 'Bearer ' + token,
         },
     });
-
-    if (hostname === 'app.dlaw-dms.com') {
-        return {
-            redirect: {
-                permanent: false,
-                destination: '/workspace',
-            },
-        };
-    }
 
     return {
         props: {
@@ -290,4 +278,4 @@ export const getServerSideProps = withAuthUserSSR({
     };
 });
 
-export default Home;
+export default Workspace;

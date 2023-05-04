@@ -62,7 +62,7 @@ const BaseLayout = {
         const items: MenuProps['items'] = [
             getItem(
                 <div
-                    onClick={() => router.push('/')}
+                    onClick={() => router.push('/workspace')}
                     className="flex flex-col items-center justify-center py-5"
                 >
                     <RiComputerLine className="menu-icon" />
@@ -129,7 +129,7 @@ const BaseLayout = {
                     <div
                         className="cursor-pointer"
                         onClick={() => {
-                            router.push('/');
+                            router.push('/workspace');
                         }}
                     >
                         <Logo className="m-4" />
@@ -261,7 +261,7 @@ const BaseLayout = {
             getItem(
                 <Tooltip placement="right" title={'Workshop'} color={'#4a4a4a'}>
                     <div
-                        onClick={() => router.push('/')}
+                        onClick={() => router.push('/workspace')}
                         className="flex flex-col items-center justify-center py-4"
                     >
                         <RiComputerLine className="menu-icon text-gray-500" />
