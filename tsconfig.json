@@ -27,6 +27,7 @@
       "@locales/*": ["locales/*"],  
       "@interfaces/*": ["interfaces/*"],  
       "@hoc/*": ["hoc/*"],  
+      "@mocks/*": ["mocks/*"],  
     },
     "types": ["vidstack/globals"]
   },

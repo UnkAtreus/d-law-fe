@@ -1,0 +1,14 @@
+{
+    "rewrites": [
+        {
+            "source": "/:path*",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "dlaw-dms.com"
+                }
+            ],
+            "destination": "/landing/:path*"
+        }
+    ]
+}
