@@ -21,7 +21,7 @@ function Login() {
             const { status } = await signIn(value.email, value.password);
             if (status) {
                 message.success('เข้าสู่ระบบสำเร็จ');
-                router.push('/');
+                router.push('/workspace');
             } else {
                 message.error('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
             }

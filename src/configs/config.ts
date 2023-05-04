@@ -11,7 +11,7 @@ export const config = {
         httpOnly: true,
         maxAge: TWELVE_DAYS_IN_MS,
         overwrite: true,
-        path: '/workspace',
+        path: '/',
         sameSite: 'lax',
         secure: 'true',
         signed: true,
