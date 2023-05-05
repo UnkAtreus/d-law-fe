@@ -1,7 +1,14 @@
-import { ModalForm, ProFormText } from '@ant-design/pro-components';
+/* eslint-disable unused-imports/no-unused-vars */
+import {
+    ModalForm,
+    ProFormSelect,
+    ProFormText,
+} from '@ant-design/pro-components';
+import CaseFolderServicePath from '@services/caseFolderService';
+import { fetcher } from '@services/useRequest';
 import { Modal, Space } from 'antd';
 import React from 'react';
-import { RiEditFill, RiEditLine } from 'react-icons/ri';
+import { RiEditFill, RiEditLine, RiFolderTransferLine } from 'react-icons/ri';
 
 const BaseModal = {
     delete({
@@ -59,6 +66,68 @@ const BaseModal = {
                     label={`ชื่อ${type === 'file' ? 'ไฟล์' : 'โฟลเดอร์'}`}
                     placeholder={'ชื่อโฟลเดอร์หรือไฟล์ใหม่'}
                     rules={[{ required: true }]}
+                />
+            </ModalForm>
+        );
+    },
+    MoveFile<T>({
+        onFinish,
+        token,
+        path,
+    }: {
+        onFinish:
+            | (((formData: T) => Promise<boolean | void>) &
+                  ((formData: T) => Promise<any>))
+            | undefined;
+        token: string | null;
+        path: string;
+    }) {
+        return (
+            <ModalForm<T>
+                trigger={
+                    <div className="flex space-x-2">
+                        <RiFolderTransferLine className="icon__button text-gray-500" />
+                        <span className="self-center">ย้ายไฟล์ไปที่</span>
+                    </div>
+                }
+                title={
+                    <Space>
+                        <RiFolderTransferLine className="icon" />
+                        <span>ย้ายไฟล์ไปที่</span>
+                    </Space>
+                }
+                autoFocusFirstInput
+                modalProps={{
+                    destroyOnClose: true,
+                    okText: 'ย้าย',
+                }}
+                onFinish={onFinish}
+            >
+                <ProFormSelect
+                    name="targetFolderId"
+                    label={'ชื่อโฟลเดอร์'}
+                    placeholder={'ต้องการย้ายไฟล์ไปที่โฟลเดอร์'}
+                    rules={[{ required: true }]}
+                    request={async () => {
+                        const { data } = await fetcher(
+                            CaseFolderServicePath.CASE +
+                                path +
+                                CaseFolderServicePath.GET_ALL_FOLDER_IN_CASE_S,
+                            'GET',
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + token,
+                                },
+                            }
+                        );
+
+                        return data.map(
+                            (item: { id: string; name: string }) => ({
+                                label: item.name,
+                                value: item.id,
+                            })
+                        );
+                    }}
                 />
             </ModalForm>
         );

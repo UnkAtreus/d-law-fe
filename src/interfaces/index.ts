@@ -34,6 +34,10 @@ export interface TChangeDocumentName {
     name: string;
 }
 
+export interface TMoveFile {
+    targetFolderId: string;
+}
+
 export interface TAuthUser {
     id: string | null;
     email: string | null;

@@ -200,17 +200,17 @@ function CaseFolder({
             dataIndex: 'name',
             ellipsis: true,
         },
-        {
-            title: 'ชนิดไฟล์',
-            dataIndex: 'tags',
-            render: (_, record) => (
-                <div className="flex flex-wrap">
-                    {/* {record.Folders[0].Tags.map((name) => (
-                        <Tag key={name}>{name}</Tag>
-                    ))} */}
-                </div>
-            ),
-        },
+        // {
+        //     title: 'ชนิดไฟล์',
+        //     dataIndex: 'tags',
+        //     render: (_, record) => (
+        //         <div className="flex flex-wrap">
+        //             {/* {record.Folders[0].Tags.map((name) => (
+        //                 <Tag key={name}>{name}</Tag>
+        //             ))} */}
+        //         </div>
+        //     ),
+        // },
         {
             title: 'วันที่สร้าง/เจ้าของ',
             dataIndex: 'createdAt',

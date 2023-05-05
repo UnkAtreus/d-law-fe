@@ -20,6 +20,7 @@ import {
     ResponseData,
     TRootFolder,
     TMenuFolder,
+    TMoveFile,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
 import FileServicePath from '@services/FileService';
@@ -63,7 +64,6 @@ import {
     RiHistoryFill,
     RiUserAddFill,
     RiUserLine,
-    RiFolderTransferLine,
     RiDeleteBinLine,
     RiDownloadLine,
     RiFileCopyLine,
@@ -144,6 +144,7 @@ function Document({
                 files.forEach(async (file) => {
                     await handleUpload(file, token, path[0]);
                     await mutate();
+                    await mutateMenu();
                 });
             }
         },
@@ -152,20 +153,6 @@ function Document({
     const RenderFiles = memo(function RenderFiles() {
         return <Render />;
     });
-
-    const {
-        ExcelIcon,
-        FolderIcon,
-        IdCardIcon,
-        ImageIcon,
-        MoreIcon,
-        PdfIcon,
-        TextIcon,
-        VideoIcon,
-        WordIcon,
-        MusicIcon,
-        ZipIcon,
-    } = FileTypeIcons;
 
     const info_file: MenuProps['items'] = [
         getItem(
@@ -191,11 +178,37 @@ function Document({
             <RiDownloadLine className="icon__button text-gray-500" />
         ),
         getItem(
-            <div className="flex">
-                <span className="self-center">ย้ายไฟล์ไปที่</span>
-            </div>,
-            'movefile',
-            <RiFolderTransferLine className="icon__button text-gray-500" />
+            <BaseModal.MoveFile<TMoveFile>
+                onFinish={async (values) => {
+                    try {
+                        logDebug('🚀 ~ onFinish={ ~ payload:', values);
+                        logDebug(selectedRecordRef.current);
+                        await fetcher(
+                            FileServicePath.FILE +
+                                selectedRecordRef.current.id +
+                                FileServicePath.MOVE_FILE_S,
+                            'PATCH',
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + token,
+                                },
+                                data: values,
+                            }
+                        );
+                        message.success('ย้ายไฟล์สำเร็จ');
+                        await mutate();
+                        await mutateMenu();
+
+                        return true;
+                    } catch (error) {
+                        message.error('ย้ายไฟล์ไม่สำเร็จ');
+                        return false;
+                    }
+                }}
+                token={token}
+                path={folderData?.data.caseId || ''}
+            />,
+            'movefile'
         ),
         getItem(
             <BaseModal.ChangeName<TChangeDocumentName>
@@ -215,6 +228,7 @@ function Document({
                         );
                         message.success('แก้ไขชื่อไฟล์สำเร็จ');
                         await mutate();
+                        await mutateMenu();
 
                         return true;
                     } catch (error) {
@@ -256,13 +270,6 @@ function Document({
             <RiFileCopyLine className="icon__button text-gray-500" />
         ),
         { type: 'divider' },
-        getItem(
-            <div className="flex">
-                <span className="self-center">ย้ายโฟลเดอร์ไปที่</span>
-            </div>,
-            'movefile',
-            <RiFolderTransferLine className="icon__button text-gray-500" />
-        ),
         getItem(
             <BaseModal.ChangeName<TChangeDocumentName>
                 onFinish={async (values) => {
@@ -316,6 +323,14 @@ function Document({
             if (key === 'openfolder') {
                 router.push(`/document/${record.id}`);
             }
+            if (key === 'downloadfile') {
+                const url = record.url;
+                if (url) {
+                    router.push(url);
+                } else {
+                    message.error('เกิดข้อผิดพลาดในการดาวน์โหลด');
+                }
+            }
             if (key === 'copylink') {
                 const origin = window.location.origin;
                 const isCopy = await copy(`${origin}/preview/${record.id}`);
@@ -340,11 +355,12 @@ function Document({
                                     },
                                 }
                             );
-                            message.success(`ลบเคส${fileType}สำเร็จ`);
+                            message.success(`ลบ${fileType}สำเร็จ`);
                             await mutate();
+                            await mutateMenu();
                             return true;
                         } catch (error) {
-                            message.error(`ลบเคส${fileType}ไม่สำเร็จ`);
+                            message.error(`ลบ${fileType}ไม่สำเร็จ`);
                             return false;
                         }
                     },
@@ -419,6 +435,13 @@ function Document({
         {
             title: 'แก้ไขล่าสุด',
             dataIndex: 'updatedAt',
+            sorter: (a, b) => {
+                if (a && b) {
+                    return dayjs(a.createdAt).diff(dayjs(b.createdAt));
+                } else {
+                    return 0;
+                }
+            },
             render: (text: any) => (
                 <div className="text-gray-400">
                     {dayjs(text).format('DD MMM YYYY - HH:MM')}
@@ -481,6 +504,7 @@ function Document({
                                         path[0]
                                     );
                                     await mutate();
+                                    await mutateMenu();
                                 } catch (error) {
                                     /* empty */
                                 }
@@ -517,7 +541,7 @@ function Document({
                                     if (props.children[0]) {
                                         const record =
                                             props.children[0]?.props.record;
-                                        selectedRecordRef.current = record;
+
                                         return (
                                             <Dropdown
                                                 menu={{
@@ -554,6 +578,10 @@ function Document({
                                                                 `/preview/${record.id}`
                                                             );
                                                         }
+                                                    }}
+                                                    onContextMenu={() => {
+                                                        selectedRecordRef.current =
+                                                            record;
                                                     }}
                                                 >
                                                     {props.children}
