@@ -7,6 +7,7 @@ const CaseFolderServicePath = {
     DELETE_CASE: 'cases/',
     CASE: 'cases/',
     GET_ALL_FOLDER_IN_CASE_S: '/folders',
+    ADD_MEMBER_PERMISSION_S: '/members',
 };
 
 export default CaseFolderServicePath;

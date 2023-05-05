@@ -21,6 +21,9 @@ import {
     TRootFolder,
     TMenuFolder,
     TMoveFile,
+    TCreatePermission,
+    TPermission,
+    TUserPermissions,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
 import FileServicePath from '@services/FileService';
@@ -71,6 +74,9 @@ import {
     RiMore2Fill,
     RiUploadLine,
 } from 'react-icons/ri';
+import UserServicePath from '@services/useAuth';
+import PermissionServicePath from '@services/permissionService';
+import CaseFolderServicePath from '@services/caseFolderService';
 
 function Document({
     path,
@@ -107,6 +113,16 @@ function Document({
         url: FolderServicePath.FOLDER + path + FolderServicePath.MENU_FOLDER_S,
         token,
         initData: prefMenu,
+    });
+
+    const { data: casePermissionData, mutate: mutatePermission } = useRequest<
+        ResponseData<TUserPermissions[]>
+    >({
+        url:
+            CaseFolderServicePath.CASE +
+            folderData?.data.caseId +
+            CaseFolderServicePath.ADD_MEMBER_PERMISSION_S,
+        token,
     });
 
     const subFolders: TDocument[] = folderData?.data.subFolders
@@ -784,7 +800,7 @@ function Document({
                                             rules={[{ required: true }]}
                                         />
                                     </ModalForm>
-                                    <ModalForm<TCreateFolder>
+                                    <ModalForm<TCreatePermission>
                                         width="640px"
                                         trigger={
                                             <Button
@@ -796,7 +812,6 @@ function Document({
                                                 }
                                             ></Button>
                                         }
-                                        form={share_form}
                                         title={
                                             <Space>
                                                 <RiUserAddFill className="icon" />
@@ -815,27 +830,124 @@ function Document({
                                             ),
                                         }}
                                         onFinish={async (values) => {
-                                            console.log(values);
-                                        }}
-                                        initialValues={{
-                                            permission: 'watch',
+                                            try {
+                                                logDebug(
+                                                    '🚀 ~ onFinish={ ~ payload:',
+                                                    values
+                                                );
+                                                await fetcher(
+                                                    CaseFolderServicePath.CASE +
+                                                        folderData?.data
+                                                            .caseId +
+                                                        CaseFolderServicePath.ADD_MEMBER_PERMISSION_S,
+                                                    'POST',
+                                                    {
+                                                        headers: {
+                                                            Authorization:
+                                                                'Bearer ' +
+                                                                token,
+                                                        },
+                                                        data: values,
+                                                    }
+                                                );
+                                                message.success(
+                                                    'เพิ่มสิทธิการเข้าถึงเคสโฟลเดอร์สำเร็จ'
+                                                );
+                                                await mutatePermission();
+
+                                                return true;
+                                            } catch (error) {
+                                                message.error(
+                                                    'เพิ่มสิทธิการเข้าถึงเคสโฟลเดอร์ไม่สำเร็จ'
+                                                );
+                                                return false;
+                                            }
                                         }}
                                     >
                                         <div className="flex w-full items-end space-x-2">
                                             <ProFormSelect
-                                                name="name"
+                                                name="userId"
                                                 label="เพิ่มอีเมล"
                                                 placeholder="อีเมล"
                                                 mode="multiple"
                                                 formItemProps={{
                                                     className: 'w-full',
                                                 }}
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        message:
+                                                            'กรุณาเลือกอีเมล',
+                                                    },
+                                                ]}
+                                                request={async () => {
+                                                    const { data } =
+                                                        await fetcher(
+                                                            UserServicePath.GET_ALL_USER,
+                                                            'GET',
+                                                            {
+                                                                headers: {
+                                                                    Authorization:
+                                                                        'Bearer ' +
+                                                                        token,
+                                                                },
+                                                            }
+                                                        );
+
+                                                    return data
+                                                        .map(
+                                                            (
+                                                                item: TAuthUser
+                                                            ) => {
+                                                                if (
+                                                                    item.id !==
+                                                                    authUser.id
+                                                                )
+                                                                    return {
+                                                                        label: JSON.stringify(
+                                                                            {
+                                                                                email: item.email,
+                                                                                firstName:
+                                                                                    item.firstName,
+                                                                                lastName:
+                                                                                    item.lastName,
+                                                                            }
+                                                                        ),
+                                                                        value: item.id,
+                                                                    };
+                                                            }
+                                                        )
+                                                        .filter(
+                                                            (item: any) =>
+                                                                item !==
+                                                                undefined
+                                                        );
+                                                }}
                                                 fieldProps={{
                                                     filterOption: true,
-                                                    onChange: (item) => {
-                                                        setSelectedItems(item);
+
+                                                    tagRender: (props: any) => {
+                                                        if (props?.label) {
+                                                            const { email } =
+                                                                JSON.parse(
+                                                                    props.label
+                                                                );
+                                                            return (
+                                                                <Tag>
+                                                                    {email}
+                                                                </Tag>
+                                                            );
+                                                        }
+                                                        return <></>;
                                                     },
                                                     optionItemRender(item) {
+                                                        const {
+                                                            firstName,
+                                                            lastName,
+                                                            email,
+                                                        } = JSON.parse(
+                                                            item.label
+                                                        );
                                                         return (
                                                             <div className="flex items-center space-x-2">
                                                                 <Avatar
@@ -844,75 +956,128 @@ function Document({
                                                                     }
                                                                 />
                                                                 <div className="-space-y-1">
-                                                                    <div className="text-base font-medium">
-                                                                        {
-                                                                            item.label
-                                                                        }
+                                                                    <div className=" font-medium">
+                                                                        {firstName +
+                                                                            ' ' +
+                                                                            lastName}
                                                                     </div>
                                                                     <div className="text-gray-500">
-                                                                        {
-                                                                            item.value
-                                                                        }
+                                                                        {email}
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         );
                                                     },
-                                                    options: [
-                                                        {
-                                                            label: 'Choolerk T',
-                                                            value: 'choolerk@gmail.com',
-                                                        },
-                                                        {
-                                                            label: 'Unresolved',
-                                                            value: 'open',
-                                                        },
-                                                        {
-                                                            label: 'Resolved',
-                                                            value: 'closed',
-                                                        },
-                                                        {
-                                                            label: 'Resolving',
-                                                            value: 'processing',
-                                                        },
-                                                    ].filter(
-                                                        (item) =>
-                                                            !selectedItems.includes(
-                                                                item.value
-                                                            )
-                                                    ),
                                                 }}
                                             />
                                             <ProFormSelect
                                                 name="permission"
-                                                valueEnum={{
-                                                    watch: 'สามารถดู',
-                                                    edit: 'สามารถแก้ไข',
-                                                }}
                                                 allowClear={false}
-                                                required
+                                                rules={[{ required: true }]}
+                                                style={{
+                                                    minWidth: '120px',
+                                                }}
+                                                request={async () => {
+                                                    const { data } =
+                                                        await fetcher(
+                                                            PermissionServicePath.GET_ALL_PERMISSSION,
+                                                            'GET',
+                                                            {
+                                                                headers: {
+                                                                    Authorization:
+                                                                        'Bearer ' +
+                                                                        token,
+                                                                },
+                                                            }
+                                                        );
+
+                                                    return data
+                                                        .map(
+                                                            (
+                                                                item: TPermission
+                                                            ) => {
+                                                                const name =
+                                                                    item.Name;
+                                                                const permission_name: any =
+                                                                    {
+                                                                        editor: 'สามารถแก้ไข',
+                                                                        viewer: 'สามารถดู',
+                                                                    };
+
+                                                                if (
+                                                                    permission_name[
+                                                                        name
+                                                                    ]
+                                                                ) {
+                                                                    return {
+                                                                        label: permission_name[
+                                                                            name
+                                                                        ],
+                                                                        value: item.Name,
+                                                                    };
+                                                                }
+                                                            }
+                                                        )
+                                                        .filter(
+                                                            (item: any) =>
+                                                                item !==
+                                                                undefined
+                                                        );
+                                                }}
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-4">
-                                                    <Avatar
-                                                        size={'large'}
-                                                        icon={
-                                                            <RiUserLine className="icon" />
-                                                        }
-                                                    />
-                                                    <div className="">
-                                                        <div className="text-base font-medium">
-                                                            Kittipat Dechkul
+                                            {casePermissionData?.data.map(
+                                                (item) => {
+                                                    const permission_name: any =
+                                                        {
+                                                            owner: 'เจ้าของ',
+                                                            editor: 'สามารถแก้ไข',
+                                                            viewer: 'สามารถดู',
+                                                        };
+                                                    return (
+                                                        <div
+                                                            className="flex items-center justify-between"
+                                                            key={item.email}
+                                                        >
+                                                            <div className="flex items-center space-x-4">
+                                                                <Avatar
+                                                                    size={
+                                                                        'large'
+                                                                    }
+                                                                    // icon={
+                                                                    //     <RiUserLine className="icon" />
+                                                                    // }
+                                                                >
+                                                                    {`${item.firstName.charAt(
+                                                                        0
+                                                                    )}${item.lastName.charAt(
+                                                                        0
+                                                                    )}`}
+                                                                </Avatar>
+                                                                <div className="">
+                                                                    <div className="text-base font-medium">
+                                                                        {`${item.firstName} ${item.lastName}`}
+                                                                    </div>
+                                                                    <div className="text-gray-500">
+                                                                        {
+                                                                            item.email
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span>
+                                                                {
+                                                                    permission_name[
+                                                                        item
+                                                                            .permission
+                                                                    ]
+                                                                }
+                                                            </span>
                                                         </div>
-                                                        <div className="text-gray-500">
-                                                            kittipat2544@gmail.com
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <span>เจ้าของ</span>
-                                            </div>
+                                                    );
+                                                }
+                                            )}
                                         </div>
                                     </ModalForm>
                                     <Button

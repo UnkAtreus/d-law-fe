@@ -34,16 +34,35 @@ export interface TChangeDocumentName {
     name: string;
 }
 
+export interface TCreatePermission {
+    userId: string;
+    permission: string;
+}
+
+export interface TPermission {
+    ID: string;
+    CreatedAt: string | Date | null;
+    UpdatedAt: string | Date | null;
+    DeletedAt: string | Date | null;
+    Name: string;
+    CasePermissions: any;
+    PermissionLogs: any;
+}
+
 export interface TMoveFile {
     targetFolderId: string;
 }
 
 export interface TAuthUser {
-    id: string | null;
-    email: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    token: string | null;
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    token: string;
+}
+
+export interface TUserPermissions extends TAuthUser {
+    permission: string
 }
 
 export interface TCaseFolder {
