@@ -4,6 +4,9 @@ const FolderServicePath = {
     CREATE_FOLDER: 'folders',
     UPDATE_FOLDER: 'folders/',
     DELETE_FOLDER: 'folders/',
+    FOLDER: 'folders/',
+    MENU_FOLDER_S: '/menu',
+    GET_ROOT_FOLDER_S: '/root',
 };
 
 export default FolderServicePath;

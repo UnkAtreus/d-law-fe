@@ -145,6 +145,17 @@ export interface TFolder {
     caseId: string;
 }
 
+export interface TRootFolder {
+    id: string;
+    name: string;
+}
+
+export interface TMenuFolder {
+    id: string;
+    name: TFileTypes | string;
+    count: number;
+}
+
 export interface TFreqCaseFolder {
     id: string;
     name: string;

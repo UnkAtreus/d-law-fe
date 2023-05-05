@@ -14,12 +14,12 @@ import {
     RiFilePptFill,
 } from 'react-icons/ri';
 
-export function changeNumberTo1k(number: string): string {
+export function changeNumberTo1k(number: string | number): string | number {
     const num = Number(number);
     if (num > 1000) {
         return `${(num / 1000).toFixed(1)}k`;
     } else {
-        return number;
+        return num;
     }
 }
 

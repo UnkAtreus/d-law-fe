@@ -5,6 +5,8 @@ const CaseFolderServicePath = {
     CREATE_CASE: 'cases',
     UPDATE_CASE: 'cases/',
     DELETE_CASE: 'cases/',
+    CASE: 'cases/',
+    GET_ALL_FOLDER_IN_CASE_S: '/folders',
 };
 
 export default CaseFolderServicePath;

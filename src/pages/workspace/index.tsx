@@ -1,6 +1,6 @@
 import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
-import BaseTag, { ITag } from '@baseComponents/BaseTag';
+import { ITag } from '@baseComponents/BaseTag';
 
 import { Col, Row, Typography } from 'antd';
 
@@ -189,16 +189,7 @@ const Workspace = ({
         <>
             <BaseLayout.Main>
                 <Row gutter={24}>
-                    <Col xl={5} xxl={4}>
-                        <BaseTag
-                            items={Tags}
-                            defaultTag="tag_1"
-                            onChange={(key, tag) => {
-                                console.log(key, tag);
-                            }}
-                        />
-                    </Col>
-                    <Col xl={19} xxl={20} className="space-y-6">
+                    <Col span={24} className="space-y-6">
                         <ProCard
                             title={
                                 <Typography.Title level={4} className="inline">
@@ -229,43 +220,41 @@ const Workspace = ({
                                     ))}
                             </Row>
                         </ProCard>
-
-                        <ProTable<TFile>
-                            columns={columns}
-                            dataSource={recentFileData?.data}
-                            onRow={(record) => {
-                                return {
-                                    onDoubleClick: () => {
-                                        router.push(`/preview/${record.id}`);
-                                    },
-                                };
-                            }}
-                            cardBordered
-                            cardProps={{
-                                collapsible: true,
-                                title: (
-                                    <Typography.Title
-                                        level={4}
-                                        className="inline"
-                                    >
-                                        เอกสารที่เปิดล่าสุด
-                                    </Typography.Title>
-                                ),
-                            }}
-                            rowKey="id"
-                            options={{
-                                setting: false,
-                                reload: false,
-                                density: false,
-                            }}
-                            search={false}
-                            pagination={{
-                                pageSize: 50,
-                                onChange: (page: any) => console.log(page),
-                            }}
-                            dateFormatter="string"
-                            className="relative"
-                        />
+                        <ProCard
+                            title={
+                                <Typography.Title level={4} className="inline">
+                                    เอกสารที่เปิดล่าสุด
+                                </Typography.Title>
+                            }
+                            collapsible
+                        >
+                            <ProTable<TFile>
+                                columns={columns}
+                                dataSource={recentFileData?.data}
+                                onRow={(record) => {
+                                    return {
+                                        onDoubleClick: () => {
+                                            router.push(
+                                                `/preview/${record.id}`
+                                            );
+                                        },
+                                    };
+                                }}
+                                cardBordered
+                                rowKey="id"
+                                options={{
+                                    setting: false,
+                                    reload: false,
+                                    density: false,
+                                }}
+                                search={false}
+                                pagination={{
+                                    hideOnSinglePage: true,
+                                }}
+                                dateFormatter="string"
+                                className="relative"
+                            />
+                        </ProCard>
                     </Col>
                 </Row>
             </BaseLayout.Main>

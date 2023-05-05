@@ -7,7 +7,7 @@ import {
 } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseModal from '@baseComponents/BaseModal';
-import BaseTag, { ITag } from '@baseComponents/BaseTag';
+import BaseTag from '@baseComponents/BaseTag';
 import AuthAction from '@hoc/AuthAction';
 import withAuthUserSSR from '@hoc/withAuthUserSSR';
 import {
@@ -18,6 +18,8 @@ import {
     TMyCaseFolder,
     TDocument,
     ResponseData,
+    TRootFolder,
+    TMenuFolder,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
 import FileServicePath from '@services/FileService';
@@ -73,11 +75,15 @@ import {
 function Document({
     path,
     authUser,
-    data,
+    prefFolder,
+    prefRootFolder,
+    prefMenu,
 }: {
     path: string;
     authUser: TAuthUser;
-    data: ResponseData<TMyCaseFolder>;
+    prefFolder: ResponseData<TMyCaseFolder>;
+    prefRootFolder: ResponseData<TRootFolder[]>;
+    prefMenu: ResponseData<TMenuFolder[]>;
 }) {
     const { token } = authUser;
     const {
@@ -87,7 +93,20 @@ function Document({
     } = useRequest({
         url: FolderServicePath.GET_BY_ID + path,
         token,
-        initData: data,
+        initData: prefFolder,
+    });
+    const { data: breadcrumbData } = useRequest({
+        url:
+            FolderServicePath.FOLDER +
+            path +
+            FolderServicePath.GET_ROOT_FOLDER_S,
+        token,
+        initData: prefRootFolder,
+    });
+    const { data: menuFolderData, mutate: mutateMenu } = useRequest({
+        url: FolderServicePath.FOLDER + path + FolderServicePath.MENU_FOLDER_S,
+        token,
+        initData: prefMenu,
     });
 
     const subFolders: TDocument[] = folderData?.data.subFolders
@@ -123,7 +142,7 @@ function Document({
                 }
 
                 files.forEach(async (file) => {
-                    const id = await handleUpload(file, token, path[0]);
+                    await handleUpload(file, token, path[0]);
                     await mutate();
                 });
             }
@@ -439,71 +458,6 @@ function Document({
             width: 48,
         },
     ];
-    const Tags: ITag[] = [
-        {
-            key: 'tag_1',
-            name: 'เอกสารทั้งหมด',
-            icon: <TextIcon className="icon" />,
-            value: '22',
-        },
-        {
-            key: 'tag_2',
-            name: 'สำเนาบัตรประจำตัวประชาชน',
-            icon: <IdCardIcon className="icon" />,
-            value: '2',
-            onClick: () => {
-                console.log(`test`);
-            },
-        },
-        {
-            key: 'tag_3',
-            name: 'เอกสาร Excel',
-            icon: <ExcelIcon className="icon" />,
-            value: '5',
-        },
-        {
-            key: 'tag_4',
-            name: 'เอกสาร PDF',
-            icon: <PdfIcon className="icon" />,
-            value: '10',
-        },
-        {
-            key: 'tag_5',
-            name: 'เอกสาร Word',
-            icon: <WordIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_6',
-            name: 'รูปภาพ',
-            icon: <ImageIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_7',
-            name: 'วิดีโอ',
-            icon: <VideoIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_8',
-            name: 'เสียง',
-            icon: <MusicIcon className="icon" />,
-            value: '1',
-        },
-        {
-            key: 'tag_9',
-            name: 'บีบอัด',
-            icon: <ZipIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_10',
-            name: 'เอกสารอื่นๆ',
-            icon: <MoreIcon className="icon" />,
-            value: '2',
-        },
-    ];
 
     return (
         <BaseLayout.Main path={'document'}>
@@ -543,8 +497,7 @@ function Document({
                             </Button>
                         </Upload>
                         <BaseTag
-                            items={Tags}
-                            defaultTag="tag_1"
+                            items={menuFolderData?.data || []}
                             onChange={(key, tag) => {
                                 console.log(key, tag);
                             }}
@@ -622,18 +575,116 @@ function Document({
                             headStyle: { marginBottom: '16px' },
                             title: (
                                 <div className="mb-6 inline">
-                                    <Breadcrumb
-                                        separator=">"
-                                        className="items-center"
-                                    >
+                                    <Breadcrumb className="items-center">
                                         <Breadcrumb.Item className="text-lg font-medium">
                                             <Link href={'/document'}>
                                                 โฟลเดอร์เคส
                                             </Link>
                                         </Breadcrumb.Item>
-                                        <Breadcrumb.Item className="h-full text-base font-medium ">
-                                            {folderData?.data.name}
-                                        </Breadcrumb.Item>
+                                        {breadcrumbData?.data.map((data, i) => {
+                                            const size =
+                                                breadcrumbData?.data.length;
+
+                                            if (size < 5) {
+                                                if (i === size - 1) {
+                                                    return (
+                                                        <Breadcrumb.Item
+                                                            key={data.id}
+                                                            className="h-full text-base font-medium "
+                                                        >
+                                                            {data.name}
+                                                        </Breadcrumb.Item>
+                                                    );
+                                                }
+                                                return (
+                                                    <Breadcrumb.Item
+                                                        key={data.id}
+                                                        className="h-full text-base font-medium "
+                                                    >
+                                                        <Link
+                                                            href={`/document/${data.id}`}
+                                                        >
+                                                            {data.name}
+                                                        </Link>
+                                                    </Breadcrumb.Item>
+                                                );
+                                            } else {
+                                                if (size === i + 1) {
+                                                    return (
+                                                        <Breadcrumb.Item
+                                                            key={data.id}
+                                                            className="h-full text-base font-medium "
+                                                        >
+                                                            {data.name}
+                                                        </Breadcrumb.Item>
+                                                    );
+                                                }
+                                                if (i === 0) {
+                                                    return (
+                                                        <Breadcrumb.Item
+                                                            key={data.id}
+                                                            className="h-full text-base font-medium "
+                                                        >
+                                                            <Link
+                                                                href={`/document/${data.id}`}
+                                                            >
+                                                                {data.name}
+                                                            </Link>
+                                                        </Breadcrumb.Item>
+                                                    );
+                                                }
+                                                if (i === size - 2) {
+                                                    return (
+                                                        <Breadcrumb.Item
+                                                            key={data.id}
+                                                            className="h-full text-base font-medium "
+                                                        >
+                                                            <Link
+                                                                href={`/document/${data.id}`}
+                                                            >
+                                                                {data.name}
+                                                            </Link>
+                                                        </Breadcrumb.Item>
+                                                    );
+                                                }
+                                                if (i === 2) {
+                                                    const items =
+                                                        breadcrumbData?.data
+                                                            .slice(1, -1)
+                                                            .map(
+                                                                ({
+                                                                    id,
+                                                                    name,
+                                                                }) => ({
+                                                                    key: id,
+                                                                    label: (
+                                                                        <Link
+                                                                            href={`/document/${id}`}
+                                                                        >
+                                                                            {
+                                                                                name
+                                                                            }
+                                                                        </Link>
+                                                                    ),
+                                                                })
+                                                            );
+                                                    return (
+                                                        <Breadcrumb.Item
+                                                            key={data.id}
+                                                            className="h-full text-base font-medium "
+                                                            menu={{
+                                                                expandIcon:
+                                                                    false,
+                                                                itemIcon: false,
+                                                                items: items,
+                                                            }}
+                                                        >
+                                                            ...
+                                                        </Breadcrumb.Item>
+                                                    );
+                                                }
+                                            }
+                                        })}
                                     </Breadcrumb>
                                 </div>
                             ),
@@ -986,16 +1037,44 @@ export const getServerSideProps = withAuthUserSSR({
     const { document } = params;
     const token = authUser.token;
 
-    const data = await fetcher(FolderServicePath.GET_BY_ID + document, 'GET', {
-        headers: {
-            Authorization: 'Bearer ' + token,
-        },
-    });
+    const prefFolder = await fetcher(
+        FolderServicePath.GET_BY_ID + document,
+        'GET',
+        {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            },
+        }
+    );
+
+    const prefRootFolder = await fetcher(
+        FolderServicePath.FOLDER +
+            document +
+            FolderServicePath.GET_ROOT_FOLDER_S,
+        'GET',
+        {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            },
+        }
+    );
+
+    const prefMenu = await fetcher(
+        FolderServicePath.FOLDER + document + FolderServicePath.MENU_FOLDER_S,
+        'GET',
+        {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            },
+        }
+    );
 
     return {
         props: {
             authUser,
-            data,
+            prefFolder,
+            prefRootFolder,
+            prefMenu,
             path: document || null,
         },
     };

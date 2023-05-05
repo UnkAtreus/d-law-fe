@@ -6,8 +6,8 @@ const FileServicePath = {
     UPLOAD_FILE: 'files/upload',
     DELETE_FILE: 'files/',
     UPDATE_FILE: 'files/',
-    MOVE_FILE: '/move',
     FILE: 'files/',
+    MOVE_FILE_S: '/move',
 };
 
 export default FileServicePath;
