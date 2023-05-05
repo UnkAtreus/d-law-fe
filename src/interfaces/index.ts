@@ -116,15 +116,17 @@ export interface TMyCaseFolder {
     caseId: 'fcea6122-f9ad-4162-8ac6-391d8f3adbbb';
 }
 
+interface TTags {
+    id: string;
+    name: TFileTypes;
+}
+
 export interface TDocument {
     id: string;
     name: string;
     url?: string;
     previewUrl?: string;
-    tags: {
-        id: string;
-        name: TFileTypes;
-    }[];
+    tags: TTags[];
     subFolders?: null;
     files?: TDocument[];
     caseId?: string;
@@ -139,10 +141,7 @@ export interface TFolder {
     files: TDocument[];
     createdAt: Date | string;
     updatedAt: Date | string;
-    tags: {
-        id: string;
-        name: TFileTypes;
-    }[];
+    tags: TTags[];
     caseId: string;
 }
 
@@ -157,4 +156,15 @@ export interface TUser {
     email: string;
     firstName: string;
     lastName: string;
+}
+
+export interface TFile {
+    id: string;
+    name: string;
+    url: string;
+    previewUrl: string;
+    tags: TTags[];
+    createdAt: Date | string;
+    updatedAt: Date | string;
+    type: TFileTypes;
 }

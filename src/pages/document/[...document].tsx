@@ -340,6 +340,7 @@ function Document({
             title: <RiFile2Fill className="m-auto" />,
             dataIndex: 'type',
             render: (_, record) => {
+                if (record.caseId) return showFileIcon('folder');
                 if (record.tags.length === 0) return showFileIcon('folder');
                 if (record.tags.length > 0)
                     return showFileIcon(record.tags[0].name);
@@ -358,15 +359,25 @@ function Document({
             dataIndex: 'tags',
             render: (_, record) => (
                 <div className="flex flex-wrap">
-                    {record.tags.map((item) => (
-                        <Tag key={item.id}>{item.name}</Tag>
-                    ))}
+                    {record.tags.map((item) => {
+                        if (item.name === 'folder') {
+                            return null;
+                        }
+                        return <Tag key={item.id}>{item.name}</Tag>;
+                    })}
                 </div>
             ),
         },
         {
             title: 'วันที่สร้าง/เจ้าของ',
             dataIndex: 'createdAt',
+            sorter: (a, b) => {
+                if (a && b) {
+                    return dayjs(a.createdAt).diff(dayjs(b.createdAt));
+                } else {
+                    return 0;
+                }
+            },
             // valueType: 'dateTime',
             render: (text: any, record) => (
                 <div className="flex flex-col ">

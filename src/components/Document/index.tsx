@@ -12,11 +12,11 @@ import {
     RiZoomOutLine,
 } from 'react-icons/ri';
 import BaseLoading from '@baseComponents/BaseLoading';
-import pdfFile from '@assets/testpdf.pdf';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-function Document({ containerRef }: { containerRef: any }) {
+function Document({ containerRef, file }: { containerRef: any; file: string }) {
+    console.log('🚀 ~ Document ~ file:', file);
     const [numPages, setNumPages] = useState<number>(0);
     const [value, setValue] = useState('1');
     const [zoom, setZoom] = useState(0);
@@ -56,7 +56,7 @@ function Document({ containerRef }: { containerRef: any }) {
     return (
         <div>
             <RenderDocument
-                file={pdfFile}
+                file={file}
                 onLoadSuccess={({ numPages }) => {
                     setNumPages(numPages);
                 }}

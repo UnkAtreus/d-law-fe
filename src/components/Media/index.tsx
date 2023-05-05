@@ -12,17 +12,18 @@ import { RiDownloadFill } from 'react-icons/ri';
 interface IMediaProps {
     type: TFileTypes;
     poster?: string;
+    media: string;
 }
 
-function Media({ type, poster }: IMediaProps) {
+function Media({ type, poster, media }: IMediaProps) {
     const RenderMedia = memo(function RenderMedia() {
         const { AUDIO, VIDEO } = FileTypes;
         switch (type) {
             case VIDEO:
                 return (
                     <MediaPlayer
-                        src="https://media-files.vidstack.io/720p.mp4"
-                        poster="https://media-files.vidstack.io/poster.png"
+                        src={media}
+                        // poster="https://media-files.vidstack.io/poster.png"
                         controls
                     >
                         <MediaOutlet />
@@ -33,7 +34,7 @@ function Media({ type, poster }: IMediaProps) {
                     <MediaPlayer
                         src={[
                             {
-                                src: 'https://media-files.vidstack.io/audio.mp3',
+                                src: media,
                                 type: 'audio/mpeg',
                             },
                             {

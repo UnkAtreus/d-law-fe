@@ -63,7 +63,7 @@
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {
-    background: #f9fafb;
+    background: #f9fafb !important;
 }
 
 .ant-collapse .ant-collapse-content > .ant-collapse-content-box {

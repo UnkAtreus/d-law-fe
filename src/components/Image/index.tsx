@@ -1,19 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react';
-import MockImage from '@assets/testpic.jpg';
 import { Space } from 'antd';
 import { RiSubtractLine, RiZoomOutLine, RiAddLine } from 'react-icons/ri';
 
-function Image() {
+function Image({ image }: { image: string }) {
     const [zoom, setZoom] = useState(0);
 
     const ZOOM_SCALE = [1, 1.25, 1.5, 2, 3];
     return (
-        <div className="flex h-full items-center">
+        <div className=" flex h-full items-center">
             <img
-                src={MockImage.src}
+                src={image}
                 alt=""
-                className="transition"
+                className="h-full transition"
                 style={{
                     transform: `scale(${ZOOM_SCALE[zoom]})`,
                 }}

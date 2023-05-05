@@ -1,8 +1,9 @@
 import { Button, Empty, Space } from 'antd';
+import Link from 'next/link';
 import React from 'react';
 import { RiDownloadFill } from 'react-icons/ri';
 
-function FileNotFound() {
+function FileNotFound({ download }: { download: string }) {
     return (
         <div className=" flex h-full w-full max-w-screen-sm items-center justify-center">
             <div className="flex w-full flex-col items-center rounded-lg bg-white p-6 shadow-lg">
@@ -19,14 +20,16 @@ function FileNotFound() {
                                 </div>
                             </div>
                             <Space>
-                                <Button
-                                    type="primary"
-                                    icon={
-                                        <RiDownloadFill className="icon__button mr-2" />
-                                    }
-                                >
-                                    ดาวน์โหลด
-                                </Button>
+                                <Link href={download}>
+                                    <Button
+                                        type="primary"
+                                        icon={
+                                            <RiDownloadFill className="icon__button mr-2" />
+                                        }
+                                    >
+                                        ดาวน์โหลด
+                                    </Button>
+                                </Link>
                             </Space>
                         </div>
                     }

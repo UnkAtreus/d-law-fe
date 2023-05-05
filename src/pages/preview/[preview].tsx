@@ -36,6 +36,13 @@ import Text from '@components/Text';
 import FileNotFound from '@components/FileNotFound';
 import dayjs from 'dayjs';
 import Image from '@components/Image';
+import useRequest, { fetcher } from '@services/useRequest';
+import FileServicePath from '@services/FileService';
+import { ResponseData, TAuthUser, TFile } from '@interfaces/index';
+import withAuthUserSSR from '@hoc/withAuthUserSSR';
+import AuthAction from '@hoc/AuthAction';
+import logDebug from '@utilities/logDebug';
+import Link from 'next/link';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -57,30 +64,32 @@ export function getItem(
     } as MenuItem;
 }
 
-export async function getServerSideProps(ctx: any) {
-    const { params, query } = ctx;
-    const { preview } = params;
-
-    return {
-        props: {
-            path: preview || null,
-            type: query?.type || 'pdf',
-        },
-    };
-}
-
 function Preview({
     path: FILE_PATH,
-    type: FILE_TYPE,
+    type: fileType,
+    authUser,
+    data,
 }: {
     path: string;
     type: FileTypes;
+    data: ResponseData<TFile>;
+    authUser: TAuthUser;
 }) {
     // TODO: Check file type if does not exist in query parameter, using useEffect and SWR
-    console.log('🚀 ~ file: [preview].tsx:75 ~ FILE_TYPE', FILE_TYPE);
+    logDebug('🚀 ~ FILE_TYPE', fileType);
+
+    const token = authUser.token || '';
+    const {
+        mutate,
+        data: fileData,
+        isLoading,
+    } = useRequest({
+        url: FileServicePath.GET_BY_ID + FILE_PATH,
+        token,
+        initData: data,
+    });
 
     const [isMoreInfo, setIsMoreInfo] = useState<boolean>(true);
-    const [fileType, setFileType] = useState<string>(FILE_TYPE);
 
     const containerRef = useRef<any>();
 
@@ -162,24 +171,29 @@ function Preview({
     ];
 
     const RenderDocument = memo(function RenderDocument() {
-        return <Document containerRef={containerRef} />;
+        return (
+            <Document
+                containerRef={containerRef}
+                file={fileData?.data.previewUrl || ''}
+            />
+        );
     });
     const RenderTxt = memo(function RenderTxt() {
-        return <Text />;
+        return <Text file={fileData?.data.previewUrl || ''} />;
     });
     const RenderMedia = memo(function RenderMedia({
         type,
     }: {
         type: 'video' | 'audio';
     }) {
-        return <Media type={type} />;
+        return <Media type={type} media={fileData?.data.previewUrl || ''} />;
     });
     const RenderImage = memo(function RenderImage() {
         // eslint-disable-next-line jsx-a11y/alt-text
-        return <Image />;
+        return <Image image={fileData?.data.previewUrl || ''} />;
     });
     const RenderNotFound = memo(function RenderNotFound() {
-        return <FileNotFound />;
+        return <FileNotFound download={fileData?.data.url || ''} />;
     });
 
     const RenderFile = memo(function RenderFile() {
@@ -193,11 +207,11 @@ function Preview({
             case PDF:
                 return <RenderDocument />;
             case DOC:
-                return <RenderDocument />;
+                return <RenderNotFound />;
             case PTT:
-                return <RenderDocument />;
+                return <RenderNotFound />;
             case XLS:
-                return <RenderDocument />;
+                return <RenderNotFound />;
             case IMAGE:
                 return <RenderImage />;
             case TEXT:
@@ -253,8 +267,9 @@ function Preview({
                             />
 
                             <h1 className="font-bold">
-                                {FILE_PATH.charAt(0).toUpperCase() +
-                                    FILE_PATH.slice(1)}
+                                {fileData?.data?.name
+                                    ? fileData?.data?.name
+                                    : ''}
                             </h1>
                         </Space>
 
@@ -270,13 +285,15 @@ function Preview({
                         </Space> */}
 
                         <Space>
-                            <Button
-                                icon={
-                                    <RiDownloadFill className="icon__button mr-2" />
-                                }
-                            >
-                                ดาวน์โหลด
-                            </Button>
+                            <Link href={fileData?.data.url || ''}>
+                                <Button
+                                    icon={
+                                        <RiDownloadFill className="icon__button mr-2" />
+                                    }
+                                >
+                                    ดาวน์โหลด
+                                </Button>
+                            </Link>
                             <Button
                                 type="primary"
                                 icon={
@@ -287,7 +304,12 @@ function Preview({
                             </Button>
 
                             <Dropdown
-                                menu={{ items: info_items }}
+                                menu={{
+                                    onClick: ({ key }) => {
+                                        console.log('🚀 ~ key:', key);
+                                    },
+                                    items: info_items,
+                                }}
                                 trigger={['click']}
                                 overlayClassName="w-64"
                             >
@@ -374,5 +396,29 @@ function Preview({
         </Layout>
     );
 }
+
+export const getServerSideProps = withAuthUserSSR({
+    whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})(async (ctx: any) => {
+    const authUser: TAuthUser = ctx.AuthUser;
+    const { params, query } = ctx;
+    const { preview } = params;
+    const token = authUser.token;
+
+    const data = await fetcher(FileServicePath.GET_BY_ID + preview, 'GET', {
+        headers: {
+            Authorization: 'Bearer ' + token,
+        },
+    });
+
+    return {
+        props: {
+            authUser,
+            data,
+            path: preview || null,
+            type: data.data.type || null,
+        },
+    };
+});
 
 export default Preview;

@@ -2,13 +2,13 @@ import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 import BaseTag, { ITag } from '@baseComponents/BaseTag';
 
-import { Avatar, Col, Row, Tag, Typography } from 'antd';
+import { Col, Row, Typography } from 'antd';
 
 import { FileTypeIcons, showFileIcon } from '@utilities/index';
 import {
     ResponseData,
     TAuthUser,
-    TDocument,
+    TFile,
     TFreqCaseFolder,
 } from '@interfaces/index';
 import router from 'next/router';
@@ -19,19 +19,27 @@ import AuthAction from '@hoc/AuthAction';
 import useRequest, { fetcher } from '@services/useRequest';
 import FolderServicePath from '@services/FolderService';
 import CaseFolderServicePath from '@services/caseFolderService';
+import FileServicePath from '@services/FileService';
 
 const Workspace = ({
-    data,
+    freqData,
+    recentData,
     authUser,
 }: {
-    data: ResponseData<TFreqCaseFolder[]>;
+    freqData: ResponseData<TFreqCaseFolder[]>;
+    recentData: ResponseData<TFile[]>;
     authUser: TAuthUser;
 }) => {
     const { token } = authUser;
-    const { data: FeqFolderData } = useRequest({
+    const { data: feqFolderData } = useRequest({
         url: FolderServicePath.GET_ALL_FOLDER,
         token,
-        initData: data,
+        initData: freqData,
+    });
+    const { data: recentFileData } = useRequest({
+        url: FileServicePath.RECENT_FILE,
+        token,
+        initData: recentData,
     });
 
     const {
@@ -48,7 +56,7 @@ const Workspace = ({
         ZipIcon,
     } = FileTypeIcons;
 
-    const columns: ProColumns<TDocument>[] = [
+    const columns: ProColumns<TFile>[] = [
         {
             title: <RiFile2Fill className="m-auto" />,
             dataIndex: 'type',
@@ -60,23 +68,23 @@ const Workspace = ({
         },
         {
             title: 'ชื่อไฟล์',
-            dataIndex: 'title',
+            dataIndex: 'name',
             ellipsis: true,
         },
-        {
-            title: 'ชนิดไฟล์',
-            dataIndex: 'tags',
-            render: (_, record) => (
-                <div className="flex flex-wrap">
-                    {record.tags.map((tag) => (
-                        <Tag key={tag.id}>{tag.name}</Tag>
-                    ))}
-                </div>
-            ),
-        },
+        // {
+        //     title: 'ชนิดไฟล์',
+        //     dataIndex: 'tags',
+        //     render: (_, record) => (
+        //         <div className="flex flex-wrap">
+        //             {record.tags.map((tag) => (
+        //                 <Tag key={tag.id}>{tag.name}</Tag>
+        //             ))}
+        //         </div>
+        //     ),
+        // },
         {
             title: 'วันที่สร้าง/เจ้าของ',
-            dataIndex: 'created_at',
+            dataIndex: 'createdAt',
             // valueType: 'dateTime',
             render: (text: any, record) => (
                 <div className="flex flex-col ">
@@ -87,18 +95,18 @@ const Workspace = ({
                 </div>
             ),
         },
-        {
-            title: 'แชร์ร่วมกับ',
-            dataIndex: 'share_with',
-            render: (text, record) => (
-                <Avatar.Group>
-                    <Avatar>{text}</Avatar>
-                </Avatar.Group>
-            ),
-        },
+        // {
+        //     title: 'แชร์ร่วมกับ',
+        //     dataIndex: 'share_with',
+        //     render: (text, record) => (
+        //         <Avatar.Group>
+        //             <Avatar>{text}</Avatar>
+        //         </Avatar.Group>
+        //     ),
+        // },
         {
             title: 'แก้ไขล่าสุด',
-            dataIndex: 'last_edited',
+            dataIndex: 'updatedAt',
             render: (text: any) => (
                 <div className="text-gray-400">
                     {dayjs(text).format('DD MMM YYYY - HH:MM')}
@@ -201,8 +209,8 @@ const Workspace = ({
                             collapsible
                         >
                             <Row gutter={[8, 8]}>
-                                {FeqFolderData?.data &&
-                                    FeqFolderData.data.map((folder) => (
+                                {feqFolderData?.data &&
+                                    feqFolderData.data.map((folder) => (
                                         <Col span={4} key={folder.id}>
                                             <div
                                                 className="hover-btn group flex w-full cursor-pointer items-center space-x-2 rounded border border-solid border-gray-200 bg-white py-5 pl-4 pr-6"
@@ -222,9 +230,16 @@ const Workspace = ({
                             </Row>
                         </ProCard>
 
-                        <ProTable<TDocument>
+                        <ProTable<TFile>
                             columns={columns}
-                            dataSource={[]}
+                            dataSource={recentFileData?.data}
+                            onRow={(record) => {
+                                return {
+                                    onDoubleClick: () => {
+                                        router.push(`/preview/${record.id}`);
+                                    },
+                                };
+                            }}
                             cardBordered
                             cardProps={{
                                 collapsible: true,
@@ -264,7 +279,12 @@ export const getServerSideProps = withAuthUserSSR({
     const authUser: TAuthUser = ctx.AuthUser;
     const token = authUser.token;
 
-    const data = await fetcher(CaseFolderServicePath.FREQ_USED, 'GET', {
+    const freqData = await fetcher(CaseFolderServicePath.FREQ_USED, 'GET', {
+        headers: {
+            Authorization: 'Bearer ' + token,
+        },
+    });
+    const recentData = await fetcher(FileServicePath.RECENT_FILE, 'GET', {
         headers: {
             Authorization: 'Bearer ' + token,
         },
@@ -273,7 +293,8 @@ export const getServerSideProps = withAuthUserSSR({
     return {
         props: {
             authUser,
-            data,
+            freqData,
+            recentData,
         },
     };
 });

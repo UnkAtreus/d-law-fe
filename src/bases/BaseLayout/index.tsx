@@ -8,7 +8,6 @@ import {
     MenuProps,
     Space,
     theme,
-    Tooltip,
     Typography,
 } from 'antd';
 import React from 'react';
@@ -22,7 +21,6 @@ import {
     RiLogoutBoxLine,
     RiArrowLeftSLine,
 } from 'react-icons/ri';
-import { GoLaw } from 'react-icons/go';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signOut } from '@services/useAuth';
@@ -216,7 +214,7 @@ const BaseLayout = {
                             <div
                                 className="cursor-pointer"
                                 onClick={() => {
-                                    router.push('/');
+                                    router.push('https://www.dlaw-dms.com/');
                                 }}
                             >
                                 <Logo className="m-4" />
@@ -224,12 +222,16 @@ const BaseLayout = {
 
                             <div>
                                 <Space size={'middle'}>
-                                    <Link href={`https://www.dlaw-dms.com/`}>
+                                    <Link
+                                        href={`https://www.dlaw-dms.com/search-case`}
+                                    >
                                         <Typography.Text className="hover-text">
                                             ค้นหาคดี
                                         </Typography.Text>
                                     </Link>
-                                    <Link href={`https://www.dlaw-dms.com/`}>
+                                    <Link
+                                        href={`https://www.dlaw-dms.com/public-appointment`}
+                                    >
                                         <Typography.Text className="hover-text">
                                             นัดหมาย
                                         </Typography.Text>
@@ -247,133 +249,6 @@ const BaseLayout = {
                         </div>
                     </Layout.Header>
                     <Layout.Content>{children}</Layout.Content>
-                </Layout>
-            </Layout>
-        );
-    },
-    Preview({
-        children,
-        fileName = '',
-    }: {
-        children: React.ReactNode;
-        fileName?: string;
-    }) {
-        const {
-            token: { colorBgContainer },
-        } = theme.useToken();
-
-        const router = useRouter();
-
-        const items: MenuProps['items'] = [
-            getItem(
-                <Tooltip placement="right" title={'Workshop'} color={'#4a4a4a'}>
-                    <div
-                        onClick={() => router.push('/workspace')}
-                        className="flex flex-col items-center justify-center py-4"
-                    >
-                        <RiComputerLine className="menu-icon text-gray-500" />
-                    </div>
-                </Tooltip>,
-                'workspace'
-            ),
-            getItem(
-                <Tooltip placement="right" title={'Document'} color={'#4a4a4a'}>
-                    <div
-                        onClick={() => router.push('/document')}
-                        className="flex flex-col items-center justify-center py-4"
-                    >
-                        <RiFileCopy2Line className="menu-icon text-gray-500" />
-                    </div>
-                </Tooltip>,
-                'document'
-            ),
-            getItem(
-                <Tooltip
-                    placement="right"
-                    title={'Appointment'}
-                    color={'#4a4a4a'}
-                >
-                    <div
-                        onClick={() => router.push('/appointment')}
-                        className="flex flex-col items-center justify-center py-4"
-                    >
-                        <RiCalendarTodoLine className="menu-icon text-gray-500" />
-                    </div>
-                </Tooltip>,
-                'appointment'
-            ),
-            getItem(
-                <Tooltip placement="right" title={'Setting'} color={'#4a4a4a'}>
-                    <div
-                        onClick={() => router.push('/setting')}
-                        className="flex flex-col items-center justify-center py-4"
-                    >
-                        <RiSettings5Line className="menu-icon text-gray-500" />
-                    </div>
-                </Tooltip>,
-                'setting'
-            ),
-        ];
-
-        return (
-            <Layout className="min-h-screen" hasSider>
-                <Layout.Sider
-                    style={{
-                        background: colorBgContainer,
-                        boxShadow: '6px 0px 24px rgba(0, 0, 0, 0.1)',
-                        overflow: 'auto',
-                        height: '100vh',
-                        position: 'fixed',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        zIndex: 20,
-                    }}
-                    width={80}
-                >
-                    <GoLaw className="icon mx-7 my-4 text-gray-700" />
-                    <Menu mode="inline" items={items} />
-                </Layout.Sider>
-                <Layout className="ml-[80px]">
-                    <Layout.Header
-                        style={{
-                            padding: 0,
-                            backgroundColor: colorBgContainer,
-                            boxShadow: '0px 4px 30px 4px rgba(0, 0, 0, 0.1)',
-                            position: 'sticky',
-                            top: 0,
-                            zIndex: 10,
-                            width: '100%',
-                        }}
-                    >
-                        <div className="flex items-center justify-between px-6 ">
-                            <Space>
-                                <Button
-                                    shape="circle"
-                                    type="text"
-                                    onClick={() => router.back()}
-                                    icon={
-                                        <RiArrowLeftSLine className="icon__button " />
-                                    }
-                                />
-
-                                <h1 className="font-bold">
-                                    {fileName.charAt(0).toUpperCase() +
-                                        fileName.slice(1)}
-                                </h1>
-                            </Space>
-
-                            <div>
-                                <Space>
-                                    <Avatar>KD</Avatar>
-                                    <RiArrowDropDownLine className="h-6 w-6 text-gray-400" />
-                                </Space>
-                            </div>
-                        </div>
-                    </Layout.Header>
-                    <Layout.Content className="mx-6 my-12">
-                        {children}
-                    </Layout.Content>
                 </Layout>
             </Layout>
         );
