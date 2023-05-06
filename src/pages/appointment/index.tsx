@@ -14,6 +14,7 @@ import { ResponseData, TAppointment, TAuthUser } from '@interfaces/index';
 import AppointmentServicePath from '@services/AppointmentService';
 import CaseFolderServicePath from '@services/caseFolderService';
 import useRequest, { fetcher } from '@services/useRequest';
+import { getAvatarName } from '@utilities/index';
 import logDebug from '@utilities/logDebug';
 import {
     Badge,
@@ -49,6 +50,7 @@ function Appointment({
     authUser: TAuthUser;
 }) {
     const token = authUser.token || '';
+    const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
     const {
         mutate,
         data: appointmentData,
@@ -160,7 +162,7 @@ function Appointment({
     };
 
     return (
-        <BaseLayout.Main path={'appointment'}>
+        <BaseLayout.Main path={'appointment'} avatarName={avatarName}>
             <Row gutter={24}>
                 <Col>
                     <Card>

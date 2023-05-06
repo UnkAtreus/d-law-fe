@@ -8,6 +8,7 @@ import {
     Layout,
     Menu,
     MenuProps,
+    message,
     Space,
     theme,
     Tooltip,
@@ -22,8 +23,6 @@ import {
     RiShareForward2Fill,
     RiMore2Fill,
     RiInformationLine,
-    RiFolderTransferLine,
-    RiEditLine,
     RiCloseFill,
 } from 'react-icons/ri';
 import { GoLaw } from 'react-icons/go';
@@ -38,11 +37,17 @@ import dayjs from 'dayjs';
 import Image from '@components/Image';
 import useRequest, { fetcher } from '@services/useRequest';
 import FileServicePath from '@services/FileService';
-import { ResponseData, TAuthUser, TFile } from '@interfaces/index';
+import {
+    ResponseData,
+    TAuthUser,
+    TChangeDocumentName,
+    TFile,
+} from '@interfaces/index';
 import withAuthUserSSR from '@hoc/withAuthUserSSR';
 import AuthAction from '@hoc/AuthAction';
 import logDebug from '@utilities/logDebug';
 import Link from 'next/link';
+import BaseModal from '@baseComponents/BaseModal';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -65,7 +70,7 @@ export function getItem(
 }
 
 function Preview({
-    path: FILE_PATH,
+    path,
     type: fileType,
     authUser,
     data,
@@ -75,7 +80,6 @@ function Preview({
     data: ResponseData<TFile>;
     authUser: TAuthUser;
 }) {
-    // TODO: Check file type if does not exist in query parameter, using useEffect and SWR
     logDebug('🚀 ~ FILE_TYPE', fileType);
 
     const token = authUser.token || '';
@@ -84,7 +88,7 @@ function Preview({
         data: fileData,
         isLoading,
     } = useRequest({
-        url: FileServicePath.GET_BY_ID + FILE_PATH,
+        url: FileServicePath.GET_BY_ID + path,
         token,
         initData: data,
     });
@@ -142,17 +146,31 @@ function Preview({
 
     const info_items: MenuProps['items'] = [
         getItem(
-            <div className="flex space-x-2">
-                <RiFolderTransferLine className="icon text-gray-500" />
-                <span className="self-center">ย้ายไปที่</span>
-            </div>,
-            'movefile'
-        ),
-        getItem(
-            <div className="flex space-x-2">
-                <RiEditLine className="icon text-gray-500" />
-                <span className="self-center">เปลี่ยนชื่อ</span>
-            </div>,
+            <BaseModal.ChangeName<TChangeDocumentName>
+                onFinish={async (values) => {
+                    try {
+                        logDebug('🚀 ~ onFinish={ ~ payload:', values);
+                        await fetcher(
+                            FileServicePath.UPDATE_FILE + path,
+                            'PATCH',
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + token,
+                                },
+                                data: values,
+                            }
+                        );
+                        message.success('แก้ไขชื่อไฟล์สำเร็จ');
+                        await mutate();
+
+                        return true;
+                    } catch (error) {
+                        message.error('แก้ไขชื่อไฟล์ไม่สำเร็จ');
+                        return false;
+                    }
+                }}
+                type="file"
+            />,
             'changename'
         ),
         getItem(
@@ -362,31 +380,35 @@ function Preview({
                             <div>
                                 <div>ชนิดไฟล์</div>
                                 <div className="text-base text-gray-500">
-                                    เอกสาร PDF
+                                    {fileData?.data.type}
                                 </div>
                             </div>
                             <div>
                                 <div>ขนาดไฟล์</div>
                                 <div className="text-base text-gray-500">
-                                    37.4 ไบต์
+                                    {fileData?.data.size}
                                 </div>
                             </div>
                             <div>
                                 <div>เจ้าของไฟล์</div>
                                 <div className="text-base text-gray-500">
-                                    Kittipat Dechkul
+                                    {`${authUser.firstName} ${authUser.lastName}`}
                                 </div>
                             </div>
                             <div>
                                 <div>แก้ไขวันที่</div>
                                 <div className="text-base text-gray-500">
-                                    {'-'}
+                                    {dayjs(fileData?.data.updatedAt)
+                                        .utc()
+                                        .format('DD MMM YYYY')}
                                 </div>
                             </div>
                             <div>
                                 <div>สร้างขึ้นวันที่</div>
                                 <div className="text-base text-gray-500">
-                                    {dayjs().format('DD MMM YYYY')}
+                                    {dayjs(fileData?.data.createdAt)
+                                        .utc()
+                                        .format('DD MMM YYYY')}
                                 </div>
                             </div>
                         </div>

@@ -4,7 +4,7 @@ import { ITag } from '@baseComponents/BaseTag';
 
 import { Col, Row, Typography } from 'antd';
 
-import { FileTypeIcons, showFileIcon } from '@utilities/index';
+import { FileTypeIcons, getAvatarName, showFileIcon } from '@utilities/index';
 import {
     ResponseData,
     TAuthUser,
@@ -31,6 +31,7 @@ const Workspace = ({
     authUser: TAuthUser;
 }) => {
     const { token } = authUser;
+    const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
     const { data: feqFolderData } = useRequest({
         url: FolderServicePath.GET_ALL_FOLDER,
         token,
@@ -187,7 +188,7 @@ const Workspace = ({
 
     return (
         <>
-            <BaseLayout.Main>
+            <BaseLayout.Main avatarName={avatarName}>
                 <Row gutter={24}>
                     <Col span={24} className="space-y-6">
                         <ProCard

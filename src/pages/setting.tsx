@@ -11,6 +11,7 @@ import withAuthUserSSR from '@hoc/withAuthUserSSR';
 import { ResponseData, TAuthUser, TUser } from '@interfaces/index';
 import UserServicePath from '@services/useAuth';
 import useRequest, { fetcher } from '@services/useRequest';
+import { getAvatarName } from '@utilities/index';
 import logDebug from '@utilities/logDebug';
 import { Button, Space, message } from 'antd';
 import React, { useState } from 'react';
@@ -26,6 +27,7 @@ function Setting({
     authUser: TAuthUser;
 }) {
     const { token } = authUser;
+    const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
     const { data: userData, mutate: mutateUser } = useRequest({
         url: UserServicePath.MY_USER,
         token,
@@ -40,7 +42,7 @@ function Setting({
     const [readonly, setReadonly] = useState(true);
 
     return (
-        <BaseLayout.Main path={'setting'}>
+        <BaseLayout.Main path={'setting'} avatarName={avatarName}>
             <ProCard
                 tabs={{
                     type: 'line',

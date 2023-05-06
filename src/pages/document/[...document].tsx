@@ -29,7 +29,12 @@ import { getItem } from '@pages/preview/[preview]';
 import FileServicePath from '@services/FileService';
 import FolderServicePath from '@services/FolderService';
 import useRequest, { fetcher } from '@services/useRequest';
-import { FileTypeIcons, showFileIcon } from '@utilities/index';
+import {
+    FileTypeIcons,
+    getAvatarName,
+    getRandomColor,
+    showFileIcon,
+} from '@utilities/index';
 import logDebug from '@utilities/logDebug';
 import useCopyToClipboard from '@utilities/useCopyToClipboard';
 import useUpload from '@utilities/useUpload';
@@ -92,6 +97,7 @@ function Document({
     prefMenu: ResponseData<TMenuFolder[]>;
 }) {
     const { token } = authUser;
+    const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
     const {
         data: folderData,
         mutate,
@@ -499,7 +505,7 @@ function Document({
     ];
 
     return (
-        <BaseLayout.Main path={'document'}>
+        <BaseLayout.Main path={'document'} avatarName={avatarName}>
             <Row gutter={24}>
                 <Col xl={5} xxl={4}>
                     <div className="space-y-4">
@@ -948,13 +954,29 @@ function Document({
                                                         } = JSON.parse(
                                                             item.label
                                                         );
+
+                                                        const avatarName =
+                                                            getAvatarName(
+                                                                firstName,
+                                                                lastName
+                                                            );
+                                                        const color =
+                                                            getRandomColor(
+                                                                firstName
+                                                            );
                                                         return (
                                                             <div className="flex items-center space-x-2">
                                                                 <Avatar
-                                                                    icon={
-                                                                        <RiUserLine className="icon__button" />
-                                                                    }
-                                                                />
+                                                                    // icon={
+                                                                    //     <RiUserLine className="icon__button" />
+                                                                    // }
+                                                                    style={{
+                                                                        backgroundColor:
+                                                                            color,
+                                                                    }}
+                                                                >
+                                                                    {avatarName}
+                                                                </Avatar>
                                                                 <div className="-space-y-1">
                                                                     <div className=" font-medium">
                                                                         {firstName +
@@ -1035,6 +1057,15 @@ function Document({
                                                             editor: 'สามารถแก้ไข',
                                                             viewer: 'สามารถดู',
                                                         };
+                                                    const avatarName =
+                                                        getAvatarName(
+                                                            item.firstName,
+                                                            item.lastName
+                                                        );
+                                                    const color =
+                                                        getRandomColor(
+                                                            item.firstName
+                                                        );
                                                     return (
                                                         <div
                                                             className="flex items-center justify-between"
@@ -1048,12 +1079,12 @@ function Document({
                                                                     // icon={
                                                                     //     <RiUserLine className="icon" />
                                                                     // }
+                                                                    style={{
+                                                                        backgroundColor:
+                                                                            color,
+                                                                    }}
                                                                 >
-                                                                    {`${item.firstName.charAt(
-                                                                        0
-                                                                    )}${item.lastName.charAt(
-                                                                        0
-                                                                    )}`}
+                                                                    {avatarName}
                                                                 </Avatar>
                                                                 <div className="">
                                                                     <div className="text-base font-medium">

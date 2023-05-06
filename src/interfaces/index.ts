@@ -201,6 +201,7 @@ export interface TFile {
     createdAt: Date | string;
     updatedAt: Date | string;
     type: TFileTypes;
+    size: string;
 }
 
 export interface TAppointment {

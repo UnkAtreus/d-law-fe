@@ -16,7 +16,6 @@ import BaseLoading from '@baseComponents/BaseLoading';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 function Document({ containerRef, file }: { containerRef: any; file: string }) {
-    console.log('🚀 ~ Document ~ file:', file);
     const [numPages, setNumPages] = useState<number>(0);
     const [value, setValue] = useState('1');
     const [zoom, setZoom] = useState(0);
@@ -28,7 +27,7 @@ function Document({ containerRef, file }: { containerRef: any; file: string }) {
     const ZOOM_SCALE = [0.5, 0.75, 1, 1.25, 1.5, 2, 3];
 
     const handleScroll = useCallback(() => {
-        if (pdfRef.current[0].clientHeight) {
+        if (pdfRef.current[0]?.clientHeight) {
             const num =
                 Math.round(
                     containerRef.current.scrollTop /

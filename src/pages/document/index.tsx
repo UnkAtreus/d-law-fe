@@ -54,6 +54,7 @@ import logDebug from '@utilities/logDebug';
 import caseFolderService from '@services/caseFolderService';
 import request from 'umi-request';
 import CaseFolderServicePath from '@services/caseFolderService';
+import { getAvatarName, getRandomColor } from '@utilities/index';
 
 function CaseFolder({
     data,
@@ -63,6 +64,7 @@ function CaseFolder({
     authUser: TAuthUser;
 }) {
     const token = authUser.token || '';
+    const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
     const {
         mutate,
         data: casesFolderData,
@@ -230,23 +232,35 @@ function CaseFolder({
             render: (text, record) => (
                 <Avatar.Group
                     maxCount={4}
-                    maxStyle={{
-                        color: '#ffffff',
-                        backgroundColor: '#8e5531bf',
-                    }}
+                    // maxStyle={{
+                    //     color: '#ffffff',
+                    //     backgroundColor: '#8e5531bf',
+                    // }}
                 >
-                    {record.shareWith.map((item) => (
-                        <Tooltip
-                            title={item.email}
-                            placement="top"
-                            key={item.id}
-                        >
-                            <Avatar className="bg-primary/90" alt="tset">
-                                {item.firstName.charAt(0) +
-                                    item.lastName.charAt(0)}
-                            </Avatar>
-                        </Tooltip>
-                    ))}
+                    {record.shareWith.map((item) => {
+                        const color = getRandomColor(item.firstName);
+                        const avatarName = getAvatarName(
+                            item.firstName,
+                            item.lastName
+                        );
+
+                        return (
+                            <Tooltip
+                                title={item.email}
+                                placement="top"
+                                key={item.id}
+                            >
+                                <Avatar
+                                    style={{
+                                        backgroundColor: color,
+                                    }}
+                                    alt="tset"
+                                >
+                                    {avatarName}
+                                </Avatar>
+                            </Tooltip>
+                        );
+                    })}
                 </Avatar.Group>
             ),
         },
@@ -287,7 +301,7 @@ function CaseFolder({
     ];
 
     return (
-        <BaseLayout.Main path={'document'}>
+        <BaseLayout.Main path={'document'} avatarName={avatarName}>
             <Row gutter={24}>
                 <Col>
                     <ProTable<TCaseFolder>

@@ -24,6 +24,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { signOut } from '@services/useAuth';
+import { getRandomColor } from '@utilities/index';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -47,9 +48,11 @@ const BaseLayout = {
     Main({
         children,
         path = 'workspace',
+        avatarName = '',
     }: {
         children: React.ReactNode;
         path?: string;
+        avatarName: string;
     }) {
         const {
             token: { colorBgContainer },
@@ -177,7 +180,16 @@ const BaseLayout = {
                                 >
                                     <a onClick={(e) => e.preventDefault()}>
                                         <Space>
-                                            <Avatar>KD</Avatar>
+                                            <Avatar
+                                                style={{
+                                                    backgroundColor:
+                                                        getRandomColor(
+                                                            avatarName
+                                                        ),
+                                                }}
+                                            >
+                                                {avatarName}
+                                            </Avatar>
                                             <RiArrowDropDownLine className="h-6 w-6 text-gray-400" />
                                         </Space>
                                     </a>

@@ -23,6 +23,20 @@ export function changeNumberTo1k(number: string | number): string | number {
     }
 }
 
+export function getAvatarName(firstName: string, lastName: string): string {
+    return firstName.charAt(0).toUpperCase() + lastName.charAt(0).toUpperCase();
+}
+
+export function getRandomColor(seed: string): string {
+    return (
+        '#' +
+        Math.floor(
+            Math.abs(Math.sin(seed.charCodeAt(0)) * 16777215) % 16777215
+        ).toString(16) +
+        'e0'
+    );
+}
+
 export enum FileTypes {
     FOLDER = 'folder',
     PDF = 'pdf',
