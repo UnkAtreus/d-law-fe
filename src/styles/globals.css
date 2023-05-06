@@ -19,6 +19,10 @@
     @apply inline-flex h-5 w-5 items-center justify-center;
 }
 
+.icon__appointment {
+    @apply inline-flex h-4 w-4 items-center justify-center;
+}
+
 .icon-document__pagination {
     @apply inline-flex h-4 w-4 items-center justify-center text-gray-700;
 }

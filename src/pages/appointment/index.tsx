@@ -1,88 +1,160 @@
 import {
-    ModalForm,
     PageHeader,
     ProFormDateTimePicker,
+    ProFormInstance,
     ProFormSelect,
     ProFormText,
     ProFormTextArea,
     StepsForm,
 } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
-import type { BadgeProps } from 'antd';
-import { Badge, Button, Calendar, Card, Col, Form, Row, Space } from 'antd';
-import type { Dayjs } from 'dayjs';
+import AuthAction from '@hoc/AuthAction';
+import withAuthUserSSR from '@hoc/withAuthUserSSR';
+import { ResponseData, TAppointment, TAuthUser } from '@interfaces/index';
+import AppointmentServicePath from '@services/AppointmentService';
+import CaseFolderServicePath from '@services/caseFolderService';
+import useRequest, { fetcher } from '@services/useRequest';
+import logDebug from '@utilities/logDebug';
 import {
+    Badge,
+    Button,
+    Calendar,
+    Card,
+    Col,
+    Modal,
+    Popover,
+    Row,
+    Select,
+    Space,
+    message,
+} from 'antd';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { useRef, useState } from 'react';
+import {
+    RiFileList2Line,
     RiFileUserLine,
+    RiGroupLine,
     RiMailAddFill,
     RiMailLine,
+    RiMapPin2Line,
     RiTodoLine,
 } from 'react-icons/ri';
 
-const getListData = (value: Dayjs) => {
-    let listData;
-    switch (value.date()) {
-        case 8:
-            listData = [
-                { type: 'warning', content: 'This is warning event.' },
-                { type: 'success', content: 'This is usual event.' },
-            ];
-            break;
-        case 10:
-            listData = [
-                { type: 'warning', content: 'This is warning event.' },
-                { type: 'success', content: 'This is usual event.' },
-                { type: 'error', content: 'This is error event.' },
-            ];
-            break;
-        case 15:
-            listData = [
-                { type: 'warning', content: 'This is warning event' },
-                {
-                    type: 'success',
-                    content: 'This is very long usual event。。....',
-                },
-                { type: 'error', content: 'This is error event 1.' },
-                { type: 'error', content: 'This is error event 2.' },
-                { type: 'error', content: 'This is error event 3.' },
-                { type: 'error', content: 'This is error event 4.' },
-            ];
-            break;
-        default:
-    }
-    return listData || [];
-};
+function Appointment({
+    data: prefAppointment,
+    authUser,
+}: {
+    data: ResponseData<TAppointment[]>;
+    authUser: TAuthUser;
+}) {
+    const token = authUser.token || '';
+    const {
+        mutate,
+        data: appointmentData,
+        isLoading,
+    } = useRequest({
+        url: AppointmentServicePath.GET_MY_APPOINTMENT,
+        token,
+        initData: prefAppointment,
+    });
 
-const getMonthData = (value: Dayjs) => {
-    if (value.month() === 8) {
-        return 1394;
-    }
-};
+    const [openModal, setOpenModal] = useState(false);
 
-function Appointment() {
-    const [form] = Form.useForm<any>();
-
-    const monthCellRender = (value: Dayjs) => {
-        const num = getMonthData(value);
-        return num ? (
-            <div className="notes-month">
-                <section>{num}</section>
-                <span>Backlog number</span>
-            </div>
-        ) : null;
-    };
+    const formRef = useRef<ProFormInstance>();
 
     const dateCellRender = (value: Dayjs) => {
-        const listData = getListData(value);
         return (
             <ul className="events">
-                {listData.map((item) => (
-                    <li key={item.content}>
-                        <Badge
-                            status={item.type as BadgeProps['status']}
-                            text={item.content}
-                        />
-                    </li>
-                ))}
+                {appointmentData?.data.map((item) => {
+                    const to_date = dayjs(item.dateTime)
+                        .utc()
+                        .format('DD-MM-YYYY');
+                    const to_value = dayjs(value).utc().format('DD-MM-YYYY');
+                    if (to_date === to_value) {
+                        return (
+                            <Popover
+                                key={item.id}
+                                content={
+                                    <Row gutter={[4, 0]}>
+                                        {item.location && (
+                                            <>
+                                                <Col span={2}>
+                                                    <RiMapPin2Line className="icon__appointment text-slate-400" />
+                                                </Col>
+                                                <Col span={22}>
+                                                    <span>{item.location}</span>
+                                                </Col>
+                                            </>
+                                        )}
+
+                                        {item.detail && (
+                                            <>
+                                                <Col span={2}>
+                                                    <RiFileList2Line className="icon__appointment text-slate-400" />
+                                                </Col>
+                                                <Col span={22}>
+                                                    <span>{item.detail}</span>
+                                                </Col>
+                                            </>
+                                        )}
+
+                                        <Col span={2}>
+                                            <RiGroupLine className="icon__appointment text-slate-400" />
+                                        </Col>
+                                        <Col span={22}>
+                                            <span>
+                                                ผู้เข้าร่วม {item.emails.length}{' '}
+                                                คน
+                                            </span>
+                                        </Col>
+                                        {item.emails.map((email) => (
+                                            <Col span={22} push={2} key={email}>
+                                                <span>{email}</span>
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                }
+                                title={
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-xl font-medium">
+                                                {item.title}
+                                            </div>
+                                        </div>
+                                        <div className="font-normal">
+                                            {`${dayjs(item.dateTime)
+                                                .utc()
+                                                .format(
+                                                    'วันdddd, D MMMM - HH:mm น.'
+                                                )}`}
+                                        </div>
+                                    </>
+                                }
+                                trigger="click"
+                                placement="left"
+                            >
+                                <li>
+                                    <Badge
+                                        status="default"
+                                        text={
+                                            <>
+                                                <span>
+                                                    {dayjs(item.dateTime)
+                                                        .utc()
+                                                        .format('HH:mm น.')}
+                                                </span>
+                                                <span className="ml-1 font-medium">
+                                                    {item.title}
+                                                </span>
+                                            </>
+                                        }
+                                    />
+                                </li>
+                            </Popover>
+                        );
+                    }
+                })}
             </ul>
         );
     };
@@ -95,155 +167,278 @@ function Appointment() {
                         <PageHeader
                             title="นัดหมาย"
                             extra={
-                                <ModalForm<any>
-                                    trigger={
-                                        <Button
-                                            type="primary"
-                                            icon={
-                                                <RiMailAddFill className="icon__button mr-2" />
-                                            }
-                                        >
-                                            สร้างนัดหมาย
-                                        </Button>
+                                <Button
+                                    type="primary"
+                                    icon={
+                                        <RiMailAddFill className="icon__button mr-2" />
                                     }
-                                    submitter={false}
-                                    form={form}
-                                    title={
-                                        <Space>
-                                            {/* <RiMailAddFill className="icon" /> */}
-                                            <span className="text-base"></span>
-                                        </Space>
-                                    }
-                                    autoFocusFirstInput
-                                    modalProps={{
-                                        destroyOnClose: true,
-                                        maskClosable: false,
-                                    }}
+                                    onClick={() => setOpenModal(true)}
                                 >
-                                    <StepsForm
-                                        onFinish={async (values) => {
-                                            console.log(values);
-                                        }}
-                                        formProps={{}}
-                                        containerStyle={{
-                                            textAlign: 'center',
-                                        }}
-                                    >
-                                        <StepsForm.StepForm
-                                            name="caseinfo"
-                                            title="นัดหมายคดี"
-                                            stepProps={{
-                                                icon: (
-                                                    <RiFileUserLine className="icon" />
-                                                ),
-                                            }}
-                                            className="text-left"
-                                        >
-                                            <div className="text-center text-base">
-                                                เลือกเคสคดีที่ต้องการนัดหมาย
-                                            </div>
-                                            <ProFormSelect
-                                                options={[
-                                                    {
-                                                        value: 'id_somchai',
-                                                        label: 'นายสมชาย',
-                                                    },
-                                                ]}
-                                                name="case"
-                                                label="เลือกคดี"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            'กรุณาเลือกเคสคดีที่ต้องการนัดหมาย',
-                                                    },
-                                                ]}
-                                                className="text-left"
-                                            />
-
-                                            <ProFormText
-                                                name="location"
-                                                label="สถานที่"
-                                                placeholder="กรุณาป้อนรายละเอียดสถานที่"
-                                            />
-                                            <ProFormTextArea
-                                                allowClear
-                                                name="detail"
-                                                label="รายละเอียด"
-                                                placeholder="กรุณาป้อนรายละเอียดเพิ่มเติม"
-                                            />
-                                        </StepsForm.StepForm>
-                                        <StepsForm.StepForm
-                                            name="email"
-                                            title="ข้อมูลติดต่อ"
-                                            stepProps={{
-                                                icon: (
-                                                    <RiMailLine className="icon" />
-                                                ),
-                                            }}
-                                            className="text-left"
-                                        >
-                                            <div className="text-center text-base">
-                                                กรอกอีเมลที่ต้องการนัดหมาย
-                                            </div>
-                                            <ProFormSelect
-                                                name="email"
-                                                label="อีเมล"
-                                                valueEnum={{
-                                                    'kittipat@gmail.com':
-                                                        'kittipat@gmail.com',
-                                                }}
-                                                fieldProps={{
-                                                    mode: 'tags',
-                                                }}
-                                                placeholder="กรุณากรอกอีเมลที่ต้องการนัดหมาย"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            'กรุณากรอกหรือเลือกอีเมลที่ต้องการนัดหมาย',
-                                                        type: 'array',
-                                                    },
-                                                ]}
-                                            />
-                                        </StepsForm.StepForm>
-                                        <StepsForm.StepForm
-                                            name="datetime"
-                                            title="วันที่และเวลา"
-                                            stepProps={{
-                                                icon: (
-                                                    <RiTodoLine className="icon" />
-                                                ),
-                                            }}
-                                            onFinish={async () => {
-                                                return true;
-                                            }}
-                                        >
-                                            <div className="text-center text-base">
-                                                กรอกวันที่และเวลาที่ต้องการนัดหมาย
-                                            </div>
-                                            <ProFormDateTimePicker
-                                                name="datetime"
-                                                label="วันที่และเวลา"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message:
-                                                            'กรุณากรอกวันที่และเวลาที่ต้องการนัดหมาย',
-                                                    },
-                                                ]}
-                                                placeholder="กรุณากรอกวันที่และเวลาที่ต้องการนัดหมาย"
-                                                width={'xl'}
-                                            />
-                                        </StepsForm.StepForm>
-                                    </StepsForm>
-                                </ModalForm>
+                                    สร้างนัดหมาย
+                                </Button>
                             }
                         />
+                        <Modal
+                            title={
+                                <Space>
+                                    {/* <RiMailAddFill className="icon" /> */}
+                                    <span className="text-base"></span>
+                                </Space>
+                            }
+                            destroyOnClose={true}
+                            maskClosable={false}
+                            open={openModal}
+                            footer={false}
+                            width={'max-content'}
+                            onCancel={() => setOpenModal(false)}
+                        >
+                            <StepsForm
+                                onFinish={async (values) => {
+                                    try {
+                                        logDebug(
+                                            '🚀 ~ onFinish={ ~ payload:',
+                                            values
+                                        );
+
+                                        await fetcher(
+                                            AppointmentServicePath.CREATE_APPOINTMENT,
+                                            'POST',
+                                            {
+                                                headers: {
+                                                    Authorization:
+                                                        'Bearer ' + token,
+                                                },
+                                                data: {
+                                                    ...values,
+                                                    dateTime: dayjs(
+                                                        values.dateTime
+                                                    ),
+                                                },
+                                            }
+                                        );
+                                        message.success('สร้างนัดหมายสำเร็จ');
+                                        await mutate();
+
+                                        setOpenModal(false);
+
+                                        return true;
+                                    } catch (error) {
+                                        message.error('สร้างนัดหมายไม่สำเร็จ');
+                                        return false;
+                                    }
+                                }}
+                                containerStyle={{
+                                    textAlign: 'center',
+                                }}
+                                formRef={formRef}
+                            >
+                                <StepsForm.StepForm
+                                    name="caseinfo"
+                                    title="นัดหมายคดี"
+                                    stepProps={{
+                                        icon: (
+                                            <RiFileUserLine className="icon" />
+                                        ),
+                                    }}
+                                    className="text-left"
+                                >
+                                    <div className="text-center text-base">
+                                        เลือกเคสคดีที่ต้องการนัดหมาย
+                                    </div>
+                                    <ProFormSelect
+                                        name="caseId"
+                                        label="เลือกคดี"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'กรุณาเลือกเคสคดีที่ต้องการนัดหมาย',
+                                            },
+                                        ]}
+                                        className="text-left"
+                                        request={async () => {
+                                            const { data } = await fetcher(
+                                                CaseFolderServicePath.GET_ALL_CASE,
+                                                'GET',
+                                                {
+                                                    headers: {
+                                                        Authorization:
+                                                            'Bearer ' + token,
+                                                    },
+                                                }
+                                            );
+
+                                            return data.map(
+                                                (item: {
+                                                    id: string;
+                                                    name: string;
+                                                }) => ({
+                                                    label: item.name,
+                                                    value: item.id,
+                                                })
+                                            );
+                                        }}
+                                    />
+                                    <ProFormText
+                                        allowClear
+                                        name="title"
+                                        label="ชื่อหัวข้อ"
+                                        required
+                                        placeholder="กรุณาป้อนชื่อหัวข้อ"
+                                    />
+                                    <ProFormText
+                                        name="location"
+                                        label="สถานที่"
+                                        placeholder="กรุณาป้อนรายละเอียดสถานที่"
+                                    />
+                                    <ProFormTextArea
+                                        allowClear
+                                        name="detail"
+                                        label="รายละเอียด"
+                                        placeholder="กรุณาป้อนรายละเอียดเพิ่มเติม"
+                                    />
+                                </StepsForm.StepForm>
+                                <StepsForm.StepForm
+                                    name="email"
+                                    title="ข้อมูลติดต่อ"
+                                    stepProps={{
+                                        icon: <RiMailLine className="icon" />,
+                                    }}
+                                    className="text-left"
+                                >
+                                    <div className="text-center text-base">
+                                        กรอกอีเมลที่ต้องการนัดหมาย
+                                    </div>
+                                    <ProFormSelect
+                                        name="emails"
+                                        label="อีเมล"
+                                        valueEnum={{
+                                            [authUser.email]: authUser.email,
+                                        }}
+                                        fieldProps={{
+                                            mode: 'tags',
+                                        }}
+                                        placeholder="กรุณากรอกอีเมลที่ต้องการนัดหมาย"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'กรุณากรอกหรือเลือกอีเมลที่ต้องการนัดหมาย',
+                                                type: 'array',
+                                            },
+                                        ]}
+                                    />
+                                </StepsForm.StepForm>
+                                <StepsForm.StepForm
+                                    name="datetime"
+                                    title="วันที่และเวลา"
+                                    stepProps={{
+                                        icon: <RiTodoLine className="icon" />,
+                                    }}
+                                    onFinish={async () => {
+                                        return true;
+                                    }}
+                                >
+                                    <div className="text-center text-base">
+                                        กรอกวันที่และเวลาที่ต้องการนัดหมาย
+                                    </div>
+                                    <ProFormDateTimePicker
+                                        name="dateTime"
+                                        label="วันที่และเวลา"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message:
+                                                    'กรุณากรอกวันที่และเวลาที่ต้องการนัดหมาย',
+                                            },
+                                        ]}
+                                        placeholder="กรุณากรอกวันที่และเวลาที่ต้องการนัดหมาย"
+                                        width={'xl'}
+                                    />
+                                </StepsForm.StepForm>
+                            </StepsForm>
+                        </Modal>
                         <Calendar
                             className="rounded-lg "
                             dateCellRender={dateCellRender}
-                            monthCellRender={monthCellRender}
+                            headerRender={({ value, onChange }) => {
+                                const start = 0;
+                                const end = 12;
+                                const monthOptions = [];
+
+                                let current = value.clone();
+                                const months = [];
+                                for (let i = 0; i < 12; i++) {
+                                    current = current.month(i);
+                                    months.push(current);
+                                }
+
+                                for (let i = start; i < end; i++) {
+                                    monthOptions.push(
+                                        <Select.Option
+                                            key={i}
+                                            value={i}
+                                            className="month-item"
+                                        >
+                                            {dayjs(months[i]).format('MMMM')}
+                                        </Select.Option>
+                                    );
+                                }
+
+                                const year = value.year();
+                                const month = value.month();
+                                const options = [];
+                                for (let i = year - 10; i < year + 10; i += 1) {
+                                    options.push(
+                                        <Select.Option
+                                            key={i}
+                                            value={i}
+                                            className="year-item"
+                                        >
+                                            {i}
+                                        </Select.Option>
+                                    );
+                                }
+                                return (
+                                    <div style={{ padding: 8 }}>
+                                        <Row gutter={8} className="justify-end">
+                                            <Col>
+                                                <Select
+                                                    dropdownMatchSelectWidth={
+                                                        false
+                                                    }
+                                                    value={month}
+                                                    onChange={(newMonth) => {
+                                                        const now = value
+                                                            .clone()
+                                                            .month(newMonth);
+                                                        onChange(now);
+                                                    }}
+                                                >
+                                                    {monthOptions}
+                                                </Select>
+                                            </Col>
+                                            <Col>
+                                                <Select
+                                                    dropdownMatchSelectWidth={
+                                                        false
+                                                    }
+                                                    className="my-year-select"
+                                                    value={year}
+                                                    onChange={(newYear) => {
+                                                        const now = value
+                                                            .clone()
+                                                            .year(newYear);
+                                                        onChange(now);
+                                                    }}
+                                                >
+                                                    {options}
+                                                </Select>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                );
+                            }}
                         />
                     </Card>
                 </Col>
@@ -251,5 +446,29 @@ function Appointment() {
         </BaseLayout.Main>
     );
 }
+
+export const getServerSideProps = withAuthUserSSR({
+    whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})(async (ctx: any) => {
+    const authUser: TAuthUser = ctx.AuthUser;
+    const token = authUser.token;
+
+    const data = await fetcher(
+        AppointmentServicePath.GET_MY_APPOINTMENT,
+        'GET',
+        {
+            headers: {
+                Authorization: 'Bearer ' + token,
+            },
+        }
+    );
+
+    return {
+        props: {
+            authUser,
+            data,
+        },
+    };
+});
 
 export default Appointment;

@@ -5,8 +5,10 @@ import thTHIntl from 'antd/es/locale/th_TH';
 import dayjs from 'dayjs';
 import NextNProgress from 'nextjs-progressbar';
 require('dayjs/locale/th');
+import utc from 'dayjs/plugin/utc';
 
 dayjs.locale('th');
+dayjs.extend(utc);
 
 export default function App({ Component, pageProps, router }: AppProps) {
     return (

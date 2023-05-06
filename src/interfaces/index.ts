@@ -202,3 +202,13 @@ export interface TFile {
     updatedAt: Date | string;
     type: TFileTypes;
 }
+
+export interface TAppointment {
+    id: string;
+    emails: string[];
+    title: string;
+    detail: string;
+    location: string;
+    dateTime: Date | string;
+    updatedAt: Date | string;
+}
