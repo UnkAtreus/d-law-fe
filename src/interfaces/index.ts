@@ -58,11 +58,11 @@ export interface TAuthUser {
     email: string;
     firstName: string;
     lastName: string;
-    token: string;
+    token: string | null;
 }
 
 export interface TUserPermissions extends TAuthUser {
-    permission: string
+    permission: string;
 }
 
 export interface TCaseFolder {

@@ -14,10 +14,10 @@ const getUserFromCookies = async ({
     const { keys, secure, signed } = config.cookies;
     let user = {
         token: null,
-        id: null,
-        firstName: null,
-        lastName: null,
-        email: null,
+        id: '',
+        firstName: '',
+        lastName: '',
+        email: '',
     };
 
     if (!signed) {

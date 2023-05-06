@@ -28,10 +28,10 @@ export default async function handler(
             }
             let AuthUser = {
                 token: null,
-                id: null,
-                firstName: null,
-                lastName: null,
-                email: null,
+                id: '',
+                firstName: '',
+                lastName: '',
+                email: '',
             };
 
             const { data } = await request.get('users/me', {

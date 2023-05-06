@@ -75,7 +75,7 @@ import {
     RiUploadLine,
 } from 'react-icons/ri';
 import UserServicePath from '@services/useAuth';
-import PermissionServicePath from '@services/permissionService';
+import PermissionServicePath from '@services/PermissionService';
 import CaseFolderServicePath from '@services/caseFolderService';
 
 function Document({
