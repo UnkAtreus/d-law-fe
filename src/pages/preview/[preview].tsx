@@ -5,6 +5,8 @@ import {
     Button,
     Divider,
     Dropdown,
+    Input,
+    InputRef,
     Layout,
     Menu,
     MenuProps,
@@ -24,6 +26,9 @@ import {
     RiMore2Fill,
     RiInformationLine,
     RiCloseFill,
+    RiGlobalFill,
+    RiLockFill,
+    RiFileUploadFill,
 } from 'react-icons/ri';
 import { GoLaw } from 'react-icons/go';
 import { useRouter } from 'next/router';
@@ -48,6 +53,8 @@ import AuthAction from '@hoc/AuthAction';
 import logDebug from '@utilities/logDebug';
 import Link from 'next/link';
 import BaseModal from '@baseComponents/BaseModal';
+import useCopyToClipboard from '@utilities/useCopyToClipboard';
+import { ModalForm, ProFormSelect } from '@ant-design/pro-components';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -74,11 +81,13 @@ function Preview({
     type: fileType,
     authUser,
     data,
+    hostname,
 }: {
     path: string;
     type: FileTypes;
     data: ResponseData<TFile>;
     authUser: TAuthUser;
+    hostname: string;
 }) {
     logDebug('🚀 ~ FILE_TYPE', fileType);
 
@@ -96,6 +105,8 @@ function Preview({
     const [isMoreInfo, setIsMoreInfo] = useState<boolean>(true);
 
     const containerRef = useRef<any>();
+    const inputRef = useRef<InputRef>(null);
+    const [_, copy] = useCopyToClipboard();
 
     const {
         token: { colorBgContainer },
@@ -312,14 +323,195 @@ function Preview({
                                     ดาวน์โหลด
                                 </Button>
                             </Link>
-                            <Button
-                                type="primary"
-                                icon={
-                                    <RiShareForward2Fill className="icon__button mr-2" />
+                            <ModalForm<{
+                                status: 'share' | 'public' | 'publicShare';
+                            }>
+                                initialValues={{
+                                    status: 'share',
+                                }}
+                                trigger={
+                                    <Button
+                                        type="primary"
+                                        icon={
+                                            <RiShareForward2Fill className="icon__button mr-2" />
+                                        }
+                                    >
+                                        เผยแพร่
+                                    </Button>
                                 }
+                                title={
+                                    <Space>
+                                        <RiShareForward2Fill className="icon" />
+                                        <span>เผยแพร่</span>
+                                    </Space>
+                                }
+                                autoFocusFirstInput
+                                modalProps={{
+                                    destroyOnClose: true,
+                                    okText: 'เสร็จสิ้น',
+                                }}
+                                onFinish={async (values) => {
+                                    console.log(values);
+                                    const { status } = values;
+                                    if (status === 'share') {
+                                        try {
+                                            await fetcher(
+                                                FileServicePath.FILE +
+                                                    fileData?.data.id +
+                                                    FileServicePath.UNSHARE_FILE_S,
+                                                'PATCH',
+                                                {
+                                                    headers: {
+                                                        Authorization:
+                                                            'Bearer ' + token,
+                                                    },
+                                                }
+                                            );
+                                            message.success(
+                                                'เผยแพร่ลิงค์จำกัดสำเร็จ'
+                                            );
+
+                                            return true;
+                                        } catch (error) {
+                                            message.error(
+                                                'เผยแพร่ลิงค์จำกัดไม่สำเร็จ'
+                                            );
+                                            return false;
+                                        }
+                                    }
+                                    if (status === 'public') {
+                                        try {
+                                            await fetcher(
+                                                FileServicePath.FILE +
+                                                    fileData?.data.id +
+                                                    FileServicePath.SHARE_FILE_S,
+                                                'PATCH',
+                                                {
+                                                    headers: {
+                                                        Authorization:
+                                                            'Bearer ' + token,
+                                                    },
+                                                }
+                                            );
+                                            message.success(
+                                                'เผยแพร่ลิงค์สาธารณะสำเร็จ'
+                                            );
+
+                                            return true;
+                                        } catch (error) {
+                                            message.error(
+                                                'เผยแพร่ลิงค์สาธารณะไม่สำเร็จ'
+                                            );
+                                            return false;
+                                        }
+                                    }
+                                    if (status === 'publicShare') {
+                                        try {
+                                            await fetcher(
+                                                FileServicePath.FILE +
+                                                    fileData?.data.id +
+                                                    FileServicePath.PUBLIC_FILE_S,
+                                                'PATCH',
+                                                {
+                                                    headers: {
+                                                        Authorization:
+                                                            'Bearer ' + token,
+                                                    },
+                                                }
+                                            );
+                                            message.success(
+                                                'เผยแพร่เอกสารสำเร็จ'
+                                            );
+
+                                            return true;
+                                        } catch (error) {
+                                            message.error(
+                                                'เผยแพร่เอกสารไม่สำเร็จ'
+                                            );
+                                            return false;
+                                        }
+                                    }
+                                }}
                             >
-                                เผยแพร่
-                            </Button>
+                                <Input
+                                    value={hostname}
+                                    name="previewUrl"
+                                    suffix={
+                                        <RiFileCopy2Line
+                                            className="icon__button cursor-pointer text-gray-400"
+                                            onClick={() => {
+                                                inputRef.current!.focus({
+                                                    cursor: 'all',
+                                                });
+                                                copy(hostname);
+                                                message.success(
+                                                    'คัดลอกลิงค์สำเร็จ'
+                                                );
+                                            }}
+                                        />
+                                    }
+                                    ref={inputRef}
+                                    onClick={() => {
+                                        inputRef.current!.focus({
+                                            cursor: 'all',
+                                        });
+                                        copy(hostname);
+                                    }}
+                                    allowClear={false}
+                                    readOnly
+                                    className="mb-4"
+                                />
+                                <ProFormSelect
+                                    name="status"
+                                    label={'สิทธิ์การเข้าถึง'}
+                                    fieldProps={{
+                                        className: 'custom-form-select',
+                                    }}
+                                    allowClear={false}
+                                    valueEnum={{
+                                        share: (
+                                            <div className="flex items-center space-x-4 py-1">
+                                                <RiLockFill className="icon text-gray-600" />
+                                                <div className="leading-none">
+                                                    <div className="text-base">
+                                                        จำกัด
+                                                    </div>
+                                                    <div className="text-gray-500">
+                                                        เฉพาะคนที่มีสิทธิ์เข้าถึงเท่านั้นที่เปิดด้วยลิงก์นี้ได้
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ),
+                                        public: (
+                                            <div className="flex items-center space-x-4 py-1">
+                                                <RiGlobalFill className="icon text-gray-600" />
+                                                <div className="leading-none">
+                                                    <div className="text-base">
+                                                        ทุกคนที่มีลิงก์
+                                                    </div>
+                                                    <div className="text-gray-500">
+                                                        ผู้ใช้อินเทอร์เน็ตทุกคนที่มีลิงก์นี้สามารถดูได้
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ),
+
+                                        publicShare: (
+                                            <div className="flex items-center space-x-4 py-1">
+                                                <RiFileUploadFill className="icon text-gray-600" />
+                                                <div className="leading-none">
+                                                    <div className="text-base">
+                                                        เผยแพร่เอกสาร
+                                                    </div>
+                                                    <div className="text-gray-500">
+                                                        ผู้ใช้อินเทอร์เน็ตทุกคนสามารถเห็นลิงค์นี้ได้จากหน้าเผยแพร่เอกสาร
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ),
+                                    }}
+                                />
+                            </ModalForm>
 
                             <Dropdown
                                 menu={{
@@ -423,6 +615,8 @@ export const getServerSideProps = withAuthUserSSR({
     whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
 })(async (ctx: any) => {
     const authUser: TAuthUser = ctx.AuthUser;
+    const hostname = ctx.req.headers.referer || null;
+
     const { params, query } = ctx;
     const { preview } = params;
     const token = authUser.token;
@@ -433,12 +627,19 @@ export const getServerSideProps = withAuthUserSSR({
         },
     });
 
+    if (!data?.data) {
+        return {
+            notFound: true,
+        };
+    }
+
     return {
         props: {
             authUser,
             data,
             path: preview || null,
-            type: data.data.type || null,
+            type: data?.data.type || null,
+            hostname,
         },
     };
 });

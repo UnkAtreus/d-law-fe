@@ -87,6 +87,10 @@
 .ant-collapse-header {
     padding-left: 0 !important;
 }
+
+.custom-form-select > .ant-select-selector {
+    height: 52px !important;
+}
 /* .ant-form-item {
     margin-bottom: 16px;
 } */

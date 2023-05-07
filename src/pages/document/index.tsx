@@ -358,7 +358,7 @@ function CaseFolder({
                                                     values.caseNumber
                                                         .trim()
                                                         .match(
-                                                            '^([ก-ฮ]{1,3}).?([0-9]{1,4})/([0-9]{1,4})$'
+                                                            '^([ก-ฮ]{1,3})\\.?([0-9]{1,4})/([0-9]{1,4})$'
                                                         );
                                                 if (caseNumberSplit) {
                                                     const { data } =
@@ -366,9 +366,12 @@ function CaseFolder({
                                                             '/api/searchcase',
                                                             {
                                                                 data: {
-                                                                    title: caseNumberSplit[1],
-                                                                    id: caseNumberSplit[2],
-                                                                    year: caseNumberSplit[3],
+                                                                    blackTitle:
+                                                                        caseNumberSplit[1],
+                                                                    blackId:
+                                                                        caseNumberSplit[2],
+                                                                    blackYear:
+                                                                        caseNumberSplit[3],
                                                                 },
                                                             }
                                                         );
