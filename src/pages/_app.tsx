@@ -6,9 +6,11 @@ import dayjs from 'dayjs';
 import NextNProgress from 'nextjs-progressbar';
 require('dayjs/locale/th');
 import utc from 'dayjs/plugin/utc';
+import buddhistEra from 'dayjs/plugin/buddhistEra';
 
 dayjs.locale('th');
 dayjs.extend(utc);
+dayjs.extend(buddhistEra);
 
 export default function App({ Component, pageProps, router }: AppProps) {
     return (

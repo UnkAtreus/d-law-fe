@@ -246,3 +246,24 @@ export interface TCasePublic {
         previewUrl: string;
     }[];
 }
+
+export interface TSearchResult {
+    caseTitle: string | null;
+    blackCaseNumber: string | null;
+    blackCaseDate: string | null;
+    RedCaseNumber: string | null;
+    redCaseDate: string | null;
+    judgement: string | null;
+    appointments: TSearchAppointment[];
+
+    closestAppointment: TSearchAppointment | null;
+}
+
+export interface TSearchAppointment {
+    id: string | number;
+    room: string;
+    title: string;
+    detail: string;
+    date: string;
+    time: string;
+}

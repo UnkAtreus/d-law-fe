@@ -3,9 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { executablePath } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import buddhistEra from 'dayjs/plugin/buddhistEra';
 
-dayjs.extend(buddhistEra);
 puppeteer.use(StealthPlugin());
 
 type Data = {
