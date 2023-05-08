@@ -62,11 +62,13 @@ function useRequest<T>({
     payload,
     token,
     initData,
+    params,
 }: {
     url: string | null;
     payload?: any;
     token: string | null;
     initData?: T;
+    params?: Record<string, string>;
 }) {
     const method = payload ? 'POST' : 'GET';
     const defaultOptions = {
@@ -81,6 +83,7 @@ function useRequest<T>({
                 headers: {
                     Authorization: 'Bearer ' + token,
                 },
+                params: params,
                 ...(payload && { data: payload }),
             }),
         { ...defaultOptions, fallbackData: initData }

@@ -6,7 +6,9 @@ const AppointmentServicePath = {
     CREATE_APPOINTMENT: 'appointments',
     DELETE_APPOINTMENT: 'appointments/',
     UPDATE_APPOINTMENT: 'appointments/',
-    APPOINTMENT: 'appointments',
+    APPOINTMENT: 'appointments/',
+    PUBLIC_APPOINTMENT_S: '/publish',
+    UNPUBLIC_APPOINTMENT_S: '/un-publish',
 };
 
 export default AppointmentServicePath;

@@ -8,9 +8,11 @@ import {
     StepsForm,
 } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
+import BaseModal from '@baseComponents/BaseModal';
 import AuthAction from '@hoc/AuthAction';
 import withAuthUserSSR from '@hoc/withAuthUserSSR';
 import { ResponseData, TAppointment, TAuthUser } from '@interfaces/index';
+import { getItem } from '@pages/preview/[preview]';
 import AppointmentServicePath from '@services/AppointmentService';
 import CaseFolderServicePath from '@services/caseFolderService';
 import useRequest, { fetcher } from '@services/useRequest';
@@ -22,6 +24,7 @@ import {
     Calendar,
     Card,
     Col,
+    Dropdown,
     Modal,
     Popover,
     Row,
@@ -33,12 +36,15 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useRef, useState } from 'react';
 import {
+    RiCalendarTodoLine,
+    RiDeleteBinLine,
     RiFileList2Line,
     RiFileUserLine,
     RiGroupLine,
     RiMailAddFill,
     RiMailLine,
     RiMapPin2Line,
+    RiMore2Fill,
     RiTodoLine,
 } from 'react-icons/ri';
 
@@ -77,6 +83,165 @@ function Appointment({
                         return (
                             <Popover
                                 key={item.id}
+                                title={
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <div className="text-xl font-medium">
+                                                {item.title}
+                                            </div>
+                                            <Dropdown
+                                                menu={{
+                                                    onClick: async ({
+                                                        key,
+                                                    }) => {
+                                                        if (
+                                                            key === 'publish' &&
+                                                            !item.isPublished
+                                                        ) {
+                                                            try {
+                                                                await fetcher(
+                                                                    AppointmentServicePath.APPOINTMENT +
+                                                                        item.id +
+                                                                        AppointmentServicePath.PUBLIC_APPOINTMENT_S,
+                                                                    'PATCH',
+                                                                    {
+                                                                        headers:
+                                                                            {
+                                                                                Authorization:
+                                                                                    'Bearer ' +
+                                                                                    token,
+                                                                            },
+                                                                    }
+                                                                );
+                                                                message.success(
+                                                                    'เผยแพร่นัดหมายสำเร็จ'
+                                                                );
+                                                                await mutate();
+
+                                                                return true;
+                                                            } catch (error) {
+                                                                message.error(
+                                                                    'เผยแพร่นัดหมายไม่สำเร็จ'
+                                                                );
+                                                                return false;
+                                                            }
+                                                        }
+                                                        if (
+                                                            key === 'publish' &&
+                                                            item.isPublished
+                                                        ) {
+                                                            try {
+                                                                await fetcher(
+                                                                    AppointmentServicePath.APPOINTMENT +
+                                                                        item.id +
+                                                                        AppointmentServicePath.UNPUBLIC_APPOINTMENT_S,
+                                                                    'PATCH',
+                                                                    {
+                                                                        headers:
+                                                                            {
+                                                                                Authorization:
+                                                                                    'Bearer ' +
+                                                                                    token,
+                                                                            },
+                                                                    }
+                                                                );
+                                                                message.success(
+                                                                    'ยกเลิกเผยแพร่นัดหมายสำเร็จ'
+                                                                );
+                                                                await mutate();
+
+                                                                return true;
+                                                            } catch (error) {
+                                                                message.error(
+                                                                    'ยกเลิกเผยแพร่นัดหมายไม่สำเร็จ'
+                                                                );
+                                                                return false;
+                                                            }
+                                                        }
+                                                        if (key === 'delete') {
+                                                            BaseModal.delete({
+                                                                title: `ลบนัดหมาย ${item.title}`,
+                                                                content: `คุณต้องการที่จะลบ ${item.title} ใช่หรือไม่`,
+                                                                onFinish:
+                                                                    async () => {
+                                                                        try {
+                                                                            await fetcher(
+                                                                                AppointmentServicePath.DELETE_APPOINTMENT +
+                                                                                    item.id,
+                                                                                'DELETE',
+                                                                                {
+                                                                                    headers:
+                                                                                        {
+                                                                                            Authorization:
+                                                                                                'Bearer ' +
+                                                                                                token,
+                                                                                        },
+                                                                                }
+                                                                            );
+                                                                            message.success(
+                                                                                `ลบ ${item.title}สำเร็จ`
+                                                                            );
+                                                                            await mutate();
+
+                                                                            return true;
+                                                                        } catch (error) {
+                                                                            message.error(
+                                                                                `ลบ ${item.title} ไม่สำเร็จ`
+                                                                            );
+                                                                            return false;
+                                                                        }
+                                                                    },
+                                                            });
+                                                        }
+                                                    },
+                                                    items: [
+                                                        getItem(
+                                                            <div className="flex space-x-2">
+                                                                <RiCalendarTodoLine className="icon text-gray-500" />
+                                                                <span className="self-center">
+                                                                    {item.isPublished
+                                                                        ? 'ยกเลิกเผยแพร่นัดหมาย'
+                                                                        : 'เผยแพร่นัดหมาย'}
+                                                                </span>
+                                                            </div>,
+                                                            'publish'
+                                                        ),
+                                                        { type: 'divider' },
+                                                        getItem(
+                                                            <div className="flex">
+                                                                <span className="self-center">
+                                                                    ลบนัดหมาย
+                                                                </span>
+                                                            </div>,
+                                                            'delete',
+                                                            <RiDeleteBinLine className="icon__button " />,
+                                                            undefined,
+                                                            undefined,
+                                                            true
+                                                        ),
+                                                    ],
+                                                }}
+                                                trigger={['click']}
+                                            >
+                                                <Button
+                                                    type="text"
+                                                    size="small"
+                                                    shape="circle"
+                                                    icon={
+                                                        <RiMore2Fill className="icon_button m-auto text-gray-500" />
+                                                    }
+                                                />
+                                            </Dropdown>
+                                        </div>
+                                        <div className="font-normal">
+                                            {`${dayjs(item.dateTime)
+                                                .utc()
+                                                .format(
+                                                    'วันdddd, D MMMM - HH:mm น.'
+                                                )}`}
+                                        </div>
+                                    </>
+                                }
                                 content={
                                     <Row gutter={[4, 0]}>
                                         {item.location && (
@@ -116,22 +281,6 @@ function Appointment({
                                             </Col>
                                         ))}
                                     </Row>
-                                }
-                                title={
-                                    <>
-                                        <div className="flex items-center justify-between">
-                                            <div className="text-xl font-medium">
-                                                {item.title}
-                                            </div>
-                                        </div>
-                                        <div className="font-normal">
-                                            {`${dayjs(item.dateTime)
-                                                .utc()
-                                                .format(
-                                                    'วันdddd, D MMMM - HH:mm น.'
-                                                )}`}
-                                        </div>
-                                    </>
                                 }
                                 trigger="click"
                                 placement="left"

@@ -14,6 +14,7 @@ import { TFileTypes } from '@utilities/index';
 
 export interface ResponseData<T> {
     data: T;
+    pagination?: TPagination;
 }
 
 export interface TCreateFolder {
@@ -212,4 +213,21 @@ export interface TAppointment {
     location: string;
     dateTime: Date | string;
     updatedAt: Date | string;
+    isPublished: boolean;
+}
+
+export interface TSearch {
+    id: string;
+    name: string;
+    url: string;
+    previewUrl: string;
+    createdAt: Date | string;
+    updatedAt: Date | string;
+    tags: TTags[];
+}
+
+export interface TPagination {
+    total: number;
+    page: number;
+    limit: number;
 }
