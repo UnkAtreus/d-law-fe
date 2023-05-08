@@ -12,11 +12,9 @@ import BaseTag from '@baseComponents/BaseTag';
 import AuthAction from '@hoc/AuthAction';
 import withAuthUserSSR from '@hoc/withAuthUserSSR';
 import {
-    TCreateFolder,
     TCreateSubFolder,
     TChangeDocumentName,
     TAuthUser,
-    TMyCaseFolder,
     TDocument,
     ResponseData,
     TRootFolder,
@@ -96,27 +94,24 @@ function Document({
 }: {
     path: string;
     authUser: TAuthUser;
-    prefFolder: ResponseData<TMyCaseFolder>;
+    prefFolder: ResponseData<any>;
     prefRootFolder: ResponseData<TRootFolder[]>;
     prefMenu: ResponseData<TMenuFolder[]>;
 }) {
     const { token } = authUser;
     const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
-    const [queryParams, setQueryParams] = useState<string | null>(null);
+    const [queryParams, setQueryParams] = useState<
+        { tagId: string } | undefined
+    >(undefined);
     const {
         data: folderData,
         mutate,
         isLoading,
     } = useRequest({
-        url: queryParams
-            ? FolderServicePath.GET_BY_ID +
-              path +
-              '/tag/' +
-              queryParams +
-              '/files'
-            : FolderServicePath.GET_BY_ID + path,
+        url: FolderServicePath.GET_BY_ID + path,
         token,
         initData: prefFolder,
+        params: queryParams,
     });
     const { data: breadcrumbData } = useRequest({
         url:
@@ -152,7 +147,7 @@ function Document({
     const dataFileList = [...subFolders, ...files];
 
     const [isUpload, setIsUpload] = useState(false);
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
     const [openMoreInfo, setOpenMoreInfo] = useState<boolean>(false);
     const [hasFiles, setHasFiles] = useState<boolean>(false);
 
@@ -162,7 +157,6 @@ function Document({
     const router = useRouter();
     const [_, copy] = useCopyToClipboard();
     const [subfolder_form] = Form.useForm<TCreateSubFolder>();
-    const [share_form] = Form.useForm<TCreateFolder>();
 
     const { Render, handleUpload } = useUpload();
     const { getRootProps, isDragActive } = useDropzone({
@@ -566,7 +560,11 @@ function Document({
                             items={menuFolderData?.data || []}
                             onChange={(key, tag) => {
                                 console.log(key, tag);
-                                setQueryParams(tag.id);
+                                if (tag.id) {
+                                    setQueryParams({ tagId: tag.id });
+                                } else {
+                                    setQueryParams(undefined);
+                                }
                             }}
                         />
                     </div>
