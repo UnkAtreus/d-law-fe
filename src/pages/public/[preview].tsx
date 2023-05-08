@@ -118,7 +118,12 @@ function Preview({
         return <Image image={fileData?.data.previewUrl || ''} />;
     });
     const RenderNotFound = memo(function RenderNotFound() {
-        return <FileNotFound download={fileData?.data.url || ''} />;
+        return (
+            <FileNotFound
+                download={fileData?.data.url || ''}
+                name={fileData?.data.name || ''}
+            />
+        );
     });
 
     const RenderFile = memo(function RenderFile() {

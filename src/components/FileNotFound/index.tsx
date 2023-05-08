@@ -3,7 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 import { RiDownloadFill } from 'react-icons/ri';
 
-function FileNotFound({ download }: { download: string }) {
+function FileNotFound({ download, name }: { download: string; name: string }) {
     return (
         <div className=" flex h-full w-full max-w-screen-sm items-center justify-center">
             <div className="flex w-full flex-col items-center rounded-lg bg-white p-6 shadow-lg">
@@ -13,7 +13,7 @@ function FileNotFound({ download }: { download: string }) {
                         <div className="space-y-4">
                             <div className="space-y-1">
                                 <div className="text-base text-gray-600">
-                                    FileName
+                                    {name}
                                 </div>
                                 <div className="text-gray-500">
                                     ไม่มีตัวอย่างที่จะสามารถแสดงไฟล์นี้ได้

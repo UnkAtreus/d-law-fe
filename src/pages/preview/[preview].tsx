@@ -139,7 +139,10 @@ function Preview({
         ),
         getItem(
             <Tooltip placement="right" title={'Appointment'} color={'#4a4a4a'}>
-                <div className="flex flex-col items-center justify-center py-4">
+                <div
+                    onClick={() => router.push('/appointment')}
+                    className="flex flex-col items-center justify-center py-4"
+                >
                     <RiCalendarTodoLine className="menu-icon text-gray-500" />
                 </div>
             </Tooltip>,
@@ -147,7 +150,10 @@ function Preview({
         ),
         getItem(
             <Tooltip placement="right" title={'Setting'} color={'#4a4a4a'}>
-                <div className="flex flex-col items-center justify-center py-4">
+                <div
+                    onClick={() => router.push('/setting')}
+                    className="flex flex-col items-center justify-center py-4"
+                >
                     <RiSettings5Line className="menu-icon text-gray-500" />
                 </div>
             </Tooltip>,
@@ -222,7 +228,12 @@ function Preview({
         return <Image image={fileData?.data.previewUrl || ''} />;
     });
     const RenderNotFound = memo(function RenderNotFound() {
-        return <FileNotFound download={fileData?.data.url || ''} />;
+        return (
+            <FileNotFound
+                download={fileData?.data.url || ''}
+                name={fileData?.data.name || ''}
+            />
+        );
     });
 
     const RenderFile = memo(function RenderFile() {

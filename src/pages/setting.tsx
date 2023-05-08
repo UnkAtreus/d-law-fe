@@ -151,6 +151,7 @@ function Setting({
                     <ProTable
                         dataSource={allUserData?.data}
                         search={false}
+                        rowKey="id"
                         toolbar={{
                             title: 'ผู้ใช้งานทั้งหมด',
                             actions: [

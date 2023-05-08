@@ -1,8 +1,7 @@
 import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
-import { ITag } from '@baseComponents/BaseTag';
 
-import { Col, Row, Typography } from 'antd';
+import { Col, Empty, Row, Typography } from 'antd';
 
 import { FileTypeIcons, getAvatarName, showFileIcon } from '@utilities/index';
 import {
@@ -43,19 +42,7 @@ const Workspace = ({
         initData: recentData,
     });
 
-    const {
-        ExcelIcon,
-        FolderIcon,
-        IdCardIcon,
-        ImageIcon,
-        MoreIcon,
-        PdfIcon,
-        TextIcon,
-        VideoIcon,
-        WordIcon,
-        MusicIcon,
-        ZipIcon,
-    } = FileTypeIcons;
+    const { FolderIcon } = FileTypeIcons;
 
     const columns: ProColumns<TFile>[] = [
         {
@@ -116,72 +103,6 @@ const Workspace = ({
         },
     ];
 
-    const Tags: ITag[] = [
-        {
-            key: 'tag_1',
-            name: 'เอกสารทั้งหมด',
-            icon: <TextIcon className="icon" />,
-            value: '22',
-        },
-        {
-            key: 'tag_2',
-            name: 'สำเนาบัตรประจำตัวประชาชน',
-            icon: <IdCardIcon className="icon" />,
-            value: '2',
-            onClick: () => {
-                console.log(`test`);
-            },
-        },
-        {
-            key: 'tag_3',
-            name: 'เอกสาร Excel',
-            icon: <ExcelIcon className="icon" />,
-            value: '5',
-        },
-        {
-            key: 'tag_4',
-            name: 'เอกสาร PDF',
-            icon: <PdfIcon className="icon" />,
-            value: '10',
-        },
-        {
-            key: 'tag_5',
-            name: 'เอกสาร Word',
-            icon: <WordIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_6',
-            name: 'รูปภาพ',
-            icon: <ImageIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_7',
-            name: 'วิดีโอ',
-            icon: <VideoIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_8',
-            name: 'เสียง',
-            icon: <MusicIcon className="icon" />,
-            value: '1',
-        },
-        {
-            key: 'tag_9',
-            name: 'บีบอัด',
-            icon: <ZipIcon className="icon" />,
-            value: '2',
-        },
-        {
-            key: 'tag_10',
-            name: 'เอกสารอื่นๆ',
-            icon: <MoreIcon className="icon" />,
-            value: '2',
-        },
-    ];
-
     // if (isLoading) {
     //     return <BaseLoading />;
     // }
@@ -202,6 +123,7 @@ const Workspace = ({
                         >
                             <Row gutter={[8, 8]}>
                                 {feqFolderData?.data &&
+                                feqFolderData.data.length > 0 ? (
                                     feqFolderData.data.map((folder) => (
                                         <Col span={4} key={folder.id}>
                                             <div
@@ -218,7 +140,23 @@ const Workspace = ({
                                                 </span>
                                             </div>
                                         </Col>
-                                    ))}
+                                    ))
+                                ) : (
+                                    <Col span={24}>
+                                        <Empty
+                                            image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                            description={
+                                                <div className="space-y-4">
+                                                    <div className="space-y-1">
+                                                        <div className="text-base text-gray-600">
+                                                            ยังไม่มีโฟลเดอร์ที่เปิดล่าสุด
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        />
+                                    </Col>
+                                )}
                             </Row>
                         </ProCard>
                         <ProCard
@@ -240,6 +178,11 @@ const Workspace = ({
                                             );
                                         },
                                     };
+                                }}
+                                cardProps={{
+                                    bodyStyle: {
+                                        padding: 0,
+                                    },
                                 }}
                                 cardBordered
                                 rowKey="id"
