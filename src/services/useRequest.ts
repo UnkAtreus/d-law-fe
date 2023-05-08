@@ -1,4 +1,3 @@
-import logDebug from '@utilities/logDebug';
 import useSwr from 'swr';
 import { RequestOptionsInit, extend } from 'umi-request';
 import progressMiddleware from 'umi-request-progress';
@@ -38,7 +37,6 @@ export function fetcher(
     method: Method,
     options?: RequestOptionsInit | undefined
 ) {
-    logDebug(path, method, options);
     try {
         switch (method.toUpperCase()) {
             case 'GET':

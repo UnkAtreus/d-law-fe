@@ -10,7 +10,7 @@ import {
     theme,
     Typography,
 } from 'antd';
-import React from 'react';
+import React, { useRef } from 'react';
 import Logo from '@assets/dlaw_logo.svg';
 import {
     RiComputerLine,
@@ -57,6 +57,13 @@ const BaseLayout = {
         const {
             token: { colorBgContainer },
         } = theme.useToken();
+
+        const workspace = useRef(null);
+        const document = useRef(null);
+        const appointment = useRef(null);
+        const setting = useRef(null);
+        const title = useRef(null);
+        const profile = useRef(null);
 
         const router = useRouter();
 
@@ -246,6 +253,13 @@ const BaseLayout = {
                                     >
                                         <Typography.Text className="hover-text">
                                             นัดหมาย
+                                        </Typography.Text>
+                                    </Link>
+                                    <Link
+                                        href={`https://www.dlaw-dms.com/public-document`}
+                                    >
+                                        <Typography.Text className="hover-text">
+                                            เอกสารที่เผยแพร่
                                         </Typography.Text>
                                     </Link>
                                     <Divider type="vertical" className="m-0" />

@@ -1,5 +1,6 @@
 const CaseFolderServicePath = {
     GET_ALL_CASE: 'cases/me',
+    GET_ALL_PUBLIC_CASE: 'cases/public',
     FREQ_USED: 'cases/freq',
     GET_BY_ID: 'cases/',
     CREATE_CASE: 'cases',

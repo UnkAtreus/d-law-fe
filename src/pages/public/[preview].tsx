@@ -207,7 +207,7 @@ function Preview({
                             <Link href={fileData?.data.url || ''}>
                                 <Button
                                     icon={
-                                        <RiDownloadFill className="icon__button mr-2" />
+                                        <RiDownloadFill className="icon__button mr-2 text-gray-500" />
                                     }
                                 >
                                     ดาวน์โหลด
@@ -310,11 +310,10 @@ export const getServerSideProps = async (ctx: any) => {
     const { params } = ctx;
     const { preview } = params;
 
-    const data = await fetcher(FileServicePath.GET_BY_ID + preview, 'GET', {
-        headers: {
-            Authorization: 'Bearer ' + '',
-        },
-    });
+    const data = await fetcher(
+        FileServicePath.GET_PUBLIC_BY_ID + preview,
+        'GET'
+    );
 
     return {
         props: {

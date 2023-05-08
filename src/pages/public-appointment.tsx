@@ -1,27 +1,19 @@
-import {
-    ProCard,
-    ProColumns,
-    ProForm,
-    ProFormText,
-    ProTable,
-} from '@ant-design/pro-components';
+import { ProCard, ProColumns, ProTable } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
-import { Button, Form, Space, Typography } from 'antd';
+import { ResponseData, TAppointment } from '@interfaces/index';
+import AppointmentServicePath from '@services/AppointmentService';
+import { fetcher } from '@services/useRequest';
+import { Form, Typography } from 'antd';
 import dayjs from 'dayjs';
 import React from 'react';
-import { RiSearch2Line } from 'react-icons/ri';
 
-function PublicAppointment() {
+function PublicAppointment({
+    prefAppointment,
+}: {
+    prefAppointment: ResponseData<TAppointment[]>;
+}) {
     const [form] = Form.useForm();
     const columns: ProColumns<any>[] = [
-        {
-            title: 'หมายเลขคดีดำ',
-            dataIndex: 'blackCaseNumber',
-        },
-        {
-            title: 'หมายเลขคดีแดง',
-            dataIndex: 'redCaseNumber',
-        },
         {
             title: 'ชื่อหัวข้อ',
             dataIndex: 'title',
@@ -32,11 +24,20 @@ function PublicAppointment() {
             dataIndex: 'detail',
         },
         {
-            title: 'วันเวลานัดหมายที่กำลังถึง',
+            title: 'วันนัดหมายที่กำลังถึง',
             dataIndex: 'dateTime',
             render: (text: any) => (
                 <div className="text-gray-400">
-                    {dayjs(text).format('DD MMM YYYY - HH:MM')}
+                    {dayjs(text).format('DD MMM YYYY')}
+                </div>
+            ),
+        },
+        {
+            title: 'เวลา',
+            dataIndex: 'dateTime',
+            render: (text: any) => (
+                <div className="text-gray-400">
+                    {dayjs(text).format('HH:MM น.')}
                 </div>
             ),
         },
@@ -52,49 +53,18 @@ function PublicAppointment() {
                     bordered
                     title={
                         <Typography.Title level={4} className="inline">
-                            ค้นหาคดี
+                            นัดหมายคดี
                         </Typography.Title>
                     }
                 >
                     <ProTable
                         columns={columns}
-                        dataSource={[]}
+                        dataSource={prefAppointment?.data}
                         loading={false}
                         cardProps={{
                             bodyStyle: {
                                 padding: 0,
                             },
-                        }}
-                        tableExtraRender={(_, data) => {
-                            return (
-                                <ProForm
-                                    onFinish={async (values) => {
-                                        console.log(values);
-                                    }}
-                                    submitter={false}
-                                    form={form}
-                                >
-                                    <Space className="items-end">
-                                        <ProFormText
-                                            label="หมายเลขคดีดำ"
-                                            name="blackCaseNumber"
-                                        />
-                                        <ProFormText
-                                            label="หมายเลขคดีแดง"
-                                            name="blackCaseNumber"
-                                        />
-                                        <Button
-                                            type="primary"
-                                            icon={
-                                                <RiSearch2Line className="icon__button mr-1" />
-                                            }
-                                            className="mb-6"
-                                        >
-                                            ค้นหา
-                                        </Button>
-                                    </Space>
-                                </ProForm>
-                            );
                         }}
                         rowKey="id"
                         options={{
@@ -111,5 +81,19 @@ function PublicAppointment() {
         </BaseLayout.Landing>
     );
 }
+
+export const getServerSideProps = async (ctx: any) => {
+    const prefAppointment = await fetcher(
+        AppointmentServicePath.GET_PUBLIC_APPOINTMENT,
+        'GET'
+    );
+    console.log('🚀 ~ getServerSideProps ~ prefAppointment:', prefAppointment);
+
+    return {
+        props: {
+            prefAppointment,
+        },
+    };
+};
 
 export default PublicAppointment;

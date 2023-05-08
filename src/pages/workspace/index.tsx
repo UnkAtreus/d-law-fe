@@ -1,7 +1,7 @@
 import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 
-import { Col, Empty, Row, Typography } from 'antd';
+import { Col, Empty, Row, Tag, Typography } from 'antd';
 
 import { FileTypeIcons, getAvatarName, showFileIcon } from '@utilities/index';
 import {
@@ -59,17 +59,15 @@ const Workspace = ({
             dataIndex: 'name',
             ellipsis: true,
         },
-        // {
-        //     title: 'ชนิดไฟล์',
-        //     dataIndex: 'tags',
-        //     render: (_, record) => (
-        //         <div className="flex flex-wrap">
-        //             {record.tags.map((tag) => (
-        //                 <Tag key={tag.id}>{tag.name}</Tag>
-        //             ))}
-        //         </div>
-        //     ),
-        // },
+        {
+            title: 'ชนิดไฟล์',
+            dataIndex: 'type',
+            render: (text, record) => (
+                <div className="flex flex-wrap">
+                    <Tag>{text}</Tag>
+                </div>
+            ),
+        },
         {
             title: 'วันที่สร้าง/เจ้าของ',
             dataIndex: 'createdAt',

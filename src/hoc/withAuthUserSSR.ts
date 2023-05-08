@@ -54,7 +54,6 @@ const withAuthUserSSR =
                 }
             }
         }
-        logDebug('🚀 ~ returnData:', returnData);
         return returnData;
     };
 

@@ -23,10 +23,12 @@ import {
     Row,
     Space,
     Tooltip,
+    Tour,
+    TourProps,
     Typography,
     message,
 } from 'antd';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import {
     RiDeleteBinLine,
@@ -83,9 +85,54 @@ function CaseFolder({
     const selectedRecordRef = useRef<TCaseFolder>(data.data[0]);
     const searchRef = useRef<InputRef>(null);
 
+    const [tour, setTour] = useState<boolean>(
+        casesFolderData?.data.length === 0
+    );
+    const createCaseTour = useRef(null);
+    const searchTour = useRef(null);
+
     const router = useRouter();
     const [_, copy] = useCopyToClipboard();
     const [form] = Form.useForm<TCreateFolder>();
+
+    const steps: TourProps['steps'] = [
+        {
+            title: 'ยินดีต้อนรับเข้าสู่หน้าเคสโฟลเดอร์',
+            description:
+                'หน้านี้จะเป็นหน้าที่จะแสดงเคสโฟลเดอร์ทั้งหมด โดยจะสามารถสร้าง แก้ไข ลบเคสโฟลเดอร์ที่เป็นเจ้าของอยู่ได้ ',
+            target: null,
+            nextButtonProps: {
+                children: 'ถัดไป',
+            },
+            prevButtonProps: {
+                children: 'ย้อนกลับ',
+            },
+        },
+        {
+            title: 'สร้างเคสใหม่',
+            description:
+                'คุณสามารถสร้างเคสโฟลเดอร์ใหม่ โดยการกรอกชื่อและหมายเลขคดี',
+            target: () => createCaseTour.current,
+            nextButtonProps: {
+                children: 'ถัดไป',
+            },
+            prevButtonProps: {
+                children: 'ย้อนกลับ',
+            },
+        },
+        {
+            title: 'ค้นหาเอกสาร',
+            description:
+                'สามารถกรอกชื่อไฟล์ หรือชนิดของไฟล์ที่ต้องการค้นหาได้ โดยหลังจากกรอกเสร็จแล้ว ให้กดปุ่มแว่นขยายเพื่อทำการ ค้นหาไฟล์ตามที่กรอกไว้',
+            target: () => searchTour.current,
+            nextButtonProps: {
+                children: 'เข้าใจแล้ว',
+            },
+            prevButtonProps: {
+                children: 'ย้อนกลับ',
+            },
+        },
+    ];
 
     const info_items: MenuProps['items'] = [
         getItem(
@@ -337,6 +384,7 @@ function CaseFolder({
                                             <Button
                                                 type="primary"
                                                 size="large"
+                                                ref={createCaseTour}
                                                 icon={
                                                     <RiFolderAddFill className="icon mr-2" />
                                                 }
@@ -499,140 +547,145 @@ function CaseFolder({
                                         </Collapse>
                                     </ModalForm>
 
-                                    <Input
-                                        size="large"
-                                        placeholder="ค้นหาเอกสาร"
-                                        ref={searchRef}
-                                        onChange={() => {}}
-                                        prefix={
-                                            <RiSearchLine
-                                                onClick={() => {
-                                                    const value =
-                                                        searchRef.current?.input
-                                                            ?.value;
-                                                    logDebug(value);
-                                                    router.push(
-                                                        `/search/${value}`
-                                                    );
-                                                }}
-                                                className="mr-2 h-5 w-5 cursor-pointer text-gray-500"
-                                            />
-                                        }
-                                        suffix={
-                                            <Popover
-                                                placement="bottomRight"
-                                                title={
-                                                    <Space>
-                                                        <RiFilter2Fill className="icon" />
-                                                        <span>
-                                                            ค้นหาแบบละเอียด
-                                                        </span>
-                                                    </Space>
-                                                }
-                                                content={
-                                                    <ProForm<{
-                                                        tags: string;
-                                                        type: string;
-                                                    }>
-                                                        onFinish={async (
-                                                            values
-                                                        ) => {
-                                                            logDebug(values);
-                                                            const value =
-                                                                searchRef
-                                                                    .current
-                                                                    ?.input
-                                                                    ?.value;
+                                    <div ref={searchTour}>
+                                        <Input
+                                            size="large"
+                                            placeholder="ค้นหาเอกสาร"
+                                            ref={searchRef}
+                                            onChange={() => {}}
+                                            prefix={
+                                                <RiSearchLine
+                                                    onClick={() => {
+                                                        const value =
+                                                            searchRef.current
+                                                                ?.input?.value;
 
-                                                            const urlParam =
-                                                                new URLSearchParams(
-                                                                    values
-                                                                ).toString();
+                                                        router.push(
+                                                            `/search/${value}`
+                                                        );
+                                                    }}
+                                                    className="mr-2 h-5 w-5 cursor-pointer text-gray-500"
+                                                />
+                                            }
+                                            suffix={
+                                                <Popover
+                                                    placement="bottomRight"
+                                                    title={
+                                                        <Space>
+                                                            <RiFilter2Fill className="icon" />
+                                                            <span>
+                                                                ค้นหาแบบละเอียด
+                                                            </span>
+                                                        </Space>
+                                                    }
+                                                    content={
+                                                        <ProForm<{
+                                                            tags: string;
+                                                            type: string;
+                                                        }>
+                                                            onFinish={async (
+                                                                values
+                                                            ) => {
+                                                                const value =
+                                                                    searchRef
+                                                                        .current
+                                                                        ?.input
+                                                                        ?.value;
 
-                                                            router.push(
-                                                                `/search/${value}?${urlParam}`
-                                                            );
-                                                        }}
-                                                        submitter={{
-                                                            searchConfig: {
-                                                                submitText:
-                                                                    'ค้นหา',
-                                                            },
-                                                        }}
-                                                    >
-                                                        <ProFormSelect
-                                                            name="tags"
-                                                            label="หมวดหมู่ไฟล์"
-                                                            width={'sm'}
-                                                            request={async () => {
-                                                                const { data } =
-                                                                    await fetcher(
-                                                                        'file_types',
-                                                                        'GET',
-                                                                        {
-                                                                            headers:
-                                                                                {
-                                                                                    Authorization:
-                                                                                        'Bearer ' +
-                                                                                        token,
-                                                                                },
-                                                                        }
-                                                                    );
+                                                                const urlParam =
+                                                                    new URLSearchParams(
+                                                                        values
+                                                                    ).toString();
 
-                                                                return data.map(
-                                                                    (item: {
-                                                                        name: string;
-                                                                        id: string;
-                                                                    }) => {
-                                                                        return {
-                                                                            label: item.name,
-                                                                            value: item.name,
-                                                                        };
-                                                                    }
+                                                                router.push(
+                                                                    `/search/${value}?${urlParam}`
                                                                 );
                                                             }}
-                                                        />
-                                                        <ProFormSelect
-                                                            name="type"
-                                                            label="ชนิดไฟล์"
-                                                            width={'sm'}
-                                                            request={async () => {
-                                                                const { data } =
-                                                                    await fetcher(
-                                                                        'tags/menu',
-                                                                        'GET',
-                                                                        {
-                                                                            headers:
-                                                                                {
-                                                                                    Authorization:
-                                                                                        'Bearer ' +
-                                                                                        token,
-                                                                                },
+                                                            submitter={{
+                                                                searchConfig: {
+                                                                    submitText:
+                                                                        'ค้นหา',
+                                                                },
+                                                            }}
+                                                        >
+                                                            <ProFormSelect
+                                                                name="tags"
+                                                                label="หมวดหมู่ไฟล์"
+                                                                width={'sm'}
+                                                                request={async () => {
+                                                                    const {
+                                                                        data,
+                                                                    } =
+                                                                        await fetcher(
+                                                                            'file_types',
+                                                                            'GET',
+                                                                            {
+                                                                                headers:
+                                                                                    {
+                                                                                        Authorization:
+                                                                                            'Bearer ' +
+                                                                                            token,
+                                                                                    },
+                                                                            }
+                                                                        );
+
+                                                                    return data.map(
+                                                                        (item: {
+                                                                            name: string;
+                                                                            id: string;
+                                                                        }) => {
+                                                                            return {
+                                                                                label: item.name,
+                                                                                value: item.name,
+                                                                            };
                                                                         }
                                                                     );
+                                                                }}
+                                                            />
+                                                            <ProFormSelect
+                                                                name="type"
+                                                                label="ชนิดไฟล์"
+                                                                width={'sm'}
+                                                                request={async () => {
+                                                                    const {
+                                                                        data,
+                                                                    } =
+                                                                        await fetcher(
+                                                                            'tags/menu',
+                                                                            'GET',
+                                                                            {
+                                                                                headers:
+                                                                                    {
+                                                                                        Authorization:
+                                                                                            'Bearer ' +
+                                                                                            token,
+                                                                                    },
+                                                                            }
+                                                                        );
 
-                                                                return data.map(
-                                                                    (item: {
-                                                                        name: string;
-                                                                        id: string;
-                                                                    }) => {
-                                                                        return {
-                                                                            label: item.name,
-                                                                            value: item.name,
-                                                                        };
-                                                                    }
-                                                                );
-                                                            }}
-                                                        />
-                                                    </ProForm>
-                                                }
-                                                trigger={['click']}
-                                            >
-                                                <RiEqualizerLine className="icon__button cursor-pointer text-gray-500" />
-                                            </Popover>
-                                        }
-                                        className="w-96"
-                                    />
+                                                                    return data.map(
+                                                                        (item: {
+                                                                            name: string;
+                                                                            id: string;
+                                                                        }) => {
+                                                                            return {
+                                                                                label: item.name,
+                                                                                value: item.name,
+                                                                            };
+                                                                        }
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </ProForm>
+                                                    }
+                                                    trigger={['click']}
+                                                >
+                                                    <RiEqualizerLine className="icon__button cursor-pointer text-gray-500" />
+                                                </Popover>
+                                            }
+                                            className="w-96"
+                                        />
+                                    </div>
                                 </Space>
                             ),
                         }}
@@ -646,7 +699,6 @@ function CaseFolder({
                         onRow={(record) => {
                             return {
                                 onDoubleClick: () => {
-                                    logDebug(record.folderId);
                                     router.push(`/document/${record.folderId}`);
                                 },
                                 onContextMenu: () => {
@@ -684,6 +736,14 @@ function CaseFolder({
                     />
                 </Col>
             </Row>
+
+            <Tour
+                open={tour}
+                steps={steps}
+                onClose={() => {
+                    setTour(false);
+                }}
+            />
         </BaseLayout.Main>
     );
 }

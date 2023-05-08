@@ -24,7 +24,7 @@ function FileNotFound({ download, name }: { download: string; name: string }) {
                                     <Button
                                         type="primary"
                                         icon={
-                                            <RiDownloadFill className="icon__button mr-2" />
+                                            <RiDownloadFill className="icon__button mr-2 " />
                                         }
                                     >
                                         ดาวน์โหลด

@@ -169,7 +169,7 @@ const BaseTag: FC<IBaseTag> = ({ items, defaultTag = 'all', onChange }) => {
                         tags.all.key,
                         {
                             name: 'all',
-                            id: '',
+                            id: null,
                             count: total,
                         },
                         tags.all

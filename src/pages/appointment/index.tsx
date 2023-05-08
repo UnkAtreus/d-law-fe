@@ -61,7 +61,7 @@ function Appointment({
         mutate,
         data: appointmentData,
         isLoading,
-    } = useRequest({
+    } = useRequest<ResponseData<TAppointment[]>>({
         url: AppointmentServicePath.GET_MY_APPOINTMENT,
         token,
         initData: prefAppointment,
@@ -234,11 +234,9 @@ function Appointment({
                                             </Dropdown>
                                         </div>
                                         <div className="font-normal">
-                                            {`${dayjs(item.dateTime)
-                                                .utc()
-                                                .format(
-                                                    'วันdddd, D MMMM - HH:mm น.'
-                                                )}`}
+                                            {`${dayjs(item.dateTime).format(
+                                                'วันdddd, D MMMM - HH:mm น.'
+                                            )}`}
                                         </div>
                                     </>
                                 }
@@ -287,13 +285,17 @@ function Appointment({
                             >
                                 <li>
                                     <Badge
-                                        status="default"
+                                        status={
+                                            item.isPublished
+                                                ? 'processing'
+                                                : 'default'
+                                        }
                                         text={
                                             <>
                                                 <span>
-                                                    {dayjs(item.dateTime)
-                                                        .utc()
-                                                        .format('HH:mm น.')}
+                                                    {dayjs(
+                                                        item.dateTime
+                                                    ).format('HH:mm น.')}
                                                 </span>
                                                 <span className="ml-1 font-medium">
                                                     {item.title}
@@ -369,6 +371,14 @@ function Appointment({
                                         );
                                         message.success('สร้างนัดหมายสำเร็จ');
                                         await mutate();
+                                        formRef.current?.resetFields([
+                                            'caseId',
+                                            'dateTime',
+                                            'title',
+                                            'location',
+                                            'detail',
+                                            'emails',
+                                        ]);
 
                                         setOpenModal(false);
 

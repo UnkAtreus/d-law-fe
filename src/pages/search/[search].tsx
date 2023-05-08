@@ -27,6 +27,8 @@ import {
     message,
     Popover,
     InputRef,
+    Typography,
+    Badge,
 } from 'antd';
 
 import dayjs from 'dayjs';
@@ -331,7 +333,23 @@ function Search({
                         cardBordered
                         cardProps={{
                             headStyle: { marginBottom: '16px' },
-                            title: <div className="mb-6 inline"></div>,
+                            title: (
+                                <div className="mb-6 inline">
+                                    <Typography.Title
+                                        level={4}
+                                        className="inline"
+                                        style={{ marginBottom: '24px' }}
+                                    >
+                                        ค้าหาไฟล์เอกสาร{' '}
+                                        <Badge
+                                            count={
+                                                searchData?.pagination?.total
+                                            }
+                                            color={'#8e5531'}
+                                        />
+                                    </Typography.Title>
+                                </div>
+                            ),
                             extra: (
                                 <Space size={'middle'}>
                                     <Input
@@ -345,7 +363,7 @@ function Search({
                                                     const value =
                                                         searchRef.current?.input
                                                             ?.value;
-                                                    logDebug(value);
+
                                                     const urlParam =
                                                         new URLSearchParams(
                                                             folderId

@@ -175,7 +175,7 @@ export interface TRootFolder {
 }
 
 export interface TMenuFolder {
-    id: string;
+    id: string | null;
     name: TFileTypes | string;
     count: number;
 }
@@ -230,4 +230,19 @@ export interface TPagination {
     total: number;
     page: number;
     limit: number;
+}
+
+export interface TCasePublic {
+    id: string;
+    name: string;
+    redCaseNumber: string;
+    blackCaseNumber: string;
+    caseTitle: string;
+    caseDetail: string;
+    files: {
+        id: string;
+        name: string;
+        url: string;
+        previewUrl: string;
+    }[];
 }

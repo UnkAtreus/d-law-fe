@@ -63,7 +63,7 @@ import {
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { memo, useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
     RiFile2Fill,
@@ -102,12 +102,19 @@ function Document({
 }) {
     const { token } = authUser;
     const avatarName = getAvatarName(authUser.firstName, authUser.lastName);
+    const [queryParams, setQueryParams] = useState<string | null>(null);
     const {
         data: folderData,
         mutate,
         isLoading,
     } = useRequest({
-        url: FolderServicePath.GET_BY_ID + path,
+        url: queryParams
+            ? FolderServicePath.GET_BY_ID +
+              path +
+              '/tag/' +
+              queryParams +
+              '/files'
+            : FolderServicePath.GET_BY_ID + path,
         token,
         initData: prefFolder,
     });
@@ -162,6 +169,7 @@ function Document({
         noClick: true,
         noKeyboard: true,
         onDrop: (files: any[]) => {
+            console.log('🚀 ~ files:', files);
             if (files) {
                 if (!hasFiles) {
                     setIsUpload(true);
@@ -180,6 +188,13 @@ function Document({
     const RenderFiles = memo(function RenderFiles() {
         return <Render />;
     });
+
+    useEffect(() => {
+        (async () => {
+            console.log(queryParams);
+            await mutate();
+        })();
+    }, [mutate, queryParams]);
 
     const info_file: MenuProps['items'] = [
         getItem(
@@ -209,7 +224,7 @@ function Document({
                 onFinish={async (values) => {
                     try {
                         logDebug('🚀 ~ onFinish={ ~ payload:', values);
-                        logDebug(selectedRecordRef.current);
+
                         await fetcher(
                             FileServicePath.FILE +
                                 selectedRecordRef.current.id +
@@ -551,6 +566,7 @@ function Document({
                             items={menuFolderData?.data || []}
                             onChange={(key, tag) => {
                                 console.log(key, tag);
+                                setQueryParams(tag.id);
                             }}
                         />
                     </div>
@@ -1054,66 +1070,69 @@ function Document({
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            {casePermissionData?.data.map(
-                                                (item) => {
-                                                    const permission_name: any =
-                                                        {
-                                                            owner: 'เจ้าของ',
-                                                            editor: 'สามารถแก้ไข',
-                                                            viewer: 'สามารถดู',
-                                                        };
-                                                    const avatarName =
-                                                        getAvatarName(
-                                                            item.firstName,
-                                                            item.lastName
-                                                        );
-                                                    const color =
-                                                        getRandomColor(
-                                                            item.firstName
-                                                        );
-                                                    return (
-                                                        <div
-                                                            className="flex items-center justify-between"
-                                                            key={item.email}
-                                                        >
-                                                            <div className="flex items-center space-x-4">
-                                                                <Avatar
-                                                                    size={
-                                                                        'large'
-                                                                    }
-                                                                    // icon={
-                                                                    //     <RiUserLine className="icon" />
-                                                                    // }
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            color,
-                                                                    }}
-                                                                >
-                                                                    {avatarName}
-                                                                </Avatar>
-                                                                <div className="">
-                                                                    <div className="text-base font-medium">
-                                                                        {`${item.firstName} ${item.lastName}`}
-                                                                    </div>
-                                                                    <div className="text-gray-500">
-                                                                        {
-                                                                            item.email
+                                            {casePermissionData?.data &&
+                                                casePermissionData?.data.map(
+                                                    (item) => {
+                                                        const permission_name: any =
+                                                            {
+                                                                owner: 'เจ้าของ',
+                                                                editor: 'สามารถแก้ไข',
+                                                                viewer: 'สามารถดู',
+                                                            };
+                                                        const avatarName =
+                                                            getAvatarName(
+                                                                item.firstName,
+                                                                item.lastName
+                                                            );
+                                                        const color =
+                                                            getRandomColor(
+                                                                item.firstName
+                                                            );
+                                                        return (
+                                                            <div
+                                                                className="flex items-center justify-between"
+                                                                key={item.email}
+                                                            >
+                                                                <div className="flex items-center space-x-4">
+                                                                    <Avatar
+                                                                        size={
+                                                                            'large'
                                                                         }
+                                                                        // icon={
+                                                                        //     <RiUserLine className="icon" />
+                                                                        // }
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                color,
+                                                                        }}
+                                                                    >
+                                                                        {
+                                                                            avatarName
+                                                                        }
+                                                                    </Avatar>
+                                                                    <div className="">
+                                                                        <div className="text-base font-medium">
+                                                                            {`${item.firstName} ${item.lastName}`}
+                                                                        </div>
+                                                                        <div className="text-gray-500">
+                                                                            {
+                                                                                item.email
+                                                                            }
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                                <span>
+                                                                    {
+                                                                        permission_name[
+                                                                            item
+                                                                                .permission
+                                                                        ]
+                                                                    }
+                                                                </span>
                                                             </div>
-                                                            <span>
-                                                                {
-                                                                    permission_name[
-                                                                        item
-                                                                            .permission
-                                                                    ]
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                }
-                                            )}
+                                                        );
+                                                    }
+                                                )}
                                         </div>
                                     </ModalForm>
                                     <Button

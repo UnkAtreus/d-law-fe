@@ -328,7 +328,7 @@ function Preview({
                             <Link href={fileData?.data.url || ''}>
                                 <Button
                                     icon={
-                                        <RiDownloadFill className="icon__button mr-2" />
+                                        <RiDownloadFill className="icon__button mr-2 text-gray-500" />
                                     }
                                 >
                                     ดาวน์โหลด

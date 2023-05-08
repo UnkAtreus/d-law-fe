@@ -69,54 +69,56 @@ function useUpload() {
 
     const Render: any = () => {
         return (
-            <div className="float-right mb-4 w-80 rounded border border-solid border-primary/70 bg-white px-2 py-2">
+            <div className="float-right mb-4  w-80  rounded border border-solid border-primary/70 bg-white px-2 py-2">
                 <div className="mt-2 ml-4">
                     อัพโหลดทั้งหมด {fileLists.length} รายการ
                 </div>
-                <Upload
-                    customRequest={({ onSuccess }) => {
-                        setTimeout(() => {
-                            if (onSuccess) onSuccess('ok');
-                        }, 0);
-                    }}
-                    fileList={fileLists}
-                    itemRender={(_, file, _fileList) => {
-                        const fileType = file.type?.split('/')[0] || '';
-                        const uid = file.name;
+                <div className="max-h-96 overflow-y-auto py-2 scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 scrollbar-thumb-rounded-md">
+                    <Upload
+                        customRequest={({ onSuccess }) => {
+                            setTimeout(() => {
+                                if (onSuccess) onSuccess('ok');
+                            }, 0);
+                        }}
+                        fileList={fileLists}
+                        itemRender={(_, file, _fileList) => {
+                            const fileType = file.type?.split('/')[0] || '';
+                            const uid = file.name;
 
-                        return (
-                            <div className="relative  mt-1 flex items-center rounded px-4 py-2 transition hover:bg-primary/10">
-                                <span role="img" className="mr-2 ">
-                                    {RenderIconUploadType(fileType)}
-                                </span>
-                                <Tooltip title={file.name}>
-                                    <div
-                                        className={`mb-2 flex-1 overflow-hidden text-ellipsis  line-clamp-1`}
-                                    >
-                                        {file.name}
+                            return (
+                                <div className="relative  mt-1 flex items-center rounded px-4 py-2 transition hover:bg-primary/10">
+                                    <span role="img" className="mr-2 ">
+                                        {RenderIconUploadType(fileType)}
+                                    </span>
+                                    <Tooltip title={file.name}>
+                                        <div
+                                            className={`mb-2  flex-1  overflow-hidden text-ellipsis line-clamp-1`}
+                                        >
+                                            {file.name}
+                                        </div>
+                                    </Tooltip>
+
+                                    <div className="absolute -bottom-2 left-10 z-10 w-[calc(100%-64px)]">
+                                        <Progress
+                                            percent={
+                                                progress[uid] &&
+                                                progress[uid].progress
+                                            }
+                                            strokeWidth={2}
+                                            showInfo={false}
+                                        />
                                     </div>
-                                </Tooltip>
-
-                                <div className="absolute -bottom-2 left-10 z-10 w-[calc(100%-48px)]">
-                                    <Progress
-                                        percent={
-                                            progress[uid] &&
-                                            progress[uid].progress
-                                        }
-                                        strokeWidth={2}
-                                        showInfo={false}
-                                    />
-                                </div>
-                                {/* <span className="ml-2">
+                                    {/* <span className="ml-2">
                                     {RenderUploadStatus(
                                         progress[file.uid] &&
                                             progress[file.uid].status
                                     )}
                                 </span> */}
-                            </div>
-                        );
-                    }}
-                ></Upload>
+                                </div>
+                            );
+                        }}
+                    ></Upload>
+                </div>
             </div>
         );
     };
