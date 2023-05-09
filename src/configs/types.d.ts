@@ -6,3 +6,4 @@ declare module '*.xlsx';
 declare module '*.txt';
 
 declare module 'hoist-non-react-statics';
+declare module 'chrome-aws-lambda';
