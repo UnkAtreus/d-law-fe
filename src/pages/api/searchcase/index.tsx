@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { executablePath } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import chromium from 'chrome-aws-lambda';
 
 puppeteer.use(StealthPlugin());
 
@@ -16,18 +16,29 @@ export default async function searchCase(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
+    let browser = null;
     try {
         if (req.method === 'POST') {
             const body = req.body;
 
-            const browser = await puppeteer.launch({
-                headless: true,
-                executablePath: executablePath(),
+            // const browser = await puppeteer.launch({
+            //     headless: true,
+            //     executablePath: executablePath(),
+            // });
+            browser = await chromium.puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath,
+                headless: chromium.headless,
+                ignoreHTTPSErrors: true,
             });
             const page = await browser.newPage();
+            console.log('started');
 
             await page.goto('https://aryasearch.coj.go.th/search200.php');
             await page.setViewport({ width: 1080, height: 1024 });
+
+            console.log('selected search');
 
             if (body.blackTitle)
                 await page.select('#black_title', body.blackTitle);
@@ -42,7 +53,6 @@ export default async function searchCase(
             await page.click(
                 '#resultTable > div > div > div.panel-body.table-responsive > table > tbody > tr:nth-child(1) > td:nth-child(1) > a'
             );
-            await page.screenshot({ path: 'screenshot_aryasearch.png' });
 
             const searchResultSelector =
                 '#page-wrapper > div > div:nth-child(2) > div > div > div.panel-body > table > tbody > tr:nth-child(1)';
@@ -187,5 +197,9 @@ export default async function searchCase(
             status: 'error',
             message: error,
         });
+    } finally {
+        if (browser !== null) {
+            await browser.close();
+        }
     }
 }
