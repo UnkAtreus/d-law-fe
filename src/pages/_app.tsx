@@ -7,12 +7,17 @@ import NextNProgress from 'nextjs-progressbar';
 require('dayjs/locale/th');
 import utc from 'dayjs/plugin/utc';
 import buddhistEra from 'dayjs/plugin/buddhistEra';
+import { hotjar } from 'react-hotjar';
+import { useEffect } from 'react';
 
 dayjs.locale('th');
 dayjs.extend(utc);
 dayjs.extend(buddhistEra);
 
 export default function App({ Component, pageProps, router }: AppProps) {
+    useEffect(() => {
+        hotjar.initialize(3484306, 6);
+    }, []);
     return (
         <ConfigProvider
             locale={thTHIntl}

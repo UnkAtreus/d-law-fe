@@ -43,6 +43,7 @@ specifiers:
   react: 18.2.0
   react-dom: 18.2.0
   react-dropzone: ^14.2.3
+  react-hotjar: ^6.1.0
   react-icons: ^4.7.1
   react-pdf: ^6.2.2
   swr: ^2.0.3
@@ -84,6 +85,7 @@ dependencies:
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-dropzone: 14.2.3_react@18.2.0
+  react-hotjar: 6.1.0
   react-icons: 4.7.1_react@18.2.0
   react-pdf: 6.2.2_wvil6ba7rneto3zqhrwqtrm7lm
   swr: 2.0.3_react@18.2.0
@@ -6897,6 +6899,10 @@ packages:
       file-selector: 0.6.0
       prop-types: 15.8.1
       react: 18.2.0
+    dev: false
+
+  /react-hotjar/6.1.0:
+    resolution: {integrity: sha512-V1UJixDMspAIrbGIFG282U7mH2aK1JBid0YR8F9oscb6lTkjMga+gst2gesxJDsqsax+k+lM1LqRXYzmUu8izA==}
     dev: false
 
   /react-icons/4.7.1_react@18.2.0:
