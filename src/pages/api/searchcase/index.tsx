@@ -65,7 +65,7 @@ export default async function searchCase(
 
             const appointmentLength = await page.$$eval(
                 `${selectAppointment} > tr`,
-                (el) => el.length
+                (el: string | any[]) => el.length
             );
             console.log('🚀 ~ appointmentLength:', appointmentLength);
 
@@ -77,9 +77,11 @@ export default async function searchCase(
                 selectJudgement
             );
 
-            const title = await titleSelector?.evaluate((el) => el.textContent);
+            const title = await titleSelector?.evaluate(
+                (el: { textContent: any }) => el.textContent
+            );
             const judgement = await judgementSelector?.evaluate(
-                (el) => el.textContent
+                (el: { textContent: any }) => el.textContent
             );
 
             const appointments = [];
@@ -87,31 +89,31 @@ export default async function searchCase(
             for (let i = 1; i < appointmentLength + 1; i++) {
                 const id = i;
                 const date = await page.evaluate(
-                    (el) => el?.innerText,
+                    (el: { innerText: any }) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(2)`
                     )
                 );
                 const time = await page.evaluate(
-                    (el) => el?.innerText,
+                    (el: { innerText: any }) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(3)`
                     )
                 );
                 const room = await page.evaluate(
-                    (el) => el?.innerText,
+                    (el: { innerText: any }) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(4)`
                     )
                 );
                 const title = await page.evaluate(
-                    (el) => el?.innerText,
+                    (el: { innerText: any }) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(5)`
                     )
                 );
                 const detail = await page.evaluate(
-                    (el) => el?.innerText,
+                    (el: { innerText: any }) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(6)`
                     )
@@ -147,18 +149,18 @@ export default async function searchCase(
 
             if (textSelector !== null) {
                 const fullTitle = await textSelector.evaluate(
-                    (el) => el.textContent
+                    (el: { textContent: any }) => el.textContent
                 );
                 const fullList = fullTitle
                     ?.replaceAll('\t', '')
                     .replaceAll('\n', ':')
                     .replaceAll(' ', '')
                     .split(':')
-                    .map((item) => item.trim())
-                    .filter((item) => item.trim() !== '');
+                    .map((item: string) => item.trim())
+                    .filter((item: string) => item.trim() !== '');
 
                 if (fullList) {
-                    const caseDateList = fullList?.filter((item) =>
+                    const caseDateList = fullList?.filter((item: string) =>
                         item
                             .trim()
                             .match(
@@ -166,7 +168,7 @@ export default async function searchCase(
                             )
                     );
 
-                    const caseList = fullList?.filter((item) =>
+                    const caseList = fullList?.filter((item: string) =>
                         item.trim().match('^[ก-ฮ]{1,3}.?[0-9]{1,4}/[0-9]{1,4}$')
                     );
                     res.status(200).json({
