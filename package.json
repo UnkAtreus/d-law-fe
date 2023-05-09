@@ -19,6 +19,7 @@
         "@cyntler/react-doc-viewer": "^1.11.0",
         "@next/bundle-analyzer": "^13.4.1",
         "@next/font": "13.1.1",
+        "@sparticuz/chromium-min": "111",
         "@tailwindcss/line-clamp": "^0.4.2",
         "@types/node": "18.11.18",
         "@types/react": "18.0.26",
@@ -50,6 +51,7 @@
     },
     "devDependencies": {
         "@next/eslint-plugin-next": "^13.1.1",
+        "@sparticuz/chromium": "111",
         "@svgr/webpack": "^6.5.1",
         "@types/react-pdf": "^6.2.0",
         "autoprefixer": "^10.4.13",

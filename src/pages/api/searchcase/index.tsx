@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import chromium from 'chrome-aws-lambda';
+import chromium from '@sparticuz/chromium-min';
 
 puppeteer.use(StealthPlugin());
 
@@ -25,20 +25,20 @@ export default async function searchCase(
             //     headless: true,
             //     executablePath: executablePath(),
             // });
-            browser = await chromium.puppeteer.launch({
+            console.log('selected search');
+            browser = await puppeteer.launch({
                 args: chromium.args,
                 defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath,
+                executablePath: await chromium.executablePath(
+                    'https://github.com/Sparticuz/chromium/releases/download/v111.0.0/chromium-v111.0.0-pack.tar'
+                ),
                 headless: chromium.headless,
-                ignoreHTTPSErrors: true,
             });
             const page = await browser.newPage();
             console.log('started');
 
             await page.goto('https://aryasearch.coj.go.th/search200.php');
             await page.setViewport({ width: 1080, height: 1024 });
-
-            console.log('selected search');
 
             if (body.blackTitle)
                 await page.select('#black_title', body.blackTitle);
