@@ -66,11 +66,13 @@ export default async function searchCase(
             if (body.redId) await page.type('#red_id', body.redId);
             if (body.redYear) await page.type('#red_yy', body.redYear);
 
+            console.log('started search');
             await page.click('.btn.btn-primary');
+            await page.waitForNavigation();
+            console.log('open case');
             await page.click(
                 '#resultTable > div > div > div.panel-body.table-responsive > table > tbody > tr:nth-child(1) > td:nth-child(1) > a'
             );
-
             const searchResultSelector =
                 '#page-wrapper > div > div:nth-child(2) > div > div > div.panel-body > table > tbody > tr:nth-child(1)';
             const selectTitle =
