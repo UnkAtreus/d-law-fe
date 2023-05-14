@@ -38,6 +38,7 @@ specifiers:
   puppeteer: ^19.7.2
   puppeteer-extra: ^3.3.4
   puppeteer-extra-plugin-stealth: ^2.11.1
+  puppeteer-extra-plugin-user-data-dir: ^2.4.1
   puppeteer-extra-plugin-user-preferences: ^2.4.1
   raw-loader: ^4.0.2
   react: 18.2.0
@@ -81,6 +82,7 @@ dependencies:
   puppeteer: 19.7.2_typescript@4.9.4
   puppeteer-extra: 3.3.4_puppeteer@19.7.2
   puppeteer-extra-plugin-stealth: 2.11.1_puppeteer-extra@3.3.4
+  puppeteer-extra-plugin-user-data-dir: 2.4.1_puppeteer-extra@3.3.4
   puppeteer-extra-plugin-user-preferences: 2.4.1_puppeteer-extra@3.3.4
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
