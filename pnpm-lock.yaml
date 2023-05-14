@@ -38,6 +38,7 @@ specifiers:
   puppeteer: ^19.7.2
   puppeteer-extra: ^3.3.4
   puppeteer-extra-plugin-stealth: ^2.11.1
+  puppeteer-extra-plugin-user-preferences: ^2.4.1
   raw-loader: ^4.0.2
   react: 18.2.0
   react-dom: 18.2.0
@@ -80,6 +81,7 @@ dependencies:
   puppeteer: 19.7.2_typescript@4.9.4
   puppeteer-extra: 3.3.4_puppeteer@19.7.2
   puppeteer-extra-plugin-stealth: 2.11.1_puppeteer-extra@3.3.4
+  puppeteer-extra-plugin-user-preferences: 2.4.1_puppeteer-extra@3.3.4
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-dropzone: 14.2.3_react@18.2.0
@@ -5941,13 +5943,13 @@ packages:
       debug: 4.3.4
       puppeteer-extra: 3.3.4_puppeteer@19.7.2
       puppeteer-extra-plugin: 3.2.2_puppeteer-extra@3.3.4
-      puppeteer-extra-plugin-user-preferences: 2.4.0_puppeteer-extra@3.3.4
+      puppeteer-extra-plugin-user-preferences: 2.4.1_puppeteer-extra@3.3.4
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /puppeteer-extra-plugin-user-data-dir/2.4.0_puppeteer-extra@3.3.4:
-    resolution: {integrity: sha512-qrhYPTGIqzL2hpeJ5DXjf8xMy5rt1UvcqSgpGTTOUOjIMz1ROWnKHjBoE9fNBJ4+ToRZbP8MzIDXWlEk/e1zJA==}
+  /puppeteer-extra-plugin-user-data-dir/2.4.1_puppeteer-extra@3.3.4:
+    resolution: {integrity: sha512-kH1GnCcqEDoBXO7epAse4TBPJh9tEpVEK/vkedKfjOVOhZAvLkHGc9swMs5ChrJbRnf8Hdpug6TJlEuimXNQ+g==}
     engines: {node: '>=8'}
     peerDependencies:
       playwright-extra: '*'
@@ -5961,14 +5963,14 @@ packages:
       debug: 4.3.4
       fs-extra: 10.1.0
       puppeteer-extra: 3.3.4_puppeteer@19.7.2
-      puppeteer-extra-plugin: 3.2.2_puppeteer-extra@3.3.4
+      puppeteer-extra-plugin: 3.2.3_puppeteer-extra@3.3.4
       rimraf: 3.0.2
     transitivePeerDependencies:
       - supports-color
     dev: false
 
-  /puppeteer-extra-plugin-user-preferences/2.4.0_puppeteer-extra@3.3.4:
-    resolution: {integrity: sha512-4XxMhMkJ+qqLsPY9ULF90qS9Bj1Qrwwgp1TY9zTdp1dJuy7QSgYE7xlyamq3cKrRuzg3QUOqygJo52sVeXSg5A==}
+  /puppeteer-extra-plugin-user-preferences/2.4.1_puppeteer-extra@3.3.4:
+    resolution: {integrity: sha512-i1oAZxRbc1bk8MZufKCruCEC3CCafO9RKMkkodZltI4OqibLFXF3tj6HZ4LZ9C5vCXZjYcDWazgtY69mnmrQ9A==}
     engines: {node: '>=8'}
     peerDependencies:
       playwright-extra: '*'
@@ -5982,14 +5984,34 @@ packages:
       debug: 4.3.4
       deepmerge: 4.2.2
       puppeteer-extra: 3.3.4_puppeteer@19.7.2
-      puppeteer-extra-plugin: 3.2.2_puppeteer-extra@3.3.4
-      puppeteer-extra-plugin-user-data-dir: 2.4.0_puppeteer-extra@3.3.4
+      puppeteer-extra-plugin: 3.2.3_puppeteer-extra@3.3.4
+      puppeteer-extra-plugin-user-data-dir: 2.4.1_puppeteer-extra@3.3.4
     transitivePeerDependencies:
       - supports-color
     dev: false
 
   /puppeteer-extra-plugin/3.2.2_puppeteer-extra@3.3.4:
     resolution: {integrity: sha512-0uatQxzuVn8yegbrEwSk03wvwpMB5jNs7uTTnermylLZzoT+1rmAQaJXwlS3+vADUbw6ELNgNEHC7Skm0RqHbQ==}
+    engines: {node: '>=9.11.2'}
+    peerDependencies:
+      playwright-extra: '*'
+      puppeteer-extra: '*'
+    peerDependenciesMeta:
+      playwright-extra:
+        optional: true
+      puppeteer-extra:
+        optional: true
+    dependencies:
+      '@types/debug': 4.1.7
+      debug: 4.3.4
+      merge-deep: 3.0.3
+      puppeteer-extra: 3.3.4_puppeteer@19.7.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /puppeteer-extra-plugin/3.2.3_puppeteer-extra@3.3.4:
+    resolution: {integrity: sha512-6RNy0e6pH8vaS3akPIKGg28xcryKscczt4wIl0ePciZENGE2yoaQJNd17UiEbdmh5/6WW6dPcfRWT9lxBwCi2Q==}
     engines: {node: '>=9.11.2'}
     peerDependencies:
       playwright-extra: '*'
