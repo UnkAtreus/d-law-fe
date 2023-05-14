@@ -61,6 +61,7 @@ import logDebug from '@utilities/logDebug';
 import caseFolderService from '@services/caseFolderService';
 import CaseFolderServicePath from '@services/caseFolderService';
 import { getAvatarName, getRandomColor } from '@utilities/index';
+import request from 'umi-request';
 
 function CaseFolder({
     data,
@@ -414,29 +415,34 @@ function CaseFolder({
                                                             '^([ก-ฮ]{1,3})\\.?([0-9]{1,4})/([0-9]{1,4})$'
                                                         );
                                                 if (caseNumberSplit) {
-                                                    // const { data } =
-                                                    //     await request.post(
-                                                    //         '/api/searchcase',
-                                                    //         {
-                                                    //             data: {
-                                                    //                 blackTitle:
-                                                    //                     caseNumberSplit[1],
-                                                    //                 blackId:
-                                                    //                     caseNumberSplit[2],
-                                                    //                 blackYear:
-                                                    //                     caseNumberSplit[3],
-                                                    //             },
-                                                    //         }
-                                                    //     );
+                                                    const { data } =
+                                                        await request.post(
+                                                            'https://dlaw-search-ymg4vhbqaa-as.a.run.app/searchcase',
+                                                            {
+                                                                data: {
+                                                                    blackTitle:
+                                                                        caseNumberSplit[1],
+                                                                    blackId:
+                                                                        caseNumberSplit[2],
+                                                                    blackYear:
+                                                                        caseNumberSplit[3],
+                                                                },
+                                                            }
+                                                        );
                                                     const caseTitle =
-                                                        values.caseTitle;
+                                                        values.caseTitle ||
+                                                        data.caseTitle;
+
                                                     const caseContent =
-                                                        values.caseContent;
+                                                        values.caseContent ||
+                                                        data.caseContent;
 
                                                     const payload = {
                                                         blackCaseNumber:
                                                             values.caseNumber,
-                                                        RedCaseNumber: '',
+                                                        RedCaseNumber:
+                                                            data.RedCaseNumber ||
+                                                            '',
                                                         name: values.name,
                                                         email:
                                                             values.email || '',
