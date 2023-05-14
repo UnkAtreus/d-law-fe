@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import chromium from 'chrome-aws-lambda';
 
 puppeteer.use(StealthPlugin());
 
@@ -25,18 +24,15 @@ export default async function searchCase(
             //     headless: true,
             //     executablePath: executablePath(),
             // });
-            browser = await chromium.puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath,
-                headless: chromium.headless,
-                ignoreHTTPSErrors: true,
+            browser = await puppeteer.connect({
+                browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BLESS_TOKEN}`,
             });
+
             const page = await browser.newPage();
             console.log('started');
 
-            await page.goto('https://aryasearch.coj.go.th/search200.php');
             await page.setViewport({ width: 1080, height: 1024 });
+            await page.goto('https://aryasearch.coj.go.th/search200.php');
 
             console.log('selected search');
 
@@ -89,31 +85,31 @@ export default async function searchCase(
             for (let i = 1; i < appointmentLength + 1; i++) {
                 const id = i;
                 const date = await page.evaluate(
-                    (el: { innerText: any }) => el?.innerText,
+                    (el) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(2)`
                     )
                 );
                 const time = await page.evaluate(
-                    (el: { innerText: any }) => el?.innerText,
+                    (el) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(3)`
                     )
                 );
                 const room = await page.evaluate(
-                    (el: { innerText: any }) => el?.innerText,
+                    (el) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(4)`
                     )
                 );
                 const title = await page.evaluate(
-                    (el: { innerText: any }) => el?.innerText,
+                    (el) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(5)`
                     )
                 );
                 const detail = await page.evaluate(
-                    (el: { innerText: any }) => el?.innerText,
+                    (el) => el?.innerText,
                     await page.$(
                         `${selectAppointment} > tr:nth-child(${i}) > td:nth-child(6)`
                     )

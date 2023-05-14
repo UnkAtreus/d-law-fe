@@ -26,7 +26,6 @@
         "@types/react-dom": "18.0.10",
         "@vidstack/react": "^0.2.3",
         "antd": "^5.2.0",
-        "chrome-aws-lambda": "^1.6.3",
         "cookies": "^0.8.0",
         "dayjs": "^1.11.7",
         "eslint": "8.31.0",
