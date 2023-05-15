@@ -267,3 +267,19 @@ export interface TSearchAppointment {
     date: string;
     time: string;
 }
+
+export interface TFolderLog {
+    id: string;
+    folderId: string;
+    folderName: string;
+    action: string;
+    user: TUser;
+    createdAt: Date | string;
+    file: {
+        id: string;
+        filename: string;
+        fileUrl: string;
+    };
+    from: string | null;
+    to: string | null;
+}

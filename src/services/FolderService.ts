@@ -7,6 +7,7 @@ const FolderServicePath = {
     FOLDER: 'folders/',
     MENU_FOLDER_S: '/menu',
     GET_ROOT_FOLDER_S: '/root',
+    GET_LOG_FOLDER_S: '/log',
 };
 
 export default FolderServicePath;

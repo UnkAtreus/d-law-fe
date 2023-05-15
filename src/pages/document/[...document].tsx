@@ -21,8 +21,8 @@ import {
     TMenuFolder,
     TMoveFile,
     TCreatePermission,
-    TPermission,
     TUserPermissions,
+    TFolderLog,
 } from '@interfaces/index';
 import { getItem } from '@pages/preview/[preview]';
 import FileServicePath from '@services/FileService';
@@ -56,6 +56,7 @@ import {
     FloatButton,
     Popover,
     InputRef,
+    Tooltip,
 } from 'antd';
 
 import dayjs from 'dayjs';
@@ -72,7 +73,6 @@ import {
     RiTeamFill,
     RiHistoryFill,
     RiUserAddFill,
-    RiUserLine,
     RiDeleteBinLine,
     RiDownloadLine,
     RiFileCopyLine,
@@ -82,7 +82,6 @@ import {
     RiFilter2Fill,
 } from 'react-icons/ri';
 import UserServicePath from '@services/useAuth';
-import PermissionServicePath from '@services/PermissionService';
 import CaseFolderServicePath from '@services/caseFolderService';
 
 function Document({
@@ -134,6 +133,16 @@ function Document({
             CaseFolderServicePath.CASE +
             folderData?.data.caseId +
             CaseFolderServicePath.ADD_MEMBER_PERMISSION_S,
+        token,
+    });
+
+    const { data: folderLogsData, mutate: mutateLog } = useRequest<
+        ResponseData<TFolderLog[]>
+    >({
+        url:
+            FolderServicePath.FOLDER +
+            path +
+            FolderServicePath.GET_LOG_FOLDER_S,
         token,
     });
 
@@ -1015,55 +1024,12 @@ function Document({
                                                 name="permission"
                                                 allowClear={false}
                                                 rules={[{ required: true }]}
+                                                valueEnum={{
+                                                    editor: 'สามารถแก้ไข',
+                                                    viewer: 'สามารถดู',
+                                                }}
                                                 style={{
                                                     minWidth: '120px',
-                                                }}
-                                                request={async () => {
-                                                    const { data } =
-                                                        await fetcher(
-                                                            PermissionServicePath.GET_ALL_PERMISSSION,
-                                                            'GET',
-                                                            {
-                                                                headers: {
-                                                                    Authorization:
-                                                                        'Bearer ' +
-                                                                        token,
-                                                                },
-                                                            }
-                                                        );
-
-                                                    return data
-                                                        .map(
-                                                            (
-                                                                item: TPermission
-                                                            ) => {
-                                                                const name =
-                                                                    item.Name;
-                                                                const permission_name: any =
-                                                                    {
-                                                                        editor: 'สามารถแก้ไข',
-                                                                        viewer: 'สามารถดู',
-                                                                    };
-
-                                                                if (
-                                                                    permission_name[
-                                                                        name
-                                                                    ]
-                                                                ) {
-                                                                    return {
-                                                                        label: permission_name[
-                                                                            name
-                                                                        ],
-                                                                        value: item.Name,
-                                                                    };
-                                                                }
-                                                            }
-                                                        )
-                                                        .filter(
-                                                            (item: any) =>
-                                                                item !==
-                                                                undefined
-                                                        );
                                                 }}
                                             />
                                         </div>
@@ -1345,50 +1311,84 @@ function Document({
                 onClose={() => setOpenMoreInfo(false)}
                 open={openMoreInfo}
             >
-                <div className="space-y-4">
-                    <div className="text-gray-500">
-                        {dayjs().format('DD MMM YYYY')}
-                    </div>
-                    <div className="flex space-x-4">
-                        <Avatar
-                            size={'large'}
-                            icon={<RiUserLine className="icon" />}
-                        />
-                        <div className="flex-1">
-                            <div className="h-10 space-x-2 line-clamp-2">
-                                <span className="font-medium text-gray-600">
-                                    Kittipat Dechkul
-                                </span>
-                                <span className="text-gray-400">
-                                    สร้าง 1 รายการ
-                                </span>
+                {folderLogsData?.data.map((item) => {
+                    const avatarName = getAvatarName(
+                        item.user.firstName,
+                        item.user.lastName
+                    );
+                    if (item.action === 'upload') {
+                        return (
+                            <div key={item.id}>
+                                <div className="space-y-4">
+                                    <div className="text-gray-500">
+                                        {dayjs(item.createdAt).format(
+                                            'DD MMM YYYY'
+                                        )}
+                                    </div>
+                                    <div className="flex space-x-4">
+                                        <Avatar size={'large'} className="w-10">
+                                            {avatarName}
+                                        </Avatar>
+                                        <div className="w-64">
+                                            <div className=" space-x-2 line-clamp-2">
+                                                <span className="font-medium text-gray-600">
+                                                    {`${item.user.firstName} ${item.user.lastName}`}
+                                                </span>
+                                                <span className="text-gray-400">
+                                                    สร้าง 1 รายการ
+                                                </span>
+                                            </div>
+                                            <div className="flex space-x-2 ">
+                                                <FileTypeIcons.TextIcon className="icon text-gray-500" />
+                                                <Tooltip
+                                                    title={
+                                                        item.file?.filename ||
+                                                        ''
+                                                    }
+                                                >
+                                                    <div className="overflow-hidden text-ellipsis text-gray-500 line-clamp-1">
+                                                        {item.file?.filename ||
+                                                            ''}
+                                                    </div>
+                                                </Tooltip>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Divider />
                             </div>
-                            <div className="space-x-2">
-                                <FileTypeIcons.IdCardIcon className="icon text-gray-500" />
-                                <span className="text-gray-500">
-                                    บัตรประชาชน_171121.pdf
-                                </span>
+                        );
+                    }
+                    if (item.action === 'delete') {
+                        return (
+                            <div key={item.id}>
+                                <div className="space-y-4">
+                                    <div className="text-gray-500">
+                                        {dayjs(item.createdAt).format(
+                                            'DD MMM YYYY'
+                                        )}
+                                    </div>
+                                    <div className="flex items-center space-x-4">
+                                        <Avatar size={'large'}>
+                                            {avatarName}
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <div className=" space-x-2 line-clamp-2">
+                                                <span className="font-medium text-gray-600">
+                                                    {`${item.user.firstName} ${item.user.lastName}`}
+                                                </span>
+                                                <span className="text-gray-400">
+                                                    ลบ 1 รายการ
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Divider />
                             </div>
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <Avatar
-                                size={'small'}
-                                icon={
-                                    <RiUserLine className="inline-flex h-4 w-4 items-center justify-center" />
-                                }
-                            />
-                            <span className="text-xs text-gray-500">
-                                Chooleark T
-                            </span>
-                        </div>
-                        <span className="text-xs text-gray-500">
-                            สามารถดู , แก้ไข
-                        </span>
-                    </div>
-                </div>
-                <Divider />
+                        );
+                    }
+                })}
             </Drawer>
             <FloatButton.Group
                 trigger="click"
