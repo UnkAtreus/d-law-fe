@@ -1,7 +1,7 @@
 import { ProColumns, ProTable, ProCard } from '@ant-design/pro-components';
 import BaseLayout from '@baseComponents/BaseLayout';
 
-import { Col, Empty, Row, Tag, Typography } from 'antd';
+import { Button, Col, Empty, Row, Space, Tag, Typography } from 'antd';
 
 import { FileTypeIcons, getAvatarName, showFileIcon } from '@utilities/index';
 import {
@@ -19,6 +19,7 @@ import useRequest, { fetcher } from '@services/useRequest';
 import FolderServicePath from '@services/FolderService';
 import CaseFolderServicePath from '@services/caseFolderService';
 import FileServicePath from '@services/FileService';
+import Link from 'next/link';
 
 const Workspace = ({
     freqData,
@@ -107,7 +108,10 @@ const Workspace = ({
 
     return (
         <>
-            <BaseLayout.Main avatarName={avatarName}>
+            <BaseLayout.Main
+                avatarName={avatarName}
+                hasTour={feqFolderData?.data.length === 0}
+            >
                 <Row gutter={24}>
                     <Col span={24} className="space-y-6">
                         <ProCard
@@ -149,7 +153,20 @@ const Workspace = ({
                                                         <div className="text-base text-gray-600">
                                                             ยังไม่มีโฟลเดอร์ที่เปิดล่าสุด
                                                         </div>
+                                                        <div className="text-gray-500">
+                                                            ไปที่หน้า doucument
+                                                            เพือทำการสร้างเคสโฟลเดอร์
+                                                        </div>
                                                     </div>
+                                                    <Space>
+                                                        <Link
+                                                            href={'/document'}
+                                                        >
+                                                            <Button type="primary">
+                                                                เริ่มต้น
+                                                            </Button>
+                                                        </Link>
+                                                    </Space>
                                                 </div>
                                             }
                                         />

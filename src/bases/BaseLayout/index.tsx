@@ -8,9 +8,11 @@ import {
     MenuProps,
     Space,
     theme,
+    Tour,
+    TourProps,
     Typography,
 } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Logo from '@assets/dlaw_logo.svg';
 import {
     RiComputerLine,
@@ -49,11 +51,14 @@ const BaseLayout = {
         children,
         path = 'workspace',
         avatarName = '',
+        hasTour = false,
     }: {
         children: React.ReactNode;
         path?: string;
         avatarName: string;
+        hasTour?: boolean;
     }) {
+        const [tour, setTour] = useState<boolean>(hasTour);
         const {
             token: { colorBgContainer },
         } = theme.useToken();
@@ -72,6 +77,7 @@ const BaseLayout = {
                 <div
                     onClick={() => router.push('/workspace')}
                     className="flex flex-col items-center justify-center py-5"
+                    ref={workspace}
                 >
                     <RiComputerLine className="menu-icon" />
                     <div className="menu-text">WORKSPACE</div>
@@ -82,6 +88,7 @@ const BaseLayout = {
                 <div
                     onClick={() => router.push('/document')}
                     className="flex flex-col items-center justify-center py-5"
+                    ref={document}
                 >
                     <RiFileCopy2Line className="menu-icon" />
                     <div className="menu-text">DOCUMENT</div>
@@ -92,6 +99,7 @@ const BaseLayout = {
                 <div
                     onClick={() => router.push('/appointment')}
                     className="flex flex-col items-center justify-center py-5"
+                    ref={appointment}
                 >
                     <RiCalendarTodoLine className="menu-icon" />
                     <div className="menu-text">APPOINTMENT</div>
@@ -102,6 +110,7 @@ const BaseLayout = {
                 <div
                     onClick={() => router.push('/setting')}
                     className="flex flex-col items-center justify-center py-5"
+                    ref={setting}
                 >
                     <RiSettings5Line className="menu-icon" />
                     <div className="menu-text">SETTING</div>
@@ -116,6 +125,92 @@ const BaseLayout = {
                 'logout',
                 <RiLogoutBoxLine className="icon__button m-auto" />
             ),
+        ];
+
+        const steps: TourProps['steps'] = [
+            {
+                title: 'ยินดีต้อนรับเข้าสู่เว็บไซต์ D-Law',
+                description:
+                    'เว็บไซต์จัดเก็บและจัดการเอกสารสำหรับทนายให้มีความสดวกสะบายและรวดเร็ว',
+                target: null,
+                nextButtonProps: {
+                    children: 'ถัดไป',
+                },
+                prevButtonProps: {
+                    children: 'ย้อนกลับ',
+                },
+            },
+            {
+                title: 'หน้า workspace',
+                description:
+                    'จะเป็นหน้าที่จะรวมทางลัดเอาไว้ใช้เข้าถึงไฟล์และโฟลเดอร์ได้อย่างรวดเร็ว',
+                target: () => {
+                    return workspace.current;
+                },
+                placement: 'right',
+                nextButtonProps: {
+                    children: 'ถัดไป',
+                },
+                prevButtonProps: {
+                    children: 'ย้อนกลับ',
+                },
+            },
+            {
+                title: 'หน้า document',
+                description:
+                    'โดยหน้า document หรือ เรียกอีกอย่างนึงว่า folder case จะเป็นหน้าหลักโดยทำหน้าที่เก็บโฟลเดอร์จำนวนเคสที่ถูกสร้างมาโดยจะให้สัมพันธ์กับชื่อ อีกทั้งยังสามารถเก็บไฟล์เอกสารต่างๆ และยังสามารถค้าเอกสารได้จากหน้านี้อีกด้วย',
+                target: () => document.current,
+                placement: 'right',
+                nextButtonProps: {
+                    children: 'ถัดไป',
+                },
+                prevButtonProps: {
+                    children: 'ย้อนกลับ',
+                },
+            },
+            {
+                title: 'หน้า appointment',
+                description:
+                    'โดยหน้า appointment document จะเป็นหน้าที่แสดงนัดหมายต่างๆ โดยจะ สามารถ สร้างและเผยแพร่นัดหมายได้',
+                target: () => appointment.current,
+                placement: 'right',
+                nextButtonProps: {
+                    children: 'ถัดไป',
+                },
+                prevButtonProps: {
+                    children: 'ย้อนกลับ',
+                },
+            },
+            {
+                title: 'หน้า setting',
+                description:
+                    'โดยหน้า setting จะเป็นหน้าที่จัดการข้อมูลโปรไฟล์ และผู้ใช้งานต่างๆ',
+                target: () => setting.current,
+                placement: 'right',
+                nextButtonProps: {
+                    children: 'ถัดไป',
+                },
+                prevButtonProps: {
+                    children: 'ย้อนกลับ',
+                },
+            },
+            {
+                title: 'เริ่มต้นกันเลย',
+                description: (
+                    <div>
+                        สามารถคลิกไปที่หน้า{' '}
+                        <Link href={'/document'}>document</Link>{' '}
+                        เพื่อเริ่มสร้างเคสโฟลเดอร์ใหม่
+                    </div>
+                ),
+                target: null,
+                nextButtonProps: {
+                    children: 'เข้าใจแล้ว',
+                },
+                prevButtonProps: {
+                    children: 'ย้อนกลับ',
+                },
+            },
         ];
 
         return (
@@ -207,6 +302,13 @@ const BaseLayout = {
                     <Layout.Content className="mx-6 my-12">
                         {children}
                     </Layout.Content>
+                    <Tour
+                        open={tour}
+                        steps={steps}
+                        onClose={() => {
+                            setTour(false);
+                        }}
+                    />
                 </Layout>
             </Layout>
         );
