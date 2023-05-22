@@ -424,6 +424,7 @@ function Document({
                 if (record?.tags?.length === 0) return showFileIcon('folder');
                 if (record?.tags?.length > 0)
                     return showFileIcon(record.tags[0].name);
+                return showFileIcon('text');
             },
             align: 'center',
             width: 48,
