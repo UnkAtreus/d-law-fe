@@ -110,7 +110,7 @@ function CaseFolder({
         {
             title: 'สร้างเคสใหม่',
             description:
-                'คุณสามารถสร้างเคสโฟลเดอร์ใหม่ โดยการกรอกชื่อและหมายเลขคดี',
+                'คุณสามารถสร้างเคสโฟลเดอร์ใหม่ โดยการกรอกชื่อและคดีหมายเลขดำ/แดง',
             target: () => createCaseTour.current,
             nextButtonProps: {
                 children: 'ถัดไป',
@@ -486,7 +486,7 @@ function CaseFolder({
 
                                         <ProFormText
                                             name="caseNumber"
-                                            label="หมายเลขคดี"
+                                            label="คดีหมายเลขดำ/แดง"
                                             rules={[
                                                 {
                                                     required: true,
@@ -495,10 +495,10 @@ function CaseFolder({
                                                     pattern:
                                                         /^[ก-ฮ]{1,3}.?[0-9]{1,4}\/[0-9]{1,4}$/,
                                                     message:
-                                                        'กรุณากรอกหมายเลขคดีให้ถูกต้อง',
+                                                        'กรุณากรอกคดีหมายเลขดำ/แดงให้ถูกต้อง',
                                                 },
                                             ]}
-                                            placeholder={'หมายเลขคดีดำ/แดง'}
+                                            placeholder={'คดีหมายเลขดำ/แดง'}
                                         />
 
                                         <Collapse

@@ -13,12 +13,12 @@ function PublicDocument({ data }: { data: ResponseData<TCasePublic[]> }) {
     const [form] = Form.useForm();
     const columns: ProColumns<TCasePublic>[] = [
         {
-            title: 'หมายเลขคดีดำ',
+            title: 'คดีหมายเลขดำ',
             dataIndex: 'blackCaseNumber',
             width: 120,
         },
         {
-            title: 'หมายเลขคดีแดง',
+            title: 'คดีหมายเลขแดง',
             dataIndex: 'redCaseNumber',
             width: 120,
         },

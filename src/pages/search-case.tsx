@@ -158,26 +158,26 @@ function SearchCase() {
                     >
                         <Space className="items-end">
                             <ProFormText
-                                label="หมายเลขคดีดำ"
+                                label="คดีหมายเลขดำ"
                                 name="blackCaseNumber"
                                 rules={[
                                     {
                                         pattern:
                                             /^[ก-ฮ]{1,3}.?[0-9]{1,4}\/[0-9]{1,4}$/,
                                         message:
-                                            'กรุณากรอกหมายเลขคดีให้ถูกต้อง',
+                                            'กรุณากรอกคดีหมายเลขให้ถูกต้อง',
                                     },
                                 ]}
                             />
                             <ProFormText
-                                label="หมายเลขคดีแดง"
+                                label="คดีหมายเลขแดง"
                                 name="redCaseNumber"
                                 rules={[
                                     {
                                         pattern:
                                             /^[ก-ฮ]{1,3}.?[0-9]{1,4}\/[0-9]{1,4}$/,
                                         message:
-                                            'กรุณากรอกหมายเลขคดีให้ถูกต้อง',
+                                            'กรุณากรอกคดีหมายเลขให้ถูกต้อง',
                                     },
                                 ]}
                             />

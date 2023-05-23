@@ -190,7 +190,7 @@ function Preview({
                             <Button
                                 shape="circle"
                                 type="text"
-                                onClick={() => router.push('/')}
+                                onClick={() => router.back()}
                                 icon={
                                     <RiArrowLeftSLine className="icon__button " />
                                 }
