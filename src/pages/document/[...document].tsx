@@ -391,15 +391,28 @@ function Document({
                     content: `คุณต้องการที่จะลบ${fileType} ${record.name} ใช่หรือไม่`,
                     onFinish: async () => {
                         try {
-                            await fetcher(
-                                FileServicePath.DELETE_FILE + record.id,
-                                'DELETE',
-                                {
-                                    headers: {
-                                        Authorization: 'Bearer ' + token,
-                                    },
-                                }
-                            );
+                            if (type === 'File') {
+                                await fetcher(
+                                    FileServicePath.DELETE_FILE + record.id,
+                                    'DELETE',
+                                    {
+                                        headers: {
+                                            Authorization: 'Bearer ' + token,
+                                        },
+                                    }
+                                );
+                            } else {
+                                await fetcher(
+                                    FolderServicePath.DELETE_FOLDER + record.id,
+                                    'DELETE',
+                                    {
+                                        headers: {
+                                            Authorization: 'Bearer ' + token,
+                                        },
+                                    }
+                                );
+                            }
+
                             message.success(`ลบ${fileType}สำเร็จ`);
                             await mutate();
                             await mutateMenu();
