@@ -914,7 +914,7 @@ function Document({
                                     >
                                         <div className="flex w-full items-end space-x-2">
                                             <ProFormSelect
-                                                name="userId"
+                                                name="userIds"
                                                 label="เพิ่มอีเมล"
                                                 placeholder="อีเมล"
                                                 mode="multiple"

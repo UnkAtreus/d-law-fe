@@ -120,7 +120,7 @@ function SearchCase() {
 
                                     try {
                                         const { data } = await request.post(
-                                            'https://dlaw-search-ymg4vhbqaa-as.a.run.app/searchcase',
+                                            'https://dlaw-search-dpbyacckuq-as.a.run.app/searchcase',
                                             {
                                                 data: {
                                                     ...blackCase,
