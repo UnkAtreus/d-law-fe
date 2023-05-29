@@ -62,10 +62,15 @@ const Workspace = ({
         },
         {
             title: 'ชนิดไฟล์',
-            dataIndex: 'type',
-            render: (text, record) => (
+            dataIndex: 'tags',
+            render: (_, record) => (
                 <div className="flex flex-wrap">
-                    <Tag>{text}</Tag>
+                    {record?.tags?.map((item) => {
+                        if (item.name === 'folder') {
+                            return null;
+                        }
+                        return <Tag key={item.id}>{item.displayName}</Tag>;
+                    })}
                 </div>
             ),
         },

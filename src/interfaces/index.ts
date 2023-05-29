@@ -143,6 +143,7 @@ export interface TMyCaseFolder {
 interface TTags {
     id: string;
     name: TFileTypes;
+    displayName: string;
 }
 
 export interface TDocument {

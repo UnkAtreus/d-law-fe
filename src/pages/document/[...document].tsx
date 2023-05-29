@@ -457,7 +457,7 @@ function Document({
                         if (item.name === 'folder') {
                             return null;
                         }
-                        return <Tag key={item.id}>{item.name}</Tag>;
+                        return <Tag key={item.id}>{item.displayName}</Tag>;
                     })}
                 </div>
             ),
