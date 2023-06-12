@@ -1,6 +1,6 @@
 import { setCookie } from '@hoc/cookies';
 import { TAuthUser } from '@interfaces/index';
-import { request as rawRequest, request } from '@services/useRequest';
+import { request } from '@services/useRequest';
 import { config } from 'configs/config';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -17,7 +17,7 @@ export default async function handler(
     if (req.method === 'POST') {
         try {
             const { email, password } = req.body;
-            const { data: token } = await rawRequest.post('login', {
+            const { data: token } = await request.post('login', {
                 data: { email, password },
             });
 

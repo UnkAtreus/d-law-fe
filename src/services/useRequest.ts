@@ -28,6 +28,9 @@ type Method =
 
 export const request = extend({
     prefix: BASE_URL,
+    headers: {
+        'x-organization': 'iLaw',
+    },
 });
 
 request.use(progressMiddleware, { core: true });

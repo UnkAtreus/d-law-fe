@@ -1120,7 +1120,10 @@ function Document({
                                         icon={
                                             <RiHistoryFill className="icon text-gray-500" />
                                         }
-                                        onClick={() => setOpenMoreInfo(true)}
+                                        onClick={async () => {
+                                            await mutateLog();
+                                            setOpenMoreInfo(true);
+                                        }}
                                     ></Button>
                                     <Input
                                         size="large"
